@@ -1,10 +1,11 @@
 <?php
 
 return array(
-	'name'				=> 'Большой Магазин',
-	'defaultController'	=> 'site',
-	'sourceLanguage'    => 'ru',
-	'language'          => 'ru',
+	'name'				=>  'Большой Магазин',
+	'defaultController'	=>  'site',
+	'sourceLanguage'    =>  'ru',
+	'language'          =>  'ru',
+	'theme'             =>  'classic',
 
 	'params'=>array(
 		'keywords'		=>	array('компания, товары, услуги, бизнес, продажа, сделки, покупка, тендеры, заявки, каталог, справочник, информация о компаниях, прайс-листы, цены, материалы, технологии, b2b, Россия',),
@@ -29,6 +30,7 @@ return array(
 	'import'=>array(
 		'application.models.*',
 		'application.components.*',
+		'application.widgets.*',
 
         'ext.eoauth.*',
         'ext.eoauth.lib.*',
@@ -151,9 +153,12 @@ return array(
 
 
 		         /* АДМИНИСТРАТИРОВАНИЕ */
-		         // пользователи
-		         '/admin/user/<action:(edit|view|delete|passwordedit)>/<id>'     =>  'admin/users/<action>',
+		         // категории
+		        '/admin/category/<action:(add|edit|view|delete)>/<id>'     =>  'admin/categories/<action>',
+				// пользователи
+		        '/admin/user/<action:(edit|view|delete|passwordedit)>/<id>'     =>  'admin/users/<action>',
 
+		        '/category/<Alias>' => '/categories/view/'
 	        ),
 
 			'urlSuffix' => '.html',
