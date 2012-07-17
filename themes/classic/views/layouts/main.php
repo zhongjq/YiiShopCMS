@@ -4,13 +4,13 @@
     <meta charset="utf-8">
 
 	<!-- icons -->
-	<link rel="shortcut icon" href="<?php echo Yii::app()->request->baseUrl; ?>/img/favicon.ico" type="image/x-icon">
+	<link rel="shortcut icon" href="<?= Yii::app()->theme->baseUrl ?>/img/favicon.ico" type="image/x-icon">
 
     <!-- styles -->
-    <link href="<?php echo Yii::app()->request->baseUrl; ?>/css/bootstrap.min.css" rel="stylesheet">
-    <link href="<?php echo Yii::app()->request->baseUrl; ?>/css/bootstrap.min.responsive" rel="stylesheet">
+    <link href="<?= Yii::app()->theme->baseUrl ?>/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= Yii::app()->theme->baseUrl ?>/css/bootstrap.min.responsive.css" rel="stylesheet">
 
-	<link href="<?php echo Yii::app()->request->baseUrl; ?>/css/style.css" rel="stylesheet">
+	<link href="<?= Yii::app()->theme->baseUrl ?>/css/style.css" rel="stylesheet">
 	<style type="text/css">
 		body {
 			padding-top: 60px;
@@ -32,7 +32,7 @@
 		<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 	<?php Yii::app()->getClientScript()->registerScriptFile( 'jquery.js' ); ?>
-	<script src="<?php echo Yii::app()->request->baseUrl; ?>/js/bootstrap.min.js"></script>
+	<script src="<?= Yii::app()->theme->baseUrl ?>/js/bootstrap.min.js"></script>
 
 
   </head>
@@ -46,10 +46,25 @@
 			    </div>
 			    <div class="span10">
 				    <?php echo $content; ?>
+				    <?=CHtml::link('О проекте',$this->createUrl('/products/view/',array('product'=>'bus',"id"=>"asd")))?>
 			    </div>
 		    </div>
 	    </div>
-
+	    <hr>
+	    <footer id="footer">
+		    <ul class="nav nav-pills">
+			    <li><?=CHtml::link('О проекте',$this->createUrl('/page/about'))?></li>
+		    </ul>
+		    <?php
+		    if ( YII_DEBUG  ) {
+			    echo '<br/>Отработало за ' . sprintf('%0.5f', Yii::getLogger()->getExecutionTime()) . ' с. ';
+			    echo 'Скушано памяти: ' . round(memory_get_peak_usage() / (1024 * 1024), 2) . ' MB <br>';
+			    $sql_stats = YII::app()->db->getStats();
+			    echo $sql_stats[0] . ' запросов к БД, время выполнения запросов - ' . sprintf('%0.5f', $sql_stats[1]) . ' c.';
+		    }
+		    ?>
+		    <p>&copy; 2011</p>
+	    </footer><!-- #footer -->
 
 	</body>
 </html>

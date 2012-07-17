@@ -62,12 +62,12 @@ return array(
 
 	// компоненты
 	'components'=>array(
-
+/*
 		'clientScript'=>array(
             'scriptMap'=>array(
                 'jquery.js'				=> 'https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js',
                 'jquery-ui.js'			=> 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js',
-				//'jquery.ajaxqueue.js'	=> false,
+				'jquery.ajaxqueue.js'	=> false,
 				'jquery.metadata.js'	=> false,
 				'jquery.yiilistview.js'	=> false,
 				'jquery.ba-bbq.js'		=> false,
@@ -75,7 +75,7 @@ return array(
             ),
             //'enableJavaScript'=>false,    // Эта опция отключает любую генерацию javascript'а фреймворком
         ),
-
+*/
 		// почта
 		'mailer' => array(
 			'class' => 'application.extensions.mailer.EMailer',
@@ -139,6 +139,8 @@ return array(
 			'baseUrl'			=>	'http://'.$_SERVER['SERVER_NAME'],
          	'rules'				=>	array(
 		         '/'=>'site/index',
+		         //'/<class>/<id>' => '/products/view/',
+
 		         //// ПОЛЬЗОВАТЕЛЬ
 				// просмотр пользователя
 		        '/profile/' => 'user/profile',
@@ -158,7 +160,15 @@ return array(
 				// пользователи
 		        '/admin/user/<action:(edit|view|delete|passwordedit)>/<id>'     =>  'admin/users/<action>',
 
-		        '/category/<Alias>' => '/categories/view/'
+		        '/category/<Alias>' => '/categories/view/',
+
+
+		         // своё правило для URL вида '/Производитель/Модель'
+		         array(
+			         'class' => 'application.components.ProductsUrlRule',
+			         'connectionID' => 'db',
+		         ),
+
 	        ),
 
 			'urlSuffix' => '.html',

@@ -4,13 +4,13 @@
     <meta charset="utf-8">
 
 	<!-- icons -->
-	<link rel="shortcut icon" href="<?php echo Yii::app()->request->baseUrl; ?>/img/favicon.ico" type="image/x-icon">
+	<link rel="shortcut icon" href="<?= Yii::app()->theme->baseUrl ?>/img/favicon.ico" type="image/x-icon">
 
     <!-- styles -->
-    <link href="<?php echo Yii::app()->request->baseUrl; ?>/css/bootstrap.min.css" rel="stylesheet">
-    <link href="<?php echo Yii::app()->request->baseUrl; ?>/css/bootstrap-responsive.min" rel="stylesheet">
+    <link href="<?= Yii::app()->theme->baseUrl ?>/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?= Yii::app()->theme->baseUrl ?>/css/bootstrap-responsive.min.css" rel="stylesheet">
 
-	<link href="<?php echo Yii::app()->request->baseUrl; ?>/css/style.css" rel="stylesheet">
+	<link href="<?= Yii::app()->theme->baseUrl ?>/css/style.css" rel="stylesheet">
 	<style type="text/css">
 		body {
 			padding-top: 60px;
@@ -31,14 +31,14 @@
 	<!--[if lt IE 9]>
 		<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
-	<?php Yii::app()->getClientScript()->registerScriptFile( 'jquery.js' ); ?>
-	<script src="<?php echo Yii::app()->request->baseUrl; ?>/js/bootstrap.min.js"></script>
+	<script src="<?= Yii::app()->theme->baseUrl ?>/js/jquery.min.js"></script>
+	<script src="<?= Yii::app()->theme->baseUrl ?>/js/bootstrap.min.js"></script>
 
 
   </head>
 
   <body>
-
+  <? echo Yii::app()->request->baseUrl ?>
 	<div class="navbar navbar-fixed-top">
 		<div class="navbar-inner">
 		<div class="container-fluid">
