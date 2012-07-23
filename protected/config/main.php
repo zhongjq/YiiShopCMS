@@ -139,7 +139,6 @@ return array(
 			'baseUrl'			=>	'http://'.$_SERVER['SERVER_NAME'],
          	'rules'				=>	array(
 		         '/'=>'site/index',
-		         //'/<class>/<id>' => '/products/view/',
 
 		         //// ПОЛЬЗОВАТЕЛЬ
 				// просмотр пользователя
@@ -155,10 +154,13 @@ return array(
 
 
 		         /* АДМИНИСТРАТИРОВАНИЕ */
+		         "/admin/login" => "admin/default/login",
 		         // категории
 		        '/admin/category/<action:(add|edit|view|delete)>/<id>'     =>  'admin/categories/<action>',
 				// пользователи
 		        '/admin/user/<action:(edit|view|delete|passwordedit)>/<id>'     =>  'admin/users/<action>',
+		         // Продукты
+		        '/admin/product/<action:(edit|view|delete)>/<id>'     =>  'admin/product/<action>',
 
 		        '/category/<Alias>' => '/categories/view/',
 

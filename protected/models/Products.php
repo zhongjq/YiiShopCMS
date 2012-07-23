@@ -94,4 +94,49 @@ class Products extends CActiveRecord
 			'criteria'=>$criteria,
 		));
 	}
+
+	/**
+	 * Save Fields propucts
+	 * @param array $ProductsFields
+	 */
+	public function saveProductsFields( array $ProductsFields ){
+
+		if ( !empty($ProductsFields) ) {
+			$FieldsID = array();
+			foreach($ProductsFields as $FieldID => $FieldData ){
+
+				if ( stripos($FieldID,"new_") !== false )
+					$Field = new ProductsFields();
+				elseif ( is_numeric($FieldID) && $FieldID > 0 )
+					$Field = ProductsFields::model()->findByPk($FieldID);
+				else
+					throw new CException("ID NOT NUMERIC");
+
+				$Field->setScenario('add');
+				$Field->attributes = $FieldData;
+				$Field->ProductID = $this->ID;
+				if ( !$Field->save() ) throw new CException("Error");
+
+				$FieldsID[] = $FieldID;
+			}
+
+			$DeleteFields = array_diff($this->getIDFields(),$FieldsID);
+
+			if ( !empty($DeleteFields) ){
+				ProductsFields::model()->deleteByPk( array_values($DeleteFields) );
+			}
+
+		} else {
+			ProductsFields::model()->deleteAll('ProductID = :ProductID',array(":ProductID"=>$this->ID));
+		}
+		return true;
+	}
+
+	public function getIDFields(){
+		$return = array();
+		foreach($this->productsFields() as $Field) {
+			$return[] = $Field->ID;
+		}
+		return $return;
+	}
 }

@@ -1,9 +1,11 @@
 <div class="row">
-	<div class="span4">
-		<?php $form=$this->beginWidget('CActiveForm', array(
+
+	<?php $form=$this->beginWidget('CActiveForm', array(
 		'id'=>'users-form',
 		'enableAjaxValidation'=>false,
 	)); ?>
+
+	<div class="span4">
 		<div class="form well">
 
 			<p class="note">Fields with <span class="required">*</span> are required.</p>
@@ -33,8 +35,9 @@
 			</div>
 
 
-		</div><!-- form -->
+		</div>
 	</div>
+
 	<div class="span8">
 		<table id="ProductField" class="table table-bordered table-striped">
 			<thead>
@@ -45,9 +48,16 @@
 				<td width="100">Обязательно</td>
 				<td width="100">Фильтр</td>
 				<td width="10"></td>
+				<td width="10"></td>
 			</tr>
 			</thead>
-			<tbody></tbody>
+			<tbody>
+				<? if ( $Product->productsFields() ) : ?>
+					<? foreach($Product->productsFields() as $Field) : ?>
+						<? $this->renderPartial('_productField', array('Field'=>$Field)); ?>
+					<? endforeach ?>
+				<? endif ?>
+			</tbody>
 			<tfoot>
 				<tr>
 					<td colspan="6">

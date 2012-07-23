@@ -4,7 +4,7 @@ $this->breadcrumbs=array(
 );
 
 $this->SecondMenu=array(
-	array('label'=>'Добавить категорию', 'url'=>array('add')),
+	array('label'=>Yii::t("AdminModule.main", "Добавить категорию"), 'url'=>array('add')),
 );
 ?>
 

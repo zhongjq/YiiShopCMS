@@ -16,6 +16,7 @@
  */
 class ProductsFields extends CActiveRecord
 {
+	public $IsSystem = false;
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
@@ -74,6 +75,7 @@ class ProductsFields extends CActiveRecord
 			'ProductID' => 'Product',
 			'FieldType' => 'Field Type',
 			'Name' => 'Name',
+			'Alias' => 'Alias',
 			'IsMandatory' => 'Is Mandatory',
 			'IsFilter' => 'Is Filter',
 		);
@@ -100,5 +102,9 @@ class ProductsFields extends CActiveRecord
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
 		));
+	}
+
+	public function getRequiredFields(){
+
 	}
 }

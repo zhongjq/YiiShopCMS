@@ -53,10 +53,10 @@
 			<? if(!Yii::app()->user->isGuest) : ?>
 				<?php
 					$this->FirstMenu=array(
-						array('label'=>'Категории', 'url'=>array('/admin/categories'), 'active'=>$this->getId() =='categories'),
-						array('label'=>'Товары', 'url'=>array('/admin/product'), 'active'=>$this->getId() =='product'),
-						array('label'=>'Заказы', 'url'=>array('/admin/orders'), 'active'=>$this->getId() =='orders'),
-						array('label'=>'Пользователи', 'url'=>array('/admin/users'), 'active'=>$this->getId() =='users'),
+						array('label'=> Yii::t("AdminModule.main", "Категории"), 'url'=>array('/admin/categories'), 'active'=>$this->getId() =='categories'),
+						array('label'=> Yii::t("AdminModule.main", "Товары"), 'url'=>array('/admin/product'), 'active'=>$this->getId() =='product'),
+						array('label'=> Yii::t("AdminModule.main", "Заказы"), 'url'=>array('/admin/orders'), 'active'=>$this->getId() =='orders'),
+						array('label'=> Yii::t("AdminModule.main", "Пользователи"), 'url'=>array('/admin/users'), 'active'=>$this->getId() =='users'),
 					);
 				?>
 				<?php $this->widget('zii.widgets.CMenu',array(

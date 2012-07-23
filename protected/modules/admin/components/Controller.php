@@ -30,6 +30,10 @@ class Controller extends CController
 					'actions'   =>  array('error'),
 					'users'     =>  array('*'),
 			),
+			array(  'allow',    // allow admin user to perform 'admin' and 'delete' actions
+					'actions'   =>  array('login'),
+					'users'     =>  array('?'),
+			),
 			array(  'deny',     // deny all users
 					'users'     =>  array('*'),
 			),

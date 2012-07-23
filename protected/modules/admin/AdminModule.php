@@ -20,6 +20,12 @@ class AdminModule extends CWebModule
             'errorHandler'=>array(
 				'errorAction'=>'/admin/default/error',
 			),
+			'user' => array(
+				'class' => 'CWebUser',
+				'loginUrl' => Yii::app()->createUrl('admin/default/login'),
+			)
+
+
 		));
 
 	}
@@ -29,11 +35,13 @@ class AdminModule extends CWebModule
 	{
 		if(parent::beforeControllerAction($controller, $action))
 		{
-			if( Yii::app()->user->isGuest ) Yii::app()->user->loginRequired();
+			//if( Yii::app()->user->isGuest ) Yii::app()->user->loginRequired();
 
 			return true;
 		}
 		else
 			return false;
 	}
+
+
 }

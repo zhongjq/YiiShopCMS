@@ -122,3 +122,5 @@ span.required {
 div.form {
     margin-left: 15px;
 }
+
+.pointer { cursor: pointer; cursor: hand; }
