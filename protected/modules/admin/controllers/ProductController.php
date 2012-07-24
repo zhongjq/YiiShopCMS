@@ -45,6 +45,14 @@ class ProductController extends Controller
 		$Name->Alias        =   "Name";
 		$Product->addRelatedRecord("productsFields",$Name,0);
 
+		$Price = new ProductsFields();
+		$Price->FieldType    =   TypeFields::PRICE;
+		$Price->Name         =   "Стоимость";
+		$Price->IsMandatory  =   true;
+		$Price->IsSystem     =   true;
+		$Price->Alias        =   "Price";
+		$Product->addRelatedRecord("productsFields",$Price,1);
+
 		if(isset($_POST['Products']))
 		{
 			$transaction = Yii::app()->db->beginTransaction();

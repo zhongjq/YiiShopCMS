@@ -60,10 +60,19 @@
 			</tbody>
 			<tfoot>
 				<tr>
-					<td colspan="6">
+					<td colspan="7">
 						<div class="buttons">
 							<?php echo CHtml::Button('Добавить поле',array("class"=>"btn","id"=>"AddField")); ?>
-							<?php echo CHtml::Button('Отмена',array("class"=>"btn hide","id"=>"CancelAddField")); ?>
+
+							<?php echo CHtml::ajaxButton(   Yii::t('AdminModule.main','Добавить поле'),
+															$this->createUrl('/admin/ajax/fieldform'),
+															array(
+																'onclick'=>'$("#jobDialog").dialog("open"); return false;',
+																'update'=>'#jobDialog'
+															),array("class"=>"btn",'id'=>'showJobDialog'));?>
+
+							<div id="jobDialog"></div>
+
 						</div>
 					</td>
 				</tr>

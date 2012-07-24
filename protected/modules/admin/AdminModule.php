@@ -43,5 +43,4 @@ class AdminModule extends CWebModule
 			return false;
 	}
 
-
 }

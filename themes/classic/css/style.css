@@ -124,3 +124,7 @@ div.form {
 }
 
 .pointer { cursor: pointer; cursor: hand; }
+
+form > div.row {
+    margin: 0px;
+}

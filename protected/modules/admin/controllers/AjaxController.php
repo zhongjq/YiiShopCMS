@@ -18,4 +18,39 @@ class AjaxController extends Controller
 		echo json_encode( $return );
 		Yii::app()->end();
 	}
+
+	public function actionFieldForm()
+	{
+		$model = new ProductFieldForm();
+
+		$form = new CForm(array(
+
+			'elements'=>array(
+				'name'=>array(
+					'type'=>'text',
+					'maxlength'=>32,
+				),
+				'phone'=>array(
+					'type'=>'password',
+					'maxlength'=>32,
+				),
+				'timeToCall'=>array(
+					'type'=>'checkbox',
+				)
+			),
+
+			'buttons'=>array(
+				'login'=>array(
+					'type'=>'submit',
+					'label'=>'Вход',
+					'class'=>"btn"
+				),
+			),
+		), $model);
+
+		$this->renderPartial('/product/ProductFieldDialog',array('form'=>$form),false,true);
+
+
+	}
+
 }
