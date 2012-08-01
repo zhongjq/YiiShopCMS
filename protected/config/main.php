@@ -58,7 +58,7 @@ return array(
     ),
 
 	'preload'=>array('log'),
-	
+
 
 	// компоненты
 	'components'=>array(
@@ -81,9 +81,15 @@ return array(
 			'class' => 'application.extensions.mailer.EMailer',
 			'pathViews' => 'application.views.email',
 			'pathLayouts' => 'application.views.email.layouts'
-		),		
-		
+		),
+
 		// база
+		'db'=>array(
+            'connectionString'=>'sqlite:'.$_SERVER['DOCUMENT_ROOT'].'/protected/data/blog.db',
+            'tablePrefix'=>'',
+        ),
+
+/*
 		'db'=>array(
 			'connectionString' => 'mysql:host=localhost;dbname=magazin',
 			'emulatePrepare' => true,
@@ -96,7 +102,7 @@ return array(
 			// показываем значения параметров
 			'enableParamLogging' => true,
 		),
-
+*/
 		// пользователи
 		'session' => array(
 			'autoStart'		=> true,
