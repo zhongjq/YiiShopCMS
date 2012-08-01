@@ -16,7 +16,6 @@
  */
 class ProductsFields extends CActiveRecord
 {
-	public $IsSystem = false;
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
@@ -43,10 +42,14 @@ class ProductsFields extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('ProductID, FieldType, Name, Alias', 'required', 'on'=>'add'),
-			array('FieldType, Name, Alias', 'required', 'on'=>'validate'),
+			array('FieldType, Name, Alias', 'required', 'on'=>'add'),
 			array('ProductID, FieldType, IsMandatory, IsFilter', 'numerical', 'integerOnly'=>true),
 			array('Name', 'length', 'max'=>255),
+			array('Alias', 'length', 'max'=>50),
+			array('Name, Alias', 'unique'),
+			array('IsColumnTable', 'boolean'),
+			array('Alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u',
+				'message' => Yii::t("AdminModule.products",'Field contains invalid characters.')),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('ID, ProductID, FieldType, Name, IsMandatory, IsFilter', 'safe', 'on'=>'search'),
@@ -71,13 +74,16 @@ class ProductsFields extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'ID' => 'ID',
-			'ProductID' => 'Product',
-			'FieldType' => 'Field Type',
-			'Name' => 'Name',
-			'Alias' => 'Alias',
-			'IsMandatory' => 'Is Mandatory',
-			'IsFilter' => 'Is Filter',
+			'ID'            =>  Yii::t("AdminModule.main",'Идентификатор'),
+			'ProductID'     =>  Yii::t("AdminModule.main",'Идентификатор продукта'),
+			'FieldType'     =>  Yii::t("AdminModule.main",'Тип поля'),
+			'Name'          =>  Yii::t("AdminModule.main",'Наименование'),
+			'Alias'         =>  Yii::t("AdminModule.main",'Псевдоним'),
+			'IsMandatory'   =>  Yii::t("AdminModule.main",'Обязательно'),
+			'IsFilter'      =>  Yii::t("AdminModule.main",'Использовать в фильтрации'),
+			'IsColumnTable' =>  Yii::t("AdminModule.main",'Used In Table Header?'),
+			'UnitName'      =>  Yii::t("AdminModule.main",'Used In Table Header?'),
+			'Hint'          =>  Yii::t("AdminModule.main",'Used In Table Header?'),
 		);
 	}
 
@@ -104,7 +110,80 @@ class ProductsFields extends CActiveRecord
 		));
 	}
 
-	public function getRequiredFields(){
+	// форма в формате CForm
+	public function getMotelCForm(){
+		return new CForm(array(
+			'attributes' => array(
+				'enctype' => 'application/form-data',
+				'class' => 'well',
+				'id'=>'FieldForm'
+			),
+			'activeForm' => array(
+				'class' => 'CActiveForm',
+				'enableAjaxValidation' => true,
+				'enableClientValidation' => false,
+				'id' => "FieldForm",
+				'clientOptions' => array(
+					'validateOnSubmit' => true,
+					'validateOnChange' => false,
+				),
+			),
 
+			'elements'=>array(
+				'FieldType'=>array(
+					'type'  =>  'dropdownlist',
+					'items' =>  TypeFields::getFieldsList(),
+					'empty'=>  '',
+					"disabled".$this->isNewRecord  =>  "disabled1",
+					'ajax' => array(
+						'type'  =>  'POST',
+						'url'   =>  "",
+						'update'=>  '#FieldForm',
+					)
+				),
+				'Name'=>array(
+					'type'=>'text',
+					'maxlength'=>255
+				),
+				'Alias'=>array(
+					'type'      =>  'text',
+					'maxlength' =>  255,
+					"disabled".$this->isNewRecord  =>  "disabled1",
+				),
+				'IsMandatory'=>array(
+					'type'=>'checkbox',
+					'layout'=>'{input}{label}{error}{hint}',
+				),
+				'IsFilter'=>array(
+					'type'=>'checkbox',
+					'layout'=>'{input}{label}{error}{hint}',
+				),
+				'IsColumnTable'=>array(
+					'type'=>'checkbox',
+					'layout'=>'{input}{label}{error}{hint}',
+				),
+				'Name'=>array(
+					'type'=>'text',
+					'maxlength'=>255
+				),
+			),
+
+			'buttons'=>array(
+				'<br/>',
+				'submit'=>array(
+					'type'  =>  'submit',
+					'label' =>  $this->isNewRecord ? 'Создать' : "Сохранить",
+					'class' =>  "btn"
+				),
+			),
+		), $this);
+	}
+
+	public static function CreateField($FieldType){
+		if ( !isset(TypeFields::$Fields[$FieldType]['class']) ){
+			throw new CException("NOT NUMERIC");
+		}
+
+		return new TypeFields::$Fields[$FieldType]['class']();
 	}
 }

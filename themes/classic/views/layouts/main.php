@@ -22,16 +22,12 @@
 	</style>
 
 	<title><?php echo CHtml::encode($this->pageTitle); ?></title>
-	<?php echo CHtml::metaTag(Yii::app()->params['description'],'description'); ?>
-	<?php echo CHtml::metaTag(is_array(Yii::app()->params['keywords'])?implode(Yii::app()->params['keywords'],','):Yii::app()->params['keywords'],'keywords');?>
-	<?php echo CHtml::metaTag(Yii::app()->params['author'],'author'); ?>
-
 
 	<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
 	<!--[if lt IE 9]>
 		<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
-	<?php Yii::app()->getClientScript()->registerScriptFile( 'jquery.js' ); ?>
+	<?php Yii::app()->clientScript->registerCoreScript('jquery.js'); ?>
 	<script src="<?= Yii::app()->theme->baseUrl ?>/js/bootstrap.min.js"></script>
 
 

@@ -3,7 +3,6 @@
 class DefaultController extends Controller
 {
 
-
 	public function filters()
 	{
 		return array(
@@ -11,8 +10,14 @@ class DefaultController extends Controller
 		);
 	}
 
+
 	public function actionIndex()
 	{
+
+		//echo 123;
+
+
+
 		$this->render('index');
 	}
 

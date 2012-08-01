@@ -3,7 +3,7 @@
 return array(
 	'name'				=>  'Большой Магазин',
 	'defaultController'	=>  'site',
-	'sourceLanguage'    =>  'ru',
+	'sourceLanguage'    =>  'en',
 	'language'          =>  'ru',
 	'theme'             =>  'classic',
 
@@ -54,7 +54,7 @@ return array(
             'ipFilters'     =>  array("192.168.56.1","127.0.0.1",),
             'newFileMode'   =>  0666,
             'newDirMode'    =>  0777,
-        ),
+        )
     ),
 
 	'preload'=>array('log'),
@@ -62,20 +62,20 @@ return array(
 
 	// компоненты
 	'components'=>array(
-/*
+
 		'clientScript'=>array(
             'scriptMap'=>array(
                 'jquery.js'				=> 'https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js',
-                'jquery-ui.js'			=> 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js',
-				'jquery.ajaxqueue.js'	=> false,
-				'jquery.metadata.js'	=> false,
-				'jquery.yiilistview.js'	=> false,
-				'jquery.ba-bbq.js'		=> false,
-				'styles.css'			=> false,
+                //'jquery-ui.js'			=> 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js',
+				//'jquery.ajaxqueue.js'	=> false,
+				//'jquery.metadata.js'	=> false,
+				//'jquery.yiilistview.js'	=> false,
+				//'jquery.ba-bbq.js'		=> false,
+				//'styles.css'			=> false,
             ),
             //'enableJavaScript'=>false,    // Эта опция отключает любую генерацию javascript'а фреймворком
         ),
-*/
+
 		// почта
 		'mailer' => array(
 			'class' => 'application.extensions.mailer.EMailer',
@@ -156,14 +156,18 @@ return array(
 		         /* АДМИНИСТРАТИРОВАНИЕ */
 		         "/admin/login" => "admin/default/login",
 		         // категории
-		        '/admin/category/<action:(add|edit|view|delete)>/<id>'     =>  'admin/categories/<action>',
+		        '/admin/category/<action:(add|edit|view|delete)>/<id>'      =>  'admin/categories/<action>',
 				// пользователи
-		        '/admin/user/<action:(edit|view|delete|passwordedit)>/<id>'     =>  'admin/users/<action>',
+		        '/admin/user/<action:(edit|view|delete|passwordedit)>/<id>' =>  'admin/users/<action>',
 		         // Продукты
-		        '/admin/product/<action:(edit|view|delete)>/<id>'     =>  'admin/product/<action>',
+		        '/admin/products' => 'admin/product/index',
+		        '/admin/product/<action:(edit|view|delete)>/<id:\d+>'       =>  'admin/product/<action>',
+		        '/admin/product/view/<id:\d+>/add'                          =>  'admin/product/add',
+		        '/admin/product/edit/<id:\d+>/fields'                       =>  'admin/product/fields',
+		        '/admin/product/edit/<id:\d+>/fields/add'                   =>  'admin/product/addfield',
+		        '/admin/product/edit/<id:\d+>/fields/<action:(edit|delete)>/<FieldID:\d+>'  =>  'admin/product/<action>field',
 
 		        '/category/<Alias>' => '/categories/view/',
-
 
 		         // своё правило для URL вида '/Производитель/Модель'
 		         array(

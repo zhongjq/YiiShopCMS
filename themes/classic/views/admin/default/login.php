@@ -2,7 +2,7 @@
 
 <div class="row">
 	
-	<div class="span9 offset4">
+	<div class="span9 offset3">
 		<h1>Вход</h1>
 
 	<?php $form=$this->beginWidget('CActiveForm', array(
@@ -32,18 +32,10 @@
 		
 		<div>
 			<?php echo CHtml::submitButton('Воити', array("class"=>"btn") ); ?>
-			<?php echo CHtml::link('Регистрация',$this->createUrl('registration')); ?>
 		</div>
 
 	<?php $this->endWidget(); ?>
 
 	</div>
 
-</div><!-- form -->	
-
-<div align="center" class="row">	
-	<div class="span10 offset1">
-		<h2>Нажмите на иконку для входа через один из сайтов:</h2>
-		<?php $this->widget('ext.eauth.EAuthWidget', array('action' => 'login')); ?>
-	</div>
-</div>
+</div><!-- form -->

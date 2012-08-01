@@ -6,12 +6,16 @@ class ProductsUrlRule extends CBaseUrlRule
 
 	public function createUrl($manager,$route,$params,$ampersand)
 	{
-		if ($route==='products/view')
-		{
-			if (isset($params['product'], $params['id']))
-				return $params['product'] . '/' . $params['id'].$manager->urlSuffix;
-			else if (isset($params['product']))
-				return $params['product'];
+		switch($route){
+			case "products/index":
+				return $params['Alias'].$manager->urlSuffix;
+			break;
+			case "products/view":
+				if (isset($params['Product'], $params['id']))
+					return $params['Product'] . '/' . $params['id'].$manager->urlSuffix;
+				else if (isset($params['Product'], $params['Alias']))
+					return $params['Product'] . '/' . $params['Alias'].$manager->urlSuffix;
+			break;
 		}
 		return false;  // не применяем данное правило
 	}
@@ -20,14 +24,11 @@ class ProductsUrlRule extends CBaseUrlRule
 	{
 		if (preg_match('%^(\w+)(/(\w+))?$%', $pathInfo, $matches))
 		{
-			//print_r($matches);
-			if ( Products::model()->find('Alias=:Alias', array(':Alias'=>$matches[1])) )
-				return 'site/index';
-			// Проверяем $matches[1] и $matches[3] на предмет
-			// соответствия производителю и модели в БД.
-			// Если соответствуют, выставляем $_GET['manufacturer'] и/или $_GET['model']
-			// и возвращаем строку с маршрутом 'car/index'.
-			//
+			// Ищем товар
+			if ( Products::model()->find('Alias=:Alias', array(':Alias'=>$matches[1])) ){
+				$_GET['Alias'] = $matches[1];
+				return 'products/index';
+			}
 		}
 		return false;  // не применяем данное правило
 	}

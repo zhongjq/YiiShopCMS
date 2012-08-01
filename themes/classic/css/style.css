@@ -20,7 +20,10 @@ html {
 	margin-bottom: 1px;
 }
 
-input[type=radio] + label, input[type=checkbox] + label { display:inline !important; }
+input[type=radio] + label, input[type=checkbox] + label {
+    display:inline !important;
+    margin: 10px 5px;
+}
 
 /* Subnav */
 .subnav {
@@ -92,7 +95,7 @@ input[type=radio] + label, input[type=checkbox] + label { display:inline !import
     top: 40px;
     left: 0;
     right: 0;
-    z-index: 1020; /* 10 less than .navbar-fixed to prevent any overlap */
+    z-index: 999; /* 10 less than .navbar-fixed to prevent any overlap */
     border-color: #d5d5d5;
     border-width: 0 0 1px; /* drop the border on the fixed edges */
     -webkit-border-radius: 0;
@@ -127,4 +130,17 @@ div.form {
 
 form > div.row {
     margin: 0px;
+}
+
+.navbar-fixed-top, .navbar-fixed-bottom {
+    z-index: 1001;
+}
+
+div.errorMessage{
+    color: red;
+    font-size: 11px;
+}
+
+form .row {
+    margin: 0;
 }

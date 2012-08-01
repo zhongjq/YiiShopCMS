@@ -31,7 +31,8 @@
 	<!--[if lt IE 9]>
 		<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
-	<script src="<?= Yii::app()->theme->baseUrl ?>/js/jquery.min.js"></script>
+	<!--  <script src="<?= Yii::app()->theme->baseUrl ?>/js/jquery.min.js"></script>-->
+	  <?php Yii::app()->clientScript->registerCoreScript('jquery'); ?>
 	<script src="<?= Yii::app()->theme->baseUrl ?>/js/bootstrap.min.js"></script>
 
 
@@ -54,7 +55,7 @@
 				<?php
 					$this->FirstMenu=array(
 						array('label'=> Yii::t("AdminModule.main", "Категории"), 'url'=>array('/admin/categories'), 'active'=>$this->getId() =='categories'),
-						array('label'=> Yii::t("AdminModule.main", "Товары"), 'url'=>array('/admin/product'), 'active'=>$this->getId() =='product'),
+						array('label'=> Yii::t("AdminModule.main", "Товары"), 'url'=>array('/admin/products'), 'active'=>$this->getId() =='product'),
 						array('label'=> Yii::t("AdminModule.main", "Заказы"), 'url'=>array('/admin/orders'), 'active'=>$this->getId() =='orders'),
 						array('label'=> Yii::t("AdminModule.main", "Пользователи"), 'url'=>array('/admin/users'), 'active'=>$this->getId() =='users'),
 					);

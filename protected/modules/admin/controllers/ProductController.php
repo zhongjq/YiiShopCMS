@@ -21,37 +21,69 @@ class ProductController extends Controller
 			'Products' => $Products,
 			'pages' => $pages
 		));
-	}	
-	
-	public function actionProduct()
-	{
-		$this->render('index');
 	}
 
-	public function actionAdd()
+
+	public static function asd($a){
+		return $a;
+	}
+
+	public function actionView($id)
 	{
-		$this->render('index');
+		$Product = Products::model()->with('productsFields')->findByPk($id);
+		$Product->getAttributes();
+
+		$Goods = $Product->getGoodsObject();
+		$Goods = $Goods->findAll(array(
+			'select'=>'t.Name'
+		));
+
+		$this->render('view', array(
+			'Product' => $Product,
+			'Goods' => $Goods,
+		));
+	}
+
+	public function actionAdd($id)
+	{
+		$Product = Products::model()->with('productsFields')->findByPk($id);
+		$Goods = $Product->getGoodsObject();
+
+		if(isset($_POST[$Goods->tableName()])) {
+			$Goods->attributes = $_POST[$Goods->tableName()];
+			if(isset($_POST['submit']) && $Goods->save()){
+				$this->redirect($this->createUrl('/admin/product/view',array('id'=>$Product->ID)));
+			}
+		}
+
+		if(Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "GoodsForm" )
+		{
+			echo CActiveForm::validate($Goods);
+			Yii::app()->end();
+		}
+
+		$Form = $Goods->getMotelCForm();
+
+		$this->render('add',array('Product'=>$Product,'Form'=>$Form));
+	}
+
+	protected function performAjaxValidation($model)
+	{
+		if(Yii::app()->request->isAjaxRequest )
+		{
+			echo CActiveForm::validate($model);
+			Yii::app()->end();
+		}
 	}
 
 	public function actionCreate()
 	{
-		$Product = new Products();
 
-		$Name = new ProductsFields();
-		$Name->FieldType    =   TypeFields::STRING;
-		$Name->Name         =   "Название";
-		$Name->IsMandatory  =   true;
-		$Name->IsSystem     =   true;
-		$Name->Alias        =   "Name";
-		$Product->addRelatedRecord("productsFields",$Name,0);
+		$Product = new Products('create');
 
-		$Price = new ProductsFields();
-		$Price->FieldType    =   TypeFields::PRICE;
-		$Price->Name         =   "Стоимость";
-		$Price->IsMandatory  =   true;
-		$Price->IsSystem     =   true;
-		$Price->Alias        =   "Price";
-		$Product->addRelatedRecord("productsFields",$Price,1);
+		$this->performAjaxValidation($Product);
+
+		$Form = $Product->getMotelCForm();
 
 		if(isset($_POST['Products']))
 		{
@@ -60,12 +92,14 @@ class ProductController extends Controller
 			{
 				$Product->attributes = $_POST['Products'];
 				if( $Product->save() ){
-					if ( isset($_POST['Products']['ProductField']) )
-						$ProductField = $_POST['Products']['ProductField'];
-					else
-						$ProductField = array();
+					Yii::app()->db->createCommand()->createTable($Product->Alias, array(
+						'ID' => 'pk',
+						'Alias' => 'varchar(255)',
+						'Title' => 'text',
+						'Keywords' => 'text',
+						'Description' => 'text',
+					), 'ENGINE=InnoDB');
 
-					$Product->saveProductsFields($ProductField);
 					$transaction->commit();
 					$this->redirect(array('/admin/product'));
 				}
@@ -77,37 +111,144 @@ class ProductController extends Controller
 
 		}
 
-		$this->render('create', array( "Product" => $Product ) );
+		$this->render('create', array('Form'=>$Form) );
+	}
+
+	public function actionDelete($id)
+	{
+		Products::model()->findByPk($id)->delete();
+		$this->redirect(array('/admin/product'));
+	}
+
+	public function actionEdit($id)
+	{
+		$Product = Products::model()->findByPk($id);
+
+		$this->performAjaxValidation($Product);
+
+		$Form = $Product->getMotelCForm();
+
+		if(isset($_POST['Products']))
+		{
+			$transaction = Yii::app()->db->beginTransaction();
+			try
+			{
+				$Product->attributes = $_POST['Products'];
+				if( $Product->save() ){
+					$transaction->commit();
+					$this->redirect(array('/admin/product'));
+				}
+			}
+			catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
+			{
+				$transaction->rollBack();
+			}
+
+		}
+
+		$this->render('edit', array('Form'=>$Form,'Product' => $Product) );
 	}
 
 
-	public function actionEdit($id){
+	public function actionFields($id)
+	{
 		$Product = Products::model()->with('productsFields')->findByPk($id);
 
-		if(isset($_POST['Products']))
+		$this->render('fields', array(
+			'Product' => $Product
+		));
+	}
+
+	public function actionAddField($id)
+	{
+		$Product = Products::model()->findByPk($id);
+
+		$ProductField = new ProductsFields('add');
+		$ProductField->ProductID = $id;
+
+		if(Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "FieldForm" )
 		{
-			$transaction = Yii::app()->db->beginTransaction();
-			try
-			{
-				$Product->attributes = $_POST['Products'];
-				if( $Product->save() ){
-					if ( isset($_POST['Products']['ProductField']) )
-						$ProductField = $_POST['Products']['ProductField'];
-					else
-						$ProductField = array();
-
-					$Product->saveProductsFields($ProductField);
-					$transaction->commit();
-					$this->redirect(array('/admin/product'));
-				}
-			}
-			catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
-			{
-				$transaction->rollBack();
-			}
-
+			echo CActiveForm::validate($ProductField);
+			Yii::app()->end();
 		}
 
-		$this->render('edit', array( 'Product' => $Product ));
+		if(isset($_POST['ProductsFields'])) {
+			$ProductField->attributes = $_POST['ProductsFields'];
+			if(isset($_POST['submit']) && $ProductField->save()){
+				Yii::app()->db->createCommand()->addColumn( $Product->Alias,
+															$ProductField->Alias,
+															TypeFields::$Fields[$ProductField->FieldType]['type']
+				);
+				$this->redirect($this->createUrl('/admin/product/fields',array('id'=>$id)));
+			}
+		}
+
+		$Form = $ProductField->getMotelCForm();
+
+		if( Yii::app()->request->isAjaxRequest ){
+
+			$class = $ProductField::CreateField($_POST['ProductsFields']['FieldType']);
+			$ClassForm = $class->getMotelCForm();
+			$ClassForm->render();
+
+
+			$Form->render();
+			echo $Form->renderElements().$ClassForm->renderElements().$Form->renderButtons();
+			Yii::app()->end();
+		}
+
+		$this->render('addfield', array(
+			'Product' => $Product,
+			'Form' => $Form,
+		));
 	}
+
+
+
+	public function actionEditField($id,$FieldID)
+	{
+		$Product = Products::model()->findByPk($id);
+
+		$ProductField = ProductsFields::model()->findByPk($FieldID);
+		$ProductField->ProductID = $id;
+
+		if(Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "FieldForm" )
+		{
+			echo CActiveForm::validate($ProductField);
+			Yii::app()->end();
+		}
+
+		if(isset($_POST['ProductsFields'])) {
+			$ProductField->attributes = $_POST['ProductsFields'];
+			if($ProductField->save()){
+				$this->redirect($this->createUrl('/admin/product/fields',array('id'=>$id)));
+			}
+		}
+
+		$Form = $ProductField->getMotelCForm();
+
+		if( Yii::app()->request->isAjaxRequest ){
+			$Form->render();
+			echo $Form->renderElements().$Form->renderButtons();
+			Yii::app()->end();
+		}
+
+		$this->render('editfield', array(
+			'Product' => $Product,
+			'Form' => $Form,
+		));
+	}
+
+	public function actionDeleteField($id,$FieldID)
+	{
+
+
+		$ProductField = ProductsFields::model()->find('ID=:ID AND ProductID=:ProductID',array(':ID'=>$FieldID,'ProductID'=>$id));
+
+		if($ProductField->delete()){
+			$this->redirect($this->createUrl('/admin/product/fields',array('id'=>$id)));
+		}
+	}
+
+
 }

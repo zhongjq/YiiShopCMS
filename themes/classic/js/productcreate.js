@@ -1,5 +1,5 @@
 $(function(){
-	$("#AddField").click(function(){
+	$("#AddField1").click(function(){
 		$('#FieldSetting').modal();
 	});
 
@@ -7,64 +7,68 @@ $(function(){
 		$(this).closest('tr').remove();
 	});
 
-	$('#FieldSetting').live('submit', function() {
-		// отправка формы
-		$(this).ajaxSubmit({
-			url:       '/admin/ajax/validatefield',
-			type:      'post',
-			dataType:  'json',
-			beforeSubmit: function (formData, jqForm, options) {
-				$(jqForm).find('div.error').removeClass('error').end().find('.help-block').empty();
-			},
-			success:  function (data, statusText, xhr, $form)  {
-				if ( data.success == false ){
-					$.each( data.errors , function(field, error) {
-						$('#FieldSetting')
-							.find('[name="ProductField\\['+field+'\\]"]')
-							.closest('div.control-group').addClass("error")
-							.find('.help-block')
-							.text( ""+error );
-					});
-				} else if ( data.success == true ) {
-					var i = "new_"+$("#ProductField").find('tbody tr').length;
-
-					var field = '<tr>';
-					field += '<td></td>';
-
-					field += '<td>';
-					var FieldType = $($form).find('[name="ProductField\\[FieldType\\]"] option:selected').val();
-					field += '<input type="hidden" name="Products[ProductField]['+i+'][FieldType]" value="'+FieldType+'"/>';
-					field += $($form).find('[name="ProductField\\[FieldType\\]"] option:selected').text();
-					field += '</td>';
-
-					field += '<td>';
-					var Name = $($form).find('[name="ProductField\\[Name\\]"]').val();
-					var Alias = $($form).find('[name="ProductField\\[Alias\\]"]').val();
-					field += '<input type="hidden" name="Products[ProductField]['+i+'][Name]" value="'+Name+'"/>';
-					field += '<input type="hidden" name="Products[ProductField]['+i+'][Alias]" value="'+Alias+'"/>';
-					field += Name;
-					field += ' ('+Alias+')';
-					field += '</td>';
-
-					var IsMandatory = $($form).find('[name="ProductField\\[IsMandatory\\]"]:checked').val();
-					field += '<td>';
-					field += '<input type="hidden" name="Products[ProductField]['+i+'][IsMandatory]" value="'+ (IsMandatory ? 1 : 0) +'"/>';
-					field += '<i class="'+ (IsMandatory ? "icon-plus" : "icon-minus") +'"></i></td>';
-
-					var IsFilter = $($form).find('[name="ProductField\\[IsFilter\\]"]:checked').val();
-					field += '<td>';
-					field += '<input type="hidden" name="Products[ProductField]['+i+'][IsFilter]" value="'+ (IsFilter ? 1 : 0) +'"/>';
-					field += '<i class="'+ (IsFilter ? "icon-plus" : "icon-minus") +'"></i></td>';
-
-					field += '<td><span class="close">&times;</span></td>';
-					field += '</tr>';
-					$("#ProductField").find('tbody').append(field);
-					$('#FieldSetting').modal('hide');
-				}
+	$('body').on('click','span.icon-pencil',function(){
+		$.ajax({
+			'type':"POST",
+			'data':{'action':"FieldForm"},
+			'onclick':'$("#jobDialog").dialog("open\");return false;',
+			'url':'',
+			'cache':false,
+			'success':function(html){
+				jQuery("#jobDialog").html(html)
 			}
 		});
+
+		return false;
+	});
+
+	$('body').on('submit','#FieldForm', function() {
+
+		var intuts = $(this).find('select,input[type="text"],input[type="checkbox"]:checked');
+		var table = $('#ProductField > tbody');
+		var col = table.find("tr").length+1;
+		var td = $('<td></td>');
+		var tdID = td.clone();
+		var tdFieldType = $('<td></td>');
+		var tdNameAlias = $('<td></td>');
+		var iEl = $('<i></i>').addClass('icon-minus');
+		var tdIsMandatory = $('<td></td>').append(iEl.clone());
+		var tdIsFilter = $('<td></td>').append(iEl.clone());
+		var tdEdit = $('<td></td>').append($('<span></span>').attr({'class':'icon-pencil pointer','title':'Редактировать'}));
+		var tr = $('<tr></tr>').append(tdID);
+		$.each(intuts,function(i,source){
+			var nameEl = $(source).attr('name').match(/\[(.*)\]/i);
+
+			if ( nameEl !== null ) {
+
+				var name = "Products[ProductField]["+col+"]["+nameEl[1]+"]";
+				var input = $("<input/>").attr({'type':"hidden","name":name,"value":$(source).val()});
+				$(tdID).append(input);
+
+				console.log(nameEl[1]);
+				switch (nameEl[1]){
+					case "FieldType":
+						tdFieldType.text($(source).find("option:selected").text());
+					break;
+					case "Name":
+						tdNameAlias.text($(source).val());
+					break;
+					case "IsMandatory":
+						tdIsMandatory.find('i').removeClass('icon-minus').addClass('icon-plus');
+					break;
+					case "IsFilter":
+						tdIsFilter.find('i').removeClass('icon-minus').addClass('icon-plus');
+					break;
+				}
+			}
+
+		});
+		tr.append(tdFieldType,tdNameAlias,tdIsMandatory,tdIsFilter,tdEdit,td);
+		table.append(tr);
+
+		$("#jobDialog").dialog("destroy");
 		return false;
 	});
 
 
-})
+});

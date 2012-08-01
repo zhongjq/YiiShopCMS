@@ -2,7 +2,7 @@
 
 <div class="row">
 	
-	<div class="span9 offset4">
+	<div class="span9 offset6">
 		<h1>Вход</h1>
 
 	<?php $form=$this->beginWidget('CActiveForm', array(

@@ -2,14 +2,34 @@
 
 class TypeFields
 {
-	const NUMERIC = 1;
+	const INTEGER = 1;
 	const STRING = 2;
 	const PRICE = 3;
 
+	public static $TypeToIDFields = array(
+		'integer'=> self::INTEGER,
+		'string'=> self::STRING,
+	);
+
 	public static $Fields = array(
-		self::NUMERIC   => array('name'=> "Число"),
-		self::STRING    => array('name'=> "Строка"),
-		self::PRICE     => array('name'=> "Цена"),
+		self::STRING    => array(
+			'name'      =>  "Строка",
+			'class'     =>  "StringFields",
+			'type'      =>  "string",
+			'dbType'    =>  "varchar(255)",
+			'form'      =>  array(
+				'type'      =>  'text',
+				'maxlength' =>  255,
+			),
+		),
+		self::INTEGER   => array(
+			'name'      => "Число",
+			'type'      => "integer",
+			'dbType'    =>  "int(11)",
+		),
+		self::PRICE     => array(
+			'name'=> "Цена"
+		),
 	);
 
 	public static function getFieldsList(){

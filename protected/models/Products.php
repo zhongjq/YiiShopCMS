@@ -40,9 +40,14 @@ class Products extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('Name, Alias', 'required'),
+			array('Name, Alias', 'required', 'on'=>'create, edit'),
 			array('Status', 'numerical', 'integerOnly'=>true),
-			array('Name, Alias', 'length', 'max'=>255),
+			array('Name', 'length', 'max'=>255),
+			array('Alias', 'length', 'max'=>50),
+			array('Name,Alias', 'unique'),
+			array('Title, Keywords, Description', 'safe'),
+			array('Alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u',
+					'message' => Yii::t("AdminModule.products",'Field contains invalid characters.')),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('ID, Status, Name, Alias', 'safe', 'on'=>'search'),
@@ -67,10 +72,13 @@ class Products extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'ID' => 'ID',
-			'Status' => 'Status',
-			'Name' => 'Name',
-			'Alias' => 'Alias',
+			'ID'        => 'ID',
+			'Status'    => Yii::t('products','Status'),
+			'Name'      => Yii::t('products','Name'),
+			'Alias'     => Yii::t('products','Alias'),
+			'Title'     => Yii::t('products','Title'),
+			'Keywords'      => Yii::t('products','Keywords'),
+			'Description'   => Yii::t('products','Description'),
 		);
 	}
 
@@ -138,5 +146,78 @@ class Products extends CActiveRecord
 			$return[] = $Field->ID;
 		}
 		return $return;
+	}
+
+	public function beforeDelete(){
+		if( parent::beforeDelete() ) {
+			$Products = $this->findAll();
+			if ( $Products )
+				foreach($Products as $Product){
+					Yii::app()->db->createCommand()->dropTable($Product->Alias);
+				}
+		}
+		return true;
+	}
+
+	// форма в формате CForm
+	public function getMotelCForm(){
+		return new CForm(array(
+			'attributes' => array(
+				'enctype' => 'application/form-data',
+				'class' => 'well'
+			),
+			'activeForm' => array(
+				'class' => 'CActiveForm',
+				'enableAjaxValidation' => true,
+				'enableClientValidation' => false,
+				'id' => "FieldForm",
+				'clientOptions' => array(
+					'validateOnSubmit' => true,
+					'validateOnChange' => false,
+				),
+			),
+
+			'elements'=>array(
+				'Status'=>array(
+					'type'=>'checkbox',
+					'layout'=>'{input}{label}{error}{hint}',
+				),
+				'Name'=>array(
+					'type'=>'text',
+					'maxlength'=>255
+				),
+				'Alias'=>array(
+					'type'      =>  'text',
+					'maxlength' =>  255,
+					"disabled".$this->isNewRecord  =>  "disabled1",
+				),
+				'Title'=>array(
+					'type'=>'textarea','class'=>"span5"
+				),
+				'Keywords'=>array(
+					'type'=>'textarea','class'=>"span5"
+				),
+				'Description'=>array(
+					'type'=>'textarea','class'=>"span5",'rows'=>5
+				),
+			),
+
+			'buttons'=>array(
+				'<br/>',
+				'submit'=>array(
+					'type'  =>  'submit',
+					'label' =>  $this->isNewRecord ? 'Создать' : "Сохранить",
+					'class' =>  "btn"
+				),
+			),
+		), $this);
+	}
+
+	public function getGoodsObject(){
+		eval("class {$this->Alias} extends Goods{}");
+		$Goods = new $this->Alias();
+		$Goods->setProductID($this->ID);
+		//$Goods->setGoodsAttributes();
+		return $Goods;
 	}
 }

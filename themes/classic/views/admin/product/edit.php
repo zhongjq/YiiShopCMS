@@ -4,11 +4,12 @@ $this->breadcrumbs=array(
 	'Редактирование товара #'.$Product->ID,
 );
 
-Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl."/js/productcreate.js",CClientScript::POS_BEGIN);
-Yii::app()->clientScript->registerScriptFile(Yii::app()->theme->baseUrl."/js/jquery.form.js",CClientScript::POS_BEGIN);
+$this->SecondMenu=array(
+	array(  'label' => 'Поля',
+			'url'   => $this->createUrl('/admin/product/fields',array('id'=>$Product->ID)),
+			'active'=> $this->getAction()->getId() == 'fields' ),
+);
 
-$this->renderPartial('SecondMenu');
-
-$this->renderPartial('_form', array('Product'=>$Product));
+echo $Form;
 
 ?>

@@ -58,7 +58,7 @@
  * This can be either a string or an array representing multiple union parts.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
- * @version $Id: CDbCommand.php 3515 2011-12-28 12:29:24Z mdomba $
+ * @version $Id$
  * @package system.db
  * @since 1.0
  */
