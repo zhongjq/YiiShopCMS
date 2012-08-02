@@ -25,6 +25,11 @@ input[type=radio] + label, input[type=checkbox] + label {
     margin: 10px 5px;
 }
 
+form div.row input[type=checkbox] {
+    display:inline !important;
+    margin: 10px 5px;
+}
+
 /* Subnav */
 .subnav {
   width: 100%;

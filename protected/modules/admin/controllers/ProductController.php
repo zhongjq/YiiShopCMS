@@ -168,7 +168,9 @@ class ProductController extends Controller
 
 		if(Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "FieldForm" )
 		{
-			echo CActiveForm::validate($ProductField);
+			$class = $ProductField::CreateField($_POST['ProductsFields']['FieldType']);
+
+			echo CActiveForm::validate(array($ProductField,$class));
 			Yii::app()->end();
 		}
 

@@ -8,19 +8,19 @@ return array(
 	'theme'             =>  'classic',
 
 	'params'=>array(
-		'keywords'		=>	array(),
-		'description'	=>	'',
+		'keywords'		=>	array('компания, товары, услуги, бизнес, продажа, сделки, покупка, тендеры, заявки, каталог, справочник, информация о компаниях, прайс-листы, цены, материалы, технологии, b2b, Россия',),
+		'description'	=>	'Каталог производителей, поставщиков, промышленных и торговых предприятий, заводов, предприятий сферы услуг России. Бесплатная регистрация компаний на сайте. Размещение прайс-листов, информации о товарах и услугах. Поиск товаров и услуг, тендеров и заявок, бесплатное создание сайта компании.',
 		'smtp'			=>	array(
 								"host"		=> "smtp.yandex.ru", 			//smtp сервер
 								"debug"		=> 0,                   		//отображение информации дебаггера (0 - нет вообще)
 								"auth"		=> true,                 		//сервер требует авторизации
 								"port"		=> 25,                    		//порт (по-умолчанию - 25)
-								"username"	=> "",			//имя пользователя на сервере
-								"password"	=> "",					//пароль
-								"addreply"	=> "",	//ваш е-mail
-								"replyto"	=> "",   //e-mail ответа
-								"fromname"	=> "",				//имя
-								"from"		=> "",	//от кого
+								"username"	=> "support@bigdirectory.ru",			//имя пользователя на сервере
+								"password"	=> "754089en",					//пароль
+								"addreply"	=> "support@bigdirectory.ru",	//ваш е-mail
+								"replyto"	=> "support@bigdirectory.ru",   //e-mail ответа
+								"fromname"	=> "BigDirectory",				//имя
+								"from"		=> "support@bigdirectory.ru",	//от кого
 								"charset"	=> "utf-8",      				//от кого
 							),
 		'separator'		=>	' | '
@@ -58,7 +58,7 @@ return array(
     ),
 
 	'preload'=>array('log'),
-
+	
 
 	// компоненты
 	'components'=>array(
@@ -81,15 +81,9 @@ return array(
 			'class' => 'application.extensions.mailer.EMailer',
 			'pathViews' => 'application.views.email',
 			'pathLayouts' => 'application.views.email.layouts'
-		),
-
+		),		
+		
 		// база
-		'db'=>array(
-            'connectionString'=>'sqlite:'.$_SERVER['DOCUMENT_ROOT'].'/protected/data/blog.db',
-            'tablePrefix'=>'',
-        ),
-
-/*
 		'db'=>array(
 			'connectionString' => 'mysql:host=localhost;dbname=magazin',
 			'emulatePrepare' => true,
@@ -102,7 +96,7 @@ return array(
 			// показываем значения параметров
 			'enableParamLogging' => true,
 		),
-*/
+
 		// пользователи
 		'session' => array(
 			'autoStart'		=> true,
