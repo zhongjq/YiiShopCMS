@@ -15,12 +15,12 @@ return array(
 								"debug"		=> 0,                   		//отображение информации дебаггера (0 - нет вообще)
 								"auth"		=> true,                 		//сервер требует авторизации
 								"port"		=> 25,                    		//порт (по-умолчанию - 25)
-								"username"	=> "support@bigdirectory.ru",			//имя пользователя на сервере
-								"password"	=> "754089en",					//пароль
-								"addreply"	=> "support@bigdirectory.ru",	//ваш е-mail
-								"replyto"	=> "support@bigdirectory.ru",   //e-mail ответа
-								"fromname"	=> "BigDirectory",				//имя
-								"from"		=> "support@bigdirectory.ru",	//от кого
+								"username"	=> "",			//имя пользователя на сервере
+								"password"	=> "",					//пароль
+								"addreply"	=> "",	//ваш е-mail
+								"replyto"	=> "",   //e-mail ответа
+								"fromname"	=> "",				//имя
+								"from"		=> "",	//от кого
 								"charset"	=> "utf-8",      				//от кого
 							),
 		'separator'		=>	' | '
