@@ -184,6 +184,6 @@ class ProductsFields extends CActiveRecord
 			throw new CException("NOT NUMERIC");
 		}
 
-		return new TypeFields::$Fields[$FieldType]['class']();
+		return new TypeFields::$Fields[$FieldType]['class']('add');
 	}
 }

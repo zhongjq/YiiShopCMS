@@ -162,40 +162,103 @@ class ProductController extends Controller
 	public function actionAddField($id)
 	{
 		$Product = Products::model()->findByPk($id);
-
 		$ProductField = new ProductsFields('add');
 		$ProductField->ProductID = $id;
 
+		$ArrayForm = array(
+			'attributes' => array(
+				'enctype' => 'application/form-data',
+				'class' => 'well',
+				'id'=>'FieldForm'
+			),
+			'activeForm' => array(
+				'class' => 'CActiveForm',
+				'enableAjaxValidation' => true,
+				'enableClientValidation' => false,
+				'id' => "FieldForm",
+				'clientOptions' => array(
+					'validateOnSubmit' => true,
+					'validateOnChange' => false,
+				),
+			),
+
+			'elements'=>array(
+				'ProductsFields'=> array(
+					'type'=>'form',
+					'elements'=>array(
+						'FieldType'=>array(
+							'type'  =>  'dropdownlist',
+							'items' =>  TypeFields::getFieldsList(),
+							'empty'=>  '',
+
+							'ajax' => array(
+								'type'  =>  'POST',
+								'url'   =>  "",
+								'update'=>  '#FieldForm',
+							)
+
+						),
+						'Name'=>array(
+							'type'=>'text',
+							'maxlength'=>255
+						),
+						'Alias'=>array(
+							'type'      =>  'text',
+							'maxlength' =>  255,
+						),
+						'IsMandatory'=>array(
+							'type'=>'checkbox',
+							'layout'=>'{input}{label}{error}{hint}',
+						),
+						'IsFilter'=>array(
+							'type'=>'checkbox',
+							'layout'=>'{input}{label}{error}{hint}',
+						),
+						'IsColumnTable'=>array(
+							'type'=>'checkbox',
+							'layout'=>'{input}{label}{error}{hint}',
+						),
+						'Name'=>array(
+							'type'=>'text',
+							'maxlength'=>255
+						),
+					)
+				)
+			),
+
+			'buttons'=>array(
+				'<br/>',
+				'submit'=>array(
+					'type'  =>  'submit',
+					'label' =>  'Создать',
+					'class' =>  "btn"
+				),
+			),
+		);
+
+		$class = null;
+		if( Yii::app()->request->isAjaxRequest && isset($_POST['ProductsFields']['FieldType']) ){
+			$ClassName = 'StringFields';
+			$class = $ProductField::CreateField(2);
+			$ArrayForm['elements'][$ClassName] = $class->getElementsMotelCForm();
+		}
+
+		$Form = new CForm($ArrayForm);
+		$Form['ProductsFields']->model = $ProductField;
+
+		if( Yii::app()->request->isAjaxRequest && isset($_POST['ProductsFields']['FieldType']) ){
+			$Form[$ClassName]->model = $class;
+		}
+
 		if(Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "FieldForm" )
 		{
-			$class = $ProductField::CreateField($_POST['ProductsFields']['FieldType']);
-
 			echo CActiveForm::validate(array($ProductField,$class));
 			Yii::app()->end();
 		}
 
-		if(isset($_POST['ProductsFields'])) {
-			$ProductField->attributes = $_POST['ProductsFields'];
-			if(isset($_POST['submit']) && $ProductField->save()){
-				Yii::app()->db->createCommand()->addColumn( $Product->Alias,
-															$ProductField->Alias,
-															TypeFields::$Fields[$ProductField->FieldType]['type']
-				);
-				$this->redirect($this->createUrl('/admin/product/fields',array('id'=>$id)));
-			}
-		}
-
-		$Form = $ProductField->getMotelCForm();
-
-		if( Yii::app()->request->isAjaxRequest ){
-
-			$class = $ProductField::CreateField($_POST['ProductsFields']['FieldType']);
-			$ClassForm = $class->getMotelCForm();
-			$ClassForm->render();
-
-
+		if( Yii::app()->request->isAjaxRequest && isset($_POST['ProductsFields']['FieldType']) ){
 			$Form->render();
-			echo $Form->renderElements().$ClassForm->renderElements().$Form->renderButtons();
+			echo $Form->renderBody();
 			Yii::app()->end();
 		}
 

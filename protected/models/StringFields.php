@@ -39,7 +39,8 @@ class StringFields extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('FieldID', 'required'),
+			array('MinLength, MaxLength', 'required', 'on'=>'add'),
+			array('FieldID, MinLength, MaxLength', 'required', 'on'=>'edit'),
 			array('FieldID, MinLength, MaxLength', 'numerical', 'integerOnly'=>true),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
@@ -92,44 +93,20 @@ class StringFields extends CActiveRecord
 	}
 
 	// форма в формате CForm
-	public function getMotelCForm(){
-		return new CForm(array(
-			'attributes' => array(
-				'enctype' => 'application/form-data',
-				'class' => 'well',
-				'id'=>'FieldForm'
-			),
-			'activeForm' => array(
-				'class' => 'CActiveForm',
-				'enableAjaxValidation' => true,
-				'enableClientValidation' => false,
-				'id' => "FieldForm",
-				'clientOptions' => array(
-					'validateOnSubmit' => true,
-					'validateOnChange' => false,
-				),
-			),
-
-			'elements'=>array(
-				'MinLength'=>array(
-					'type'=>'text',
-					'maxlength'=>255
-				),
-				'MaxLength'=>array(
-					'type'=>'text',
-					'maxlength'=>255
-				),
-			),
-
-			'buttons'=>array(
-				'<br/>',
-				'submit'=>array(
-					'type'  =>  'submit',
-					'label' =>  $this->isNewRecord ? 'Создать' : "Сохранить",
-					'class' =>  "btn"
-				),
-			),
-		), $this);
+	public function getElementsMotelCForm(){
+		return array(
+				'type'=>'form',
+				'elements'=>array(
+					'MinLength'=>array(
+						'type'=>'text',
+						'maxlength'=>255
+					),
+					'MaxLength'=>array(
+						'type'=>'text',
+						'maxlength'=>255
+					),
+				)
+			);
 	}
 
 }
