@@ -34,9 +34,7 @@ class ProductController extends Controller
 		$Product->getAttributes();
 
 		$Goods = $Product->getGoodsObject();
-		$Goods = $Goods->findAll(array(
-			'select'=>'t.Name'
-		));
+		$Goods = $Goods->findAll();
 
 		$this->render('view', array(
 			'Product' => $Product,
@@ -237,28 +235,61 @@ class ProductController extends Controller
 		);
 
 		$class = null;
-		if( Yii::app()->request->isAjaxRequest && isset($_POST['ProductsFields']['FieldType']) ){
-			$ClassName = 'StringFields';
-			$class = $ProductField::CreateField(2);
+		$FieldType = null;
+		if ( isset($_POST['ProductsFields']['FieldType']) )
+			$FieldType = $_POST['ProductsFields']['FieldType'];
+
+		if ( $FieldType > 0 )
+			$ClassName = TypeFields::$Fields[$FieldType]['class'];
+
+		if( Yii::app()->request->isAjaxRequest && $FieldType > 0 ){
+			$class = $ProductField::CreateField($FieldType);
 			$ArrayForm['elements'][$ClassName] = $class->getElementsMotelCForm();
+			$ProductField->addRelatedRecord('moredata',$class,true);
 		}
 
 		$Form = new CForm($ArrayForm);
 		$Form['ProductsFields']->model = $ProductField;
-
-		if( Yii::app()->request->isAjaxRequest && isset($_POST['ProductsFields']['FieldType']) ){
+		if( Yii::app()->request->isAjaxRequest && $FieldType > 0  ){
 			$Form[$ClassName]->model = $class;
 		}
 
-		if(Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "FieldForm" )
-		{
-			echo CActiveForm::validate(array($ProductField,$class));
+		if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "FieldForm" ){
+			$validate = array($ProductField);
+			if ( $class ) $validate[] = $class;
+			echo CActiveForm::validate($validate);
 			Yii::app()->end();
 		}
 
-		if( Yii::app()->request->isAjaxRequest && isset($_POST['ProductsFields']['FieldType']) ){
+		if( isset($_POST['ProductsFields']) ) {
+			$ProductField->attributes = $_POST['ProductsFields'];
+
+			if ( isset($_POST[$ClassName]) ){
+				$class->attributes = $_POST[$ClassName];
+			}
+
+			$transaction = Yii::app()->db->beginTransaction();
+			try
+			{
+				if ( isset($_POST[$ClassName]) && $ProductField->save() ){
+					$transaction->commit();
+					$this->redirect($this->createUrl('/admin/product/fields',array('id'=>$Product->ID)));
+				} else {
+					throw new CException("Error save");
+				}
+			}
+			catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
+			{
+				$transaction->rollBack();
+			}
+		}
+
+
+		if( Yii::app()->request->isAjaxRequest && $FieldType > 0 ){
 			$Form->render();
-			echo $Form->renderBody();
+			$sc = '';
+			Yii::app()->clientScript->render($sc);
+			echo $Form->renderBody().$sc;
 			Yii::app()->end();
 		}
 
@@ -268,37 +299,126 @@ class ProductController extends Controller
 		));
 	}
 
-
-
 	public function actionEditField($id,$FieldID)
 	{
 		$Product = Products::model()->findByPk($id);
-
+		$Product->setScenario('edit');
 		$ProductField = ProductsFields::model()->findByPk($FieldID);
-		$ProductField->ProductID = $id;
+		$ProductField->setScenario('edit');
 
-		if(Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "FieldForm" )
-		{
-			echo CActiveForm::validate($ProductField);
+		$ArrayForm = array(
+			'attributes' => array(
+				'enctype' => 'application/form-data',
+				'class' => 'well',
+				'id'=>'FieldForm'
+			),
+			'activeForm' => array(
+				'class' => 'CActiveForm',
+				'enableAjaxValidation' => true,
+				'enableClientValidation' => false,
+				'id' => "FieldForm",
+				'clientOptions' => array(
+					'validateOnSubmit' => true,
+					'validateOnChange' => false,
+				),
+			),
+
+			'elements'=>array(
+				'ProductsFields'=> array(
+					'type'=>'form',
+					'elements'=>array(
+						'FieldType'=>array(
+							'type'  =>  'dropdownlist',
+							'items' =>  TypeFields::getFieldsList(),
+							'empty'=>  '',
+							'disabled'=>'disabled',
+							'ajax' => array(
+								'type'  =>  'POST',
+								'url'   =>  "",
+								'update'=>  '#FieldForm',
+							)
+
+						),
+						'Name'=>array(
+							'type'=>'text',
+							'maxlength'=>255
+						),
+						'Alias'=>array(
+							'type'      =>  'text',
+							'maxlength' =>  255,
+							'disabled'=>'disabled',
+						),
+						'IsMandatory'=>array(
+							'type'=>'checkbox',
+							'layout'=>'{input}{label}{error}{hint}',
+						),
+						'IsFilter'=>array(
+							'type'=>'checkbox',
+							'layout'=>'{input}{label}{error}{hint}',
+						),
+						'IsColumnTable'=>array(
+							'type'=>'checkbox',
+							'layout'=>'{input}{label}{error}{hint}',
+						),
+						'Name'=>array(
+							'type'=>'text',
+							'maxlength'=>255
+						),
+					)
+				)
+			),
+
+			'buttons'=>array(
+				'<br/>',
+				'submit'=>array(
+					'type'  =>  'submit',
+					'label' =>  'Сохранить',
+					'class' =>  "btn"
+				),
+			),
+		);
+
+		$FieldType = $ProductField->FieldType;
+		$ClassName = TypeFields::$Fields[$FieldType]['class'];
+		$class = $ProductField::CreateField($FieldType);
+		$ArrayForm['elements'][$ClassName] = $class->getElementsMotelCForm();
+		$ProductField->addRelatedRecord('moredata',$class,true);
+
+		$Form = new CForm($ArrayForm);
+		$Form['ProductsFields']->model = $ProductField;
+		$Form[$ClassName]->model = $class;
+
+		if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "FieldForm" ){
+			$validate = array($ProductField);
+			if ( $class ) $validate[] = $class;
+			echo CActiveForm::validate($validate);
 			Yii::app()->end();
 		}
 
-		if(isset($_POST['ProductsFields'])) {
+		if( isset($_POST['ProductsFields']) ) {
 			$ProductField->attributes = $_POST['ProductsFields'];
-			if($ProductField->save()){
-				$this->redirect($this->createUrl('/admin/product/fields',array('id'=>$id)));
+
+			if ( isset($_POST[$ClassName]) ){
+				$class->attributes = $_POST[$ClassName];
+			}
+
+			$transaction = Yii::app()->db->beginTransaction();
+			try
+			{
+				if ( isset($_POST[$ClassName]) && $ProductField->save() ){
+					$transaction->commit();
+					$this->redirect($this->createUrl('/admin/product/fields',array('id'=>$Product->ID)));
+				} else {
+					throw new CException("Error save");
+				}
+			}
+			catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
+			{
+				$transaction->rollBack();
 			}
 		}
 
-		$Form = $ProductField->getMotelCForm();
-
-		if( Yii::app()->request->isAjaxRequest ){
-			$Form->render();
-			echo $Form->renderElements().$Form->renderButtons();
-			Yii::app()->end();
-		}
-
-		$this->render('editfield', array(
+		$this->render('addfield', array(
 			'Product' => $Product,
 			'Form' => $Form,
 		));

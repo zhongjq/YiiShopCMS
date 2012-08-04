@@ -16,6 +16,7 @@
  */
 class ProductsFields extends CActiveRecord
 {
+	public $moredata;
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
@@ -42,7 +43,7 @@ class ProductsFields extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('FieldType, Name, Alias', 'required', 'on'=>'add'),
+			array('FieldType, Name, Alias', 'required', 'on'=>'add, edit'),
 			array('ProductID, FieldType, IsMandatory, IsFilter', 'numerical', 'integerOnly'=>true),
 			array('Name', 'length', 'max'=>255),
 			array('Alias', 'length', 'max'=>50),
@@ -64,7 +65,11 @@ class ProductsFields extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'product' => array(self::BELONGS_TO, 'Products', 'ProductID'),
+			'NumericFields' => array(self::HAS_ONE, 'NumericFields', 'FieldID'),
+			'PriceFields' => array(self::HAS_ONE, 'PriceFields', 'FieldID'),
+			'Product' => array(self::BELONGS_TO, 'Products', 'ProductID'),
+			'StringFields' => array(self::HAS_ONE, 'StringFields', 'FieldID'),
+			'TextFields' => array(self::HAS_ONE, 'TextFields', 'FieldID'),
 		);
 	}
 
@@ -185,5 +190,15 @@ class ProductsFields extends CActiveRecord
 		}
 
 		return new TypeFields::$Fields[$FieldType]['class']('add');
+	}
+
+
+	public function afterSave(){
+		parent::afterSave();
+
+		if ( $this->moredata ) {
+			$this->moredata->FieldID = $this->ID;
+			$this->moredata->save();
+		}
 	}
 }

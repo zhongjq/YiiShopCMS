@@ -50,16 +50,12 @@ return array(
 		),
         'gii'=>array(
             'class'         =>  'system.gii.GiiModule',
-            'password'      =>  '1',
+            'password'      =>  '',
             'ipFilters'     =>  array("192.168.56.1","127.0.0.1",),
             'newFileMode'   =>  0666,
             'newDirMode'    =>  0777,
         )
     ),
-
-	'preload'=>array('log'),
-	
-
 	// компоненты
 	'components'=>array(
 
@@ -184,7 +180,7 @@ return array(
 			'errorAction'=>'site/error',
         ),
 
-		'preload'=>array('log'),
+		//'preload'=>array('log'),
 		'log1'=>array(
 			'class'=>'CLogRouter',
 			'routes'=>array(
