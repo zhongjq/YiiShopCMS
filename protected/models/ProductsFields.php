@@ -198,7 +198,20 @@ class ProductsFields extends CActiveRecord
 
 		if ( $this->moredata ) {
 			$this->moredata->FieldID = $this->ID;
-			$this->moredata->save();
+			if ( $this->moredata->save() ){
+				$Product = Products::model()->findByPk($this->ProductID);
+				Yii::app()->db->createCommand()->addColumn( $Product->Alias,
+															$this->Alias,
+															TypeFields::$Fields[$this->FieldType]['dbType']
+															);
+			}
+
 		}
+	}
+
+	public function beforeDelete(){
+		parent::beforeDelete();
+		$Product = Products::model()->findByPk($this->ProductID);
+		Yii::app()->db->createCommand()->dropColumn( $Product->Alias,$this->Alias);
 	}
 }

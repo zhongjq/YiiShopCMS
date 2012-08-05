@@ -107,7 +107,7 @@ class Goods extends CActiveRecord
 		if ( $ProductFields ){
 			foreach( $ProductFields as $Field ){
 				if ( $Field->IsMandatory ) $required[] = $Field->Alias;
-				if ( $Field->FieldType == TypeFields::NUMERIC ) $numerical[] = $Field->Alias;
+				if ( $Field->FieldType == TypeFields::INTEGER ) $numerical[] = $Field->Alias;
 			}
 		}
 

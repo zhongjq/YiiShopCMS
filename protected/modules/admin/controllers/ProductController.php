@@ -239,13 +239,12 @@ class ProductController extends Controller
 		if ( isset($_POST['ProductsFields']['FieldType']) )
 			$FieldType = $_POST['ProductsFields']['FieldType'];
 
-		if ( $FieldType > 0 )
+		if ( $FieldType > 0 ){
 			$ClassName = TypeFields::$Fields[$FieldType]['class'];
-
-		if( Yii::app()->request->isAjaxRequest && $FieldType > 0 ){
 			$class = $ProductField::CreateField($FieldType);
 			$ArrayForm['elements'][$ClassName] = $class->getElementsMotelCForm();
-			$ProductField->addRelatedRecord('moredata',$class,true);
+
+			$ProductField->moredata = $class;
 		}
 
 		$Form = new CForm($ArrayForm);

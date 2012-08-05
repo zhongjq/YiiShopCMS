@@ -180,8 +180,8 @@ return array(
 			'errorAction'=>'site/error',
         ),
 
-		//'preload'=>array('log'),
-		'log1'=>array(
+		'preload'=>array('log'),
+		'log'=>array(
 			'class'=>'CLogRouter',
 			'routes'=>array(
 				array(

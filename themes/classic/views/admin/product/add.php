@@ -7,5 +7,5 @@ $this->breadcrumbs=array(
 
 $this->renderPartial('GoodsSecondMenu',array('Product'=>$Product));
 
-echo $Form;
+echo $Form->render();
 ?>
