@@ -1,3 +1,2 @@
 YiiShop
-=======
-1
+YiiShop CMS
