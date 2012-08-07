@@ -1,6 +1,6 @@
 phpmyadmin
 nbproject
-yii/*
+#yii/
 .idea
-assets/*
+#assets/
 protected/runtime/
