@@ -65,11 +65,11 @@ class ProductsFields extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'NumericFields' => array(self::HAS_ONE, 'NumericFields', 'FieldID'),
-			'PriceFields' => array(self::HAS_ONE, 'PriceFields', 'FieldID'),
-			'Product' => array(self::BELONGS_TO, 'Products', 'ProductID'),
-			'StringFields' => array(self::HAS_ONE, 'StringFields', 'FieldID'),
-			'TextFields' => array(self::HAS_ONE, 'TextFields', 'FieldID'),
+			'IntegerFields' => array(self::HAS_ONE, 'IntegerFields', 'FieldID'),
+			'PriceFields'   => array(self::HAS_ONE, 'PriceFields', 'FieldID'),
+			'Product'       => array(self::BELONGS_TO, 'Products', 'ProductID'),
+			'StringFields'  => array(self::HAS_ONE, 'StringFields', 'FieldID'),
+			'TextFields'    => array(self::HAS_ONE, 'TextFields', 'FieldID'),
 		);
 	}
 
@@ -201,17 +201,16 @@ class ProductsFields extends CActiveRecord
 			if ( $this->moredata->save() ){
 				$Product = Products::model()->findByPk($this->ProductID);
 				Yii::app()->db->createCommand()->addColumn( $Product->Alias,
-															$this->Alias,
-															TypeFields::$Fields[$this->FieldType]['dbType']
-															);
+					$this->Alias,
+					TypeFields::$Fields[$this->FieldType]['dbType']
+				);
 			}
-
 		}
 	}
 
-	public function beforeDelete(){
-		parent::beforeDelete();
+	public function afterDelete(){
+		parent::afterDelete();
 		$Product = Products::model()->findByPk($this->ProductID);
-		Yii::app()->db->createCommand()->dropColumn( $Product->Alias,$this->Alias);
+		Yii::app()->db->createCommand()->dropColumn( $Product->Alias, $this->Alias );
 	}
 }

@@ -12,7 +12,7 @@ class TypeFields
 	);
 
 	public static $Fields = array(
-		self::STRING    => array(
+		self::STRING    =>  array(
 			'name'      =>  "Строка",
 			'class'     =>  "StringFields",
 			'type'      =>  "string",
@@ -22,10 +22,15 @@ class TypeFields
 				'maxlength' =>  255,
 			),
 		),
-		self::INTEGER   => array(
-			'name'      => "Число",
-			'type'      => "integer",
+		self::INTEGER   =>  array(
+			'name'      =>  "Целое число",
+			'type'      =>  "integer",
+			'class'     =>  "IntegerFields",
 			'dbType'    =>  "int(11)",
+			'form'      =>  array(
+				'type'      =>  'text',
+				'maxlength' =>  11,
+			),
 		),
 		self::PRICE     => array(
 			'name'=> "Цена"

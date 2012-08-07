@@ -81,7 +81,7 @@ return array(
 		
 		// база
 		'db'=>array(
-			'connectionString' => 'mysql:host=localhost;dbname=magazin',
+			'connectionString' => 'mysql:host=localhost;dbname=yiishop',
 			'emulatePrepare' => true,
 			'username' => 'root',
 			'password' => '',

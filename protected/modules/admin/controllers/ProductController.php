@@ -47,17 +47,17 @@ class ProductController extends Controller
 		$Product = Products::model()->with('productsFields')->findByPk($id);
 		$Goods = $Product->getGoodsObject();
 
+		if(Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "GoodsForm" )
+		{
+			echo CActiveForm::validate($Goods);
+			Yii::app()->end();
+		}
+
 		if(isset($_POST[$Goods->tableName()])) {
 			$Goods->attributes = $_POST[$Goods->tableName()];
 			if(isset($_POST['submit']) && $Goods->save()){
 				$this->redirect($this->createUrl('/admin/product/view',array('id'=>$Product->ID)));
 			}
-		}
-
-		if(Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "GoodsForm" )
-		{
-			echo CActiveForm::validate($Goods);
-			Yii::app()->end();
 		}
 
 		$Form = $Goods->getMotelCForm();
@@ -192,7 +192,7 @@ class ProductController extends Controller
 							'ajax' => array(
 								'type'  =>  'POST',
 								'url'   =>  "",
-								'update'=>  '#FieldForm',
+								'replace'=>  '#FieldForm',
 							)
 
 						),
@@ -285,10 +285,10 @@ class ProductController extends Controller
 
 
 		if( Yii::app()->request->isAjaxRequest && $FieldType > 0 ){
-			$Form->render();
+			$Form = $Form->render();
 			$sc = '';
 			Yii::app()->clientScript->render($sc);
-			echo $Form->renderBody().$sc;
+			echo $Form.$sc;
 			Yii::app()->end();
 		}
 
@@ -380,6 +380,7 @@ class ProductController extends Controller
 		$FieldType = $ProductField->FieldType;
 		$ClassName = TypeFields::$Fields[$FieldType]['class'];
 		$class = $ProductField::CreateField($FieldType);
+		$class = $class::model()->findByPk($FieldID);
 		$ArrayForm['elements'][$ClassName] = $class->getElementsMotelCForm();
 		$ProductField->addRelatedRecord('moredata',$class,true);
 
@@ -425,12 +426,19 @@ class ProductController extends Controller
 
 	public function actionDeleteField($id,$FieldID)
 	{
-
-
 		$ProductField = ProductsFields::model()->find('ID=:ID AND ProductID=:ProductID',array(':ID'=>$FieldID,'ProductID'=>$id));
 
-		if($ProductField->delete()){
-			$this->redirect($this->createUrl('/admin/product/fields',array('id'=>$id)));
+		$transaction = Yii::app()->db->beginTransaction();
+		try
+		{
+			if( $ProductField->delete() ){
+				$transaction->commit();
+				$this->redirect($this->createUrl('/admin/product/fields',array('id'=>$id)));
+			}
+		}
+		catch(Exception $e)
+		{
+			$transaction->rollBack();
 		}
 	}
 

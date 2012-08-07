@@ -2,4 +2,5 @@ phpmyadmin
 nbproject
 yii/
 .idea
-assets
+assets/
+protected/runtime/
