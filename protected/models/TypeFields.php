@@ -5,10 +5,13 @@ class TypeFields
 	const INTEGER = 1;
 	const STRING = 2;
 	const PRICE = 3;
+	const TEXT = 4;
 
 	public static $TypeToIDFields = array(
-		'integer'=> self::INTEGER,
-		'string'=> self::STRING,
+		'integer'   => self::INTEGER,
+		'string'    => self::STRING,
+		'price'     => self::PRICE,
+		'text'      => self::TEXT,
 	);
 
 	public static $Fields = array(
@@ -32,8 +35,24 @@ class TypeFields
 				'maxlength' =>  11,
 			),
 		),
+		self::TEXT   =>  array(
+			'name'      =>  "Текст",
+			'type'      =>  "text",
+			'class'     =>  "TextFields",
+			'dbType'    =>  "text",
+			'form'      =>  array(
+				'type'  =>  'textarea',
+			),
+		),
 		self::PRICE     => array(
-			'name'=> "Цена"
+			'name'      =>  "Цена",
+			'type'      =>  "price",
+			'class'     =>  "PriceFields",
+			'dbType'    =>  "decimal(9,2)",
+			'form'      =>  array(
+				'type'      =>  'text',
+				'maxlength' =>  12,
+			),
 		),
 	);
 

@@ -108,7 +108,6 @@ return array(
         ),
 
  		'authManager'=>array(
-            // Будем использовать свой менеджер авторизации
 			'class' => 'PhpAuthManager',
 			'defaultRoles'=>array('guest'),
         ),

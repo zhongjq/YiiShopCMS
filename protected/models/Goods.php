@@ -15,7 +15,9 @@ class Goods extends CActiveRecord
 		if ( $this->getProductID() === null ) throw new CException("ID NOT ProductID");
 
 		if ( $this->ProductsFields === null && $update === false )
-			$this->ProductsFields = ProductsFields::model()->findAll('ProductID=:ProductID',array(':ProductID'=>$this->getProductID()));
+			$this->ProductsFields = ProductsFields::model()
+										->with('StringFields','TextFields','IntegerFields','PriceFields')
+										->findAll('ProductID=:ProductID',array(':ProductID'=>$this->getProductID()));
 
 		return $this->ProductsFields;
 	}
@@ -72,7 +74,14 @@ class Goods extends CActiveRecord
 
 		if ( $ProductFields ){
 			foreach( $ProductFields as $Field ){
-				$Form['elements'][$Field->Alias] = TypeFields::$Fields[$Field->FieldType]['form'];
+				switch( $Field->FieldType ){
+					case TypeFields::TEXT :
+						$Form['elements'][$Field->Alias] = TypeFields::$Fields[$Field->FieldType]['form'];
+						$Form['elements'][$Field->Alias]['rows'] = $Field->TextFields->Rows;
+					break;
+					default:
+						$Form['elements'][$Field->Alias] = TypeFields::$Fields[$Field->FieldType]['form'];
+				}
 			}
 		}
 
@@ -96,26 +105,45 @@ class Goods extends CActiveRecord
 
 	public function rules()
 	{
-		$rules = array();
-		$required = array();
-		$numerical = array();
-		$safe = array('Title','Keywords','Description');
-		$unique = array("Alias");
+		$rules      = array();
+		$required   = array();
+		$numerical  = array();
+		$safe       = array('Title','Keywords','Description');
+		$unique     = array("Alias");
 
 		$ProductFields = $this->getProductFields();
 
 		if ( $ProductFields ){
 			foreach( $ProductFields as $Field ){
 				if ( $Field->IsMandatory ) $required[] = $Field->Alias;
-				if ( $Field->FieldType == TypeFields::INTEGER ) $numerical[] = $Field->Alias;
+
+				switch( $Field->FieldType ){
+					case TypeFields::TEXT :
+						$safe[] = $Field->Alias;
+						$rules[] = array($Field->Alias,'length','min'=> $Field->TextFields->MinLength,'max'=>$Field->TextFields->MaxLength,'allowEmpty'=>true );
+					break;
+					case TypeFields::STRING :
+						$safe[] = $Field->Alias;
+						$rules[] = array($Field->Alias,'length','min'=> $Field->StringFields->MinLength,'max'=>$Field->StringFields->MaxLength,'allowEmpty'=>true );
+					break;
+					case TypeFields::INTEGER :
+						$rules[] = array($Field->Alias, 'numerical', 'integerOnly'=>true,'min'=> $Field->IntegerFields->MinValue ,'max'=>$Field->IntegerFields->MaxValue ,'allowEmpty'=>true);
+					break;
+					case TypeFields::PRICE :
+						$rules[] = array($Field->Alias, 'match', 'pattern'=>'/^\s*[-+]?[0-9]*\.?[0-9]{1,2}?\s*$/',
+											'message' => Yii::t("AdminModule.products",'Price has the wrong format (eg 10.50).')
+										);
+
+						$rules[] = array($Field->Alias, 'numerical', 'max'=>$Field->PriceFields->MaxValue ,'allowEmpty'=>true);
+
+					break;
+				}
+
 			}
 		}
 
 		if ( !empty($required) )
 			$rules[] = array(implode(',',$required), 'required');
-
-		if ( !empty($numerical) )
-			$rules[] = array(implode(',',$numerical), 'numerical', 'integerOnly'=>true);
 
 		if ( !empty($safe) )
 			$rules[] = array(implode(',',$safe), 'safe');
