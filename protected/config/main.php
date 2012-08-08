@@ -82,10 +82,10 @@ return array(
 		
 		// База
 		'db'=>array(
-			'connectionString' => 'mysql:host=mysql0.db.koding.com;dbname=enchikiben_fbfde',
+			'connectionString' => 'mysql:host=localhost;dbname=yiishop',
 			'emulatePrepare' => true,
-			'username' => 'enchikiben_fbfde',
-			'password' => '754089db',
+			'username' => 'root',
+			'password' => '',
 			'charset' => 'utf8',
 			'tablePrefix' => '',
 			// включаем профайлер
@@ -132,7 +132,7 @@ return array(
         	'urlFormat'			=>	'path',
 			'showScriptName'	=>	false,
             // тут правим если запускаем из подпапки
-			'baseUrl'			=>	'http://'.$_SERVER['SERVER_NAME'].'/yiishop',
+			'baseUrl'			=>	'http://'.$_SERVER['SERVER_NAME'],
          	'rules'				=>	array(
 		         '/'=>'site/index',
 
@@ -165,7 +165,10 @@ return array(
                 '/admin/product/edit/<id:\d+>/fields'                       =>  'admin/product/fields',
 		        '/admin/product/edit/<id:\d+>/fields/add'                   =>  'admin/product/addfield',
 		        '/admin/product/edit/<id:\d+>/fields/<action:(edit|delete)>/<FieldID:\d+>'  =>  'admin/product/<action>field',
-                
+
+		        '/admin/products/lists'                                     =>  'admin/product/lists',
+		        '/admin/products/lists/<action:(add|edit|view|delete)>/<id>'=>  'admin/product/<action>list',
+
                 // Категории
 		        '/category/<Alias>' => '/categories/view/',
 

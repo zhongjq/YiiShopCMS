@@ -23,11 +23,6 @@ class ProductController extends Controller
 		));
 	}
 
-
-	public static function asd($a){
-		return $a;
-	}
-
 	public function actionView($ProductID)
 	{
 		$Product = Products::model()->with('productsFields')->findByPk($ProductID);
@@ -481,4 +476,9 @@ class ProductController extends Controller
 	}
 
 
+	/// LIST
+	public function actionLists(){
+
+		$this->render('lists/index', array() );
+	}
 }
