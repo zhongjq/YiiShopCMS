@@ -39,11 +39,11 @@ return array(
         'ext.eauth.services.*',
 	),
 
-	// сжатие
-	//'onBeginRequest'=>create_function('$event', 'return ob_start("ob_gzhandler");'),
-	//'onEndRequest'=>create_function('$event', 'return ob_end_flush();'),
+	// Сжатие
+	'onBeginRequest'=>create_function('$event', 'return ob_start("ob_gzhandler");'),
+	'onEndRequest'=>create_function('$event', 'return ob_end_flush();'),
 
-	// подули
+	// Модули
 	'modules'=>array(
 		'admin' => array(
 			'layout'=>'application.modules.admin.views.layouts.main',
@@ -56,7 +56,8 @@ return array(
             'newDirMode'    =>  0777,
         )
     ),
-	// компоненты
+    
+	// Компоненты
 	'components'=>array(
 
 		'clientScript'=>array(
@@ -72,19 +73,19 @@ return array(
             //'enableJavaScript'=>false,    // Эта опция отключает любую генерацию javascript'а фреймворком
         ),
 
-		// почта
+		// Почта
 		'mailer' => array(
 			'class' => 'application.extensions.mailer.EMailer',
 			'pathViews' => 'application.views.email',
 			'pathLayouts' => 'application.views.email.layouts'
 		),		
 		
-		// база
+		// База
 		'db'=>array(
-			'connectionString' => 'mysql:host=localhost;dbname=yiishop',
+			'connectionString' => 'mysql:host=mysql0.db.koding.com;dbname=enchikiben_fbfde',
 			'emulatePrepare' => true,
-			'username' => 'root',
-			'password' => '',
+			'username' => 'enchikiben_fbfde',
+			'password' => '754089db',
 			'charset' => 'utf8',
 			'tablePrefix' => '',
 			// включаем профайлер
@@ -102,14 +103,13 @@ return array(
         'user' => array(
 			'allowAutoLogin'	=> true,
 			'allowAutoLogin'	=> true,
-            // enable cookie-based authentication
             'identityCookie'	=> array('domain' => '.'.$_SERVER['SERVER_NAME']  ),
 			'loginUrl'			=> array('login'),
         ),
 
  		'authManager'=>array(
 			'class' => 'PhpAuthManager',
-			'defaultRoles'=>array('guest'),
+			'defaultRoles' => array('guest'),
         ),
 		'loid' => array(
             'class' => 'ext.lightopenid.loid',
@@ -131,7 +131,8 @@ return array(
         'urlManager'=>array(
         	'urlFormat'			=>	'path',
 			'showScriptName'	=>	false,
-			'baseUrl'			=>	'http://'.$_SERVER['SERVER_NAME'],
+            // тут правим если запускаем из подпапки
+			'baseUrl'			=>	'http://'.$_SERVER['SERVER_NAME'].'/yiishop',
          	'rules'				=>	array(
 		         '/'=>'site/index',
 
@@ -145,23 +146,27 @@ return array(
 				// стандартное правило для обработки '/login' как 'site/login' и т.д.
 				"<action:(login|logout|registration|signup)>" => 'site/<action>',
 				// подтверждение регистрации
-				'confirmation/<code>' => 'site/confirmation',
+				'/confirmation/<code>' => 'site/confirmation',
 
 
-		         /* АДМИНИСТРАТИРОВАНИЕ */
-		         "/admin/login" => "admin/default/login",
-		         // категории
-		        '/admin/category/<action:(add|edit|view|delete)>/<id>'      =>  'admin/categories/<action>',
-				// пользователи
+                /* АДМИНИСТРАТИРОВАНИЕ */
+                "/admin/login" => "admin/default/login",
+                // Категории
+                '/admin/category/<action:(add|edit|view|delete)>/<id>'      =>  'admin/categories/<action>',
+				// Пользователи
 		        '/admin/user/<action:(edit|view|delete|passwordedit)>/<id>' =>  'admin/users/<action>',
-		         // Продукты
+                // Продукты
 		        '/admin/products' => 'admin/product/index',
-		        '/admin/product/<action:(edit|view|delete)>/<id:\d+>'       =>  'admin/product/<action>',
-		        '/admin/product/view/<id:\d+>/add'                          =>  'admin/product/add',
-		        '/admin/product/edit/<id:\d+>/fields'                       =>  'admin/product/fields',
+		        
+                '/admin/product/<action:(edit|view|delete)>/<ProductID:\d+>'=>  'admin/product/<action>',
+		        '/admin/product/view/<ProductID:\d+>/add'                   =>  'admin/product/add',
+                '/admin/product/view/<ProductID:\d+>/record/<action:(edit|delete)>/<RecordID:\d+>'  =>  'admin/product/<action>record',
+		        
+                '/admin/product/edit/<id:\d+>/fields'                       =>  'admin/product/fields',
 		        '/admin/product/edit/<id:\d+>/fields/add'                   =>  'admin/product/addfield',
 		        '/admin/product/edit/<id:\d+>/fields/<action:(edit|delete)>/<FieldID:\d+>'  =>  'admin/product/<action>field',
-
+                
+                // Категории
 		        '/category/<Alias>' => '/categories/view/',
 
 		         // своё правило для URL вида '/Производитель/Модель'

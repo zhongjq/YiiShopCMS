@@ -28,9 +28,9 @@ class ProductController extends Controller
 		return $a;
 	}
 
-	public function actionView($id)
+	public function actionView($ProductID)
 	{
-		$Product = Products::model()->with('productsFields')->findByPk($id);
+		$Product = Products::model()->with('productsFields')->findByPk($ProductID);
 		$Product->getAttributes();
 
 		$Goods = $Product->getGoodsObject();
@@ -42,9 +42,9 @@ class ProductController extends Controller
 		));
 	}
 
-	public function actionAdd($id)
+	public function actionAdd($ProductID)
 	{
-		$Product = Products::model()->with('productsFields')->findByPk($id);
+		$Product = Products::model()->with('productsFields')->findByPk($ProductID);
 		$Goods = $Product->getGoodsObject();
 
 		if(Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "GoodsForm" )
@@ -56,13 +56,51 @@ class ProductController extends Controller
 		if(isset($_POST[$Goods->tableName()])) {
 			$Goods->attributes = $_POST[$Goods->tableName()];
 			if(isset($_POST['submit']) && $Goods->save()){
-				$this->redirect($this->createUrl('/admin/product/view',array('id'=>$Product->ID)));
+				$this->redirect($this->createUrl('/admin/product/view',array('ProductID'=>$Product->ID)));
 			}
 		}
 
 		$Form = $Goods->getMotelCForm();
 
-		$this->render('add',array('Product'=>$Product,'Form'=>$Form));
+		$this->render('AddRecord',array('Product'=>$Product,'Form'=>$Form));
+	}
+
+    public function actionEditRecord($ProductID,$RecordID)
+	{
+		$Product = Products::model()->with('productsFields')->findByPk($ProductID);
+		$Goods = $Product->getGoodsObject();
+        $Goods = $Goods->findByPk($RecordID);
+        $Goods->setProductID($ProductID);
+        
+		if(Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "GoodsForm" )
+		{
+			echo CActiveForm::validate($Goods);
+			Yii::app()->end();
+		}
+
+		if(isset($_POST[$Goods->tableName()])) {
+			$Goods->attributes = $_POST[$Goods->tableName()];
+			if(isset($_POST['submit']) && $Goods->save()){
+				$this->redirect($this->createUrl('/admin/product/view',array('ProductID'=>$Product->ID)));
+			}
+		}
+
+		$Form = $Goods->getMotelCForm();
+
+		$this->render('EditRecord',array('Product'=>$Product,'Form'=>$Form));
+	}
+
+    public function actionDeleteRecord($ProductID,$RecordID)
+    {
+		$Product = Products::model()->with('productsFields')->findByPk($ProductID);
+		$Goods = $Product->getGoodsObject();
+        $Goods = $Goods->findByPk($RecordID);
+        $Goods->setProductID($ProductID);        
+
+		if( $Goods->delete() ){
+			$this->redirect($this->createUrl('/admin/product/view',array('ProductID'=>$Product->ID)));
+		}
+
 	}
 
 	protected function performAjaxValidation($model)

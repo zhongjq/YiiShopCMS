@@ -19,6 +19,10 @@ $this->renderPartial('GoodsSecondMenu',array('Product'=>$Product));
 				<?php $f[] = $Field->Alias; ?>
 			<?php endif; ?>
 		<? endforeach ?>
+        <?php if(!empty($f)) : ?>
+    	<th width="10"></th>
+		<th width="10"></th> 
+        <?php endif  ?>
 	</tr>
 	</thead>
 	<tbody>
@@ -28,8 +32,21 @@ $this->renderPartial('GoodsSecondMenu',array('Product'=>$Product));
 				<? foreach($f as $name) : ?>
 					<td class="span2"><?= $Record->getAttribute($name) ?></td>
 				<? endforeach ?>
+                
+                <td>
+                	<?= CHtml::link( '<span class="icon-pencil pointer" title="'.Yii::t('AdminModule.main','Редактировать').'"></span>',
+                        $this->createUrl('/admin/product/editrecord',array('ProductID'=>$Field->ProductID,'RecordID'=>$Record->ID) )
+            		) ?>
+            	</td>
+            	<td>
+            		<?= CHtml::link( '<span class="close" title="'.Yii::t('AdminModule.main','Удалить').'">&times;</span>',
+            		    $this->createUrl('/admin/product/deleterecord',array('ProductID'=>$Field->ProductID,'RecordID'=>$Record->ID) )
+            		) ?>
+            	</td>                
+                
 			</tr>
 		<? endforeach ?>
+        
 	</tbody>
 	<tfoot>
 	<tr>
