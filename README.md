@@ -1,2 +1,1 @@
-YiiShop
 YiiShop CMS
