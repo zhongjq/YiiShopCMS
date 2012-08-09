@@ -82,10 +82,11 @@ return array(
 		
 		// База
 		'db'=>array(
-			'connectionString' => 'mysql:host=localhost;dbname=yiishop',
+			//'connectionString' => 'mysql:host=localhost;dbname=yiishop',
+            'connectionString' => 'mysql:host=mysql0.db.koding.com;dbname=enchikiben_fbfde',
 			'emulatePrepare' => true,
-			'username' => 'root',
-			'password' => '',
+			'username' => 'enchikiben_fbfde',
+			'password' => '754089db',
 			'charset' => 'utf8',
 			'tablePrefix' => '',
 			// включаем профайлер
@@ -132,7 +133,7 @@ return array(
         	'urlFormat'			=>	'path',
 			'showScriptName'	=>	false,
             // тут правим если запускаем из подпапки
-			'baseUrl'			=>	'http://'.$_SERVER['SERVER_NAME'],
+			'baseUrl'			=>	'http://'.$_SERVER['SERVER_NAME']."/yiishop",
          	'rules'				=>	array(
 		         '/'=>'site/index',
 
