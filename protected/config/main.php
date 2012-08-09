@@ -50,7 +50,7 @@ return array(
 		),
         'gii'=>array(
             'class'         =>  'system.gii.GiiModule',
-            'password'      =>  '',
+            'password'      =>  '1',
             'ipFilters'     =>  array("192.168.56.1","127.0.0.1",),
             'newFileMode'   =>  0666,
             'newDirMode'    =>  0777,
