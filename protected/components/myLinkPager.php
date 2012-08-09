@@ -8,7 +8,8 @@
 class myLinkPager extends CLinkPager
 {
 		const CSS_SELECTED_PAGE='active';
-
+        const CSS_HIDDEN_PAGE='disabled';
+        
 		protected function createPageButton($label,$page,$class,$hidden,$selected)
         {
                 if($hidden || $selected)

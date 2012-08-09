@@ -40,8 +40,8 @@ return array(
 	),
 
 	// Сжатие
-	'onBeginRequest'=>create_function('$event', 'return ob_start("ob_gzhandler");'),
-	'onEndRequest'=>create_function('$event', 'return ob_end_flush();'),
+	//'onBeginRequest'=>create_function('$event', 'return ob_start("ob_gzhandler");'),
+	//'onEndRequest'=>create_function('$event', 'return ob_end_flush();'),
 
 	// Модули
 	'modules'=>array(
@@ -68,7 +68,7 @@ return array(
 				//'jquery.metadata.js'	=> false,
 				//'jquery.yiilistview.js'	=> false,
 				//'jquery.ba-bbq.js'		=> false,
-				//'styles.css'			=> false,
+				'styles.css'			=> false,
             ),
             //'enableJavaScript'=>false,    // Эта опция отключает любую генерацию javascript'а фреймворком
         ),
@@ -168,8 +168,12 @@ return array(
 		        '/admin/product/edit/<id:\d+>/fields/<action:(edit|delete)>/<FieldID:\d+>'  =>  'admin/product/<action>field',
 
 		        '/admin/products/lists'                                     =>  'admin/product/lists',
-		        '/admin/products/lists/<action:(add|edit|view|delete)>/<id>'=>  'admin/product/<action>list',
-
+                '/admin/products/lists/add'                                 =>  'admin/product/addlist',
+		        '/admin/products/list/<action:(edit|delete)>/<ListID:\d+>'  =>  'admin/product/<action>list',
+                '/admin/products/list/<ListID:\d+>/items'                   =>  'admin/product/itemslist',
+                '/admin/products/list/<ListID:\d+>/items/add'               =>  'admin/product/additems',
+                '/admin/products/list/<ListID:\d+>/item/<action:(edit|delete)>/<ItemID:\d+>'  =>  'admin/product/<action>item',
+                
                 // Категории
 		        '/category/<Alias>' => '/categories/view/',
 

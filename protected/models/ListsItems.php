@@ -41,7 +41,7 @@ class ListsItems extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('ListID, Priority, Name', 'required'),
+			array('ListID, Name', 'required', 'on' => 'add, edit'),
 			array('ListID, Status, Priority', 'numerical', 'integerOnly'=>true),
 			array('Name', 'length', 'max'=>255),
 			// The following rule is used by search().
@@ -58,7 +58,7 @@ class ListsItems extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'list' => array(self::BELONGS_TO, 'Lists', 'ListID'),
+			'List' => array(self::BELONGS_TO, 'Lists', 'ListID'),
 		);
 	}
 
@@ -97,4 +97,47 @@ class ListsItems extends CActiveRecord
 			'criteria'=>$criteria,
 		));
 	}
+    
+    public function getCFormArray(){
+        return array(
+            'attributes' => array(
+        		'enctype' => 'application/form-data',
+				'class' => 'well',
+				'id'=>'ListsForm'
+			),
+			'activeForm' => array(
+				'class' => 'CActiveForm',
+				'enableAjaxValidation' => true,
+				'enableClientValidation' => false,
+				'id' => "ListsForm",
+				'clientOptions' => array(
+					'validateOnSubmit' => true,
+					'validateOnChange' => false,
+				),
+			),
+			
+			'elements'=>array(                
+    		    'Status'=>array(
+					'type'=>'checkbox',
+					'layout'=>'{input}{label}{error}{hint}',
+				),
+				'Priority'=>array(
+					'type'          =>  'text',
+					'maxlength'     =>  255,
+				),
+    			'Name'=>array(
+					'type'          =>  'text',
+					'maxlength'     =>  255,
+				),                
+			),
+
+			'buttons'=>array(
+				'submit'=>array(
+					'type'  =>  'submit',
+					'label' =>  $this->isNewRecord ? 'Создать' : "Сохранить",
+					'class' =>  "btn"
+				),
+			),
+		);    
+    }      
 }

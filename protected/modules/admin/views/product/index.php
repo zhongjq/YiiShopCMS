@@ -34,10 +34,10 @@ $this->renderPartial('SecondMenu');
 			<span class="label label-important">Неактивирован</span>
 			<?php endif ?>
 		</td>
-		<td><?= CHtml::link(CHtml::encode($Product->Name), array('view','id'=>$Product->ID)); ?></td>
+		<td><?= CHtml::link(CHtml::encode($Product->Name), array('view','ProductID'=>$Product->ID)); ?></td>
 		<td><?php echo sizeof( $Product->productsFields() ) ?></td>
-		<td><?= CHtml::link("Редактировать", array('edit','id'=>$Product->ID)); ?></td>
-		<td><?= CHtml::link("Удалить", array('delete','id'=>$Product->ID)); ?></td>
+		<td><?= CHtml::link("Редактировать", array('edit','ProductID'=>$Product->ID)); ?></td>
+		<td><?= CHtml::link("Удалить", array('delete','ProductID'=>$Product->ID)); ?></td>
 	</tr>
 	<?php endforeach ?>
 	</tbody>

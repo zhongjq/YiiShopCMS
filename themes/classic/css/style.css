@@ -149,3 +149,8 @@ div.errorMessage{
 form .row {
     margin: 0;
 }
+
+div.summary{
+    margin-bottom: 5px;
+}    
+    

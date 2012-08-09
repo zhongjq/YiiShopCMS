@@ -478,7 +478,215 @@ class ProductController extends Controller
 
 	/// LIST
 	public function actionLists(){
-
-		$this->render('lists/index', array() );
+        
+        $Lists = new CActiveDataProvider('Lists',array('pagination'=>array('pageSize'=>'20')));
+        
+    	$this->render('lists/index', array(
+            "Lists" => $Lists
+        ));        
+        
 	}
+    
+    public function actionAddList(){
+        $List = new Lists('add');
+        
+
+        
+      	if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "ListsForm" ){
+			echo CActiveForm::validate($List);
+			Yii::app()->end();
+		}
+  
+    	if( isset($_POST['Lists']) ) {
+			$List->attributes = $_POST['Lists'];
+
+			$transaction = Yii::app()->db->beginTransaction();
+			try
+			{
+				if ( $List->save() ){
+					$transaction->commit();
+					$this->redirect($this->createUrl('/admin/products/lists'));
+				} else {
+					throw new CException("Error save");
+				}
+			}
+			catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
+			{
+				$transaction->rollBack();
+			}
+		}  
+  
+        $Form = new CForm($List->getCFormArray(),$List);
+        
+		$this->render('lists/add', array(
+            "Form" => $Form
+        ));
+	}
+    
+    public function actionEditList($ListID){
+        
+        $List = Lists::model()->with('ListsItems')->findbyPk($ListID);
+        $List->setScenario('edit');
+        if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "ListsForm" ){
+			echo CActiveForm::validate($List);
+			Yii::app()->end();
+		}
+  
+    	if( isset($_POST['Lists']) ) {
+			$List->attributes = $_POST['Lists'];
+
+			$transaction = Yii::app()->db->beginTransaction();
+			try
+			{
+				if ( $List->save() ){
+					$transaction->commit();
+					$this->redirect($this->createUrl('/admin/products/lists'));
+				} else {
+					throw new CException("Error save");
+				}
+			}
+			catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
+			{
+				$transaction->rollBack();
+			}
+		}  
+  
+        $Form = new CForm($List->getCFormArray(),$List);
+        
+		$this->render('lists/edit', array(
+            "Form" => $Form
+        ));
+	}
+    
+    public function actionDeleteList($ListID){
+        
+        $List = Lists::model()->findbyPk($ListID);
+
+		$transaction = Yii::app()->db->beginTransaction();
+		try
+		{
+			if ( $List->delete() ){
+				$transaction->commit();
+				$this->redirect($this->createUrl('/admin/products/lists'));
+			} else {
+				throw new CException("Error save");
+			}
+		}
+		catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
+		{
+			$transaction->rollBack();
+		}
+	} 
+  
+     public function actionItemsList($ListID){
+        
+        $List = Lists::model()->with('ListsItems')->findbyPk($ListID);
+        
+        $criteria=new CDbCriteria;
+		$criteria->compare('ListID',$ListID);
+        $ListsItems = new CActiveDataProvider('ListsItems',array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
+        
+    	$this->render('lists/items', array(
+            "List" => $List,
+            "ListsItems" => $ListsItems
+        ));
+	}
+  
+    public function actionAddItems($ListID){
+        
+        $List = Lists::model()->with('ListsItems')->findbyPk($ListID);
+        
+        $ItemsList = new ListsItems('add');
+        $ItemsList->ListID = $ListID;
+        
+        if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "additems-form" ){
+    		echo CActiveForm::validate($ItemsList);
+			Yii::app()->end();
+		}  
+        
+         if( isset($_POST['ListsItems'])  ) {
+			
+			$transaction = Yii::app()->db->beginTransaction();
+			try
+			{
+                $Items = explode("\n",$_POST['ListsItems']['Name']);
+                
+                foreach( $Items as $Item ){
+                    $IL = new ListsItems('add');
+                    $IL->ListID = $ListID;
+                    $IL->Name = $Item;
+          			if ( !$IL->save() ){
+    					throw new CException("Error save");
+    				}                  
+                }
+                
+				$transaction->commit();
+				$this->redirect($this->createUrl('/admin/products/lists'));
+			}
+			catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
+			{
+				$transaction->rollBack();
+			}
+		}        
+        
+        $this->render('lists/AddItems', array(
+            "List" => $List,
+            "ItemsList" => $ItemsList,
+        ));
+	}     
+     public function actionEditItem($ListID, $ItemID){
+        
+        $Item = ListsItems::model()->with('List')->find('ListID = :ListID AND t.ID = :ID', array(':ListID'=>$ListID,':ID'=>$ItemID));
+        $Item->setScenario('edit');
+        
+        if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "additems-form" ){
+        	echo CActiveForm::validate($ItemsList);
+			Yii::app()->end();
+		}  
+        
+        if( isset($_POST['ListsItems'])  ) {
+			
+			$transaction = Yii::app()->db->beginTransaction();
+			try
+			{
+                            
+          			if ( $IL->save() ){
+                        $transaction->commit();  
+                        $this->redirect($this->createUrl('/admin/products/lists')); 
+                    }else{
+    					throw new CException("Error save");
+    				}
+			
+			}
+			catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
+			{
+				$transaction->rollBack();
+			}
+		}        
+        
+        $Form = new CForm($Item->getCFormArray(),$Item);
+        
+        $this->render('lists/EditItem', array(
+            "Form" => $Form,
+            "Item" => $Item,
+        ));
+	} 
+    
+    public function actionDeleteItem($ListID, $ItemID){
+        
+        $Item = ListsItems::model()->with('List')->find('ListID = :ListID AND t.ID = :ID', array(':ListID'=>$ListID,':ID'=>$ItemID));
+
+		$transaction = Yii::app()->db->beginTransaction();
+		try
+		{
+			if( $Item->delete() ){
+				$transaction->commit();
+				$this->redirect( $this->createUrl('/admin/product/itemslist',array('ListID'=>$ListID)) );
+			}
+		}
+		catch(Exception $e)
+		{
+			$transaction->rollBack();
+		}
+	}    
 }

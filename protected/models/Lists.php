@@ -12,6 +12,7 @@
  */
 class Lists extends CActiveRecord
 {
+    
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
@@ -38,7 +39,7 @@ class Lists extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('Name', 'required'),
+			array('Name', 'required', 'on'=> 'add, edit'),
 			array('Name', 'length', 'max'=>255),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
@@ -54,7 +55,7 @@ class Lists extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'listsItems' => array(self::HAS_MANY, 'ListsItems', 'ListID'),
+			'ListsItems' => array(self::HAS_MANY, 'ListsItems', 'ListID'),
 		);
 	}
 
@@ -87,4 +88,46 @@ class Lists extends CActiveRecord
 			'criteria'=>$criteria,
 		));
 	}
+    
+    public function getCFormArray(){
+        return array(
+            'attributes' => array(
+    			'enctype' => 'application/form-data',
+				'class' => 'well',
+				'id'=>'ListsForm'
+			),
+			'activeForm' => array(
+				'class' => 'CActiveForm',
+				'enableAjaxValidation' => true,
+				'enableClientValidation' => false,
+				'id' => "ListsForm",
+				'clientOptions' => array(
+					'validateOnSubmit' => true,
+					'validateOnChange' => false,
+				),
+			),
+			
+			'elements'=>array(
+				'Name'=>array(
+					'type'=>'text',
+					'maxlength' =>255,
+                    'placeholder'=>"Name"
+				)
+			),
+
+			'buttons'=>array(
+				'submit'=>array(
+					'type'  =>  'submit',
+					'label' =>  $this->isNewRecord ? 'Создать' : "Сохранить",
+					'class' =>  "btn"
+				),
+			),
+		);    
+    }    
+
+    public function afterDelete(){
+		parent::afterDelete();
+		ListsItems::model()->findAll('ListID = :ID',array(':ID'=>$this->ID));
+	}
+
 }
