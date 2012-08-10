@@ -57,6 +57,10 @@ class ProductsFields extends CActiveRecord
 		);
 	}
 
+
+    public function getRelationsNameArray(){
+        return array_keys($this->relations());
+    }
 	/**
 	 * @return array relational rules.
 	 */
@@ -70,6 +74,7 @@ class ProductsFields extends CActiveRecord
 			'Product'       => array(self::BELONGS_TO, 'Products', 'ProductID'),
 			'StringFields'  => array(self::HAS_ONE, 'StringFields', 'FieldID'),
 			'TextFields'    => array(self::HAS_ONE, 'TextFields', 'FieldID'),
+            'ListFields'    => array(self::HAS_ONE, 'ListFields', 'FieldID'),
 		);
 	}
 
@@ -195,7 +200,7 @@ class ProductsFields extends CActiveRecord
 
 	public function afterSave(){
 		parent::afterSave();
-
+        
 		if ( $this->moredata ) {
 			$this->moredata->FieldID = $this->ID;
 			if ( $this->moredata->save() ){

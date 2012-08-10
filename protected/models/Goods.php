@@ -12,12 +12,21 @@ class Goods extends CActiveRecord
 	}
 
 	public function getProductFields($update = false){
-		if ( $this->getProductID() === null ) throw new CException("ID NOT ProductID");
+		if ( $this->getProductID() === null ) {
+             $Product = Products::model()->find('Alias = :Alias',array(':Alias'=> get_class($this)) );
 
+            if ( $Product )
+                $this->setProductID($Product->ID);
+            else
+                throw new CException("ID NOT ProductID");
+		}
+        
 		if ( $this->ProductsFields === null && $update === false )
 			$this->ProductsFields = ProductsFields::model()
-										->with('StringFields','TextFields','IntegerFields','PriceFields')
+										->with('StringFields','TextFields','IntegerFields','PriceFields','ListFields')
 										->findAll('ProductID=:ProductID',array(':ProductID'=>$this->getProductID()));
+
+
 
 		return $this->ProductsFields;
 	}
@@ -74,13 +83,14 @@ class Goods extends CActiveRecord
 
 		if ( $ProductFields ){
 			foreach( $ProductFields as $Field ){
+                $Form['elements'][$Field->Alias] = TypeFields::$Fields[$Field->FieldType]['form'];
 				switch( $Field->FieldType ){
-					case TypeFields::TEXT :
-						$Form['elements'][$Field->Alias] = TypeFields::$Fields[$Field->FieldType]['form'];
+					case TypeFields::TEXT :						
 						$Form['elements'][$Field->Alias]['rows'] = $Field->TextFields->Rows;
 					break;
-					default:
-						$Form['elements'][$Field->Alias] = TypeFields::$Fields[$Field->FieldType]['form'];
+    				case TypeFields::LISTS :			
+						$Form['elements'][$Field->Alias]['items'] = CHtml::listData(ListsItems::model()->findAll('ListID = :ListID',array(':ListID'=>$Field->ListFields->ListID)), 'ID', 'Name');
+					break;                    
 				}
 			}
 		}
@@ -101,7 +111,32 @@ class Goods extends CActiveRecord
 
 		return new CForm($Form,$this);
 	}
-
+    
+    public function getRelationsNameArray(){
+        return array_keys($this->relations());
+    }
+    
+    /**
+	 * @return array relational rules.
+	 */
+	public function relations()
+	{
+        $relations = array();
+        
+        $ProductFields = $this->getProductFields();
+    	if ( $ProductFields ){
+			foreach( $ProductFields as $Field ){
+				switch( $Field->FieldType ){
+					case TypeFields::LISTS :
+                        $relations[$Field->Alias.'List'] = array(self::BELONGS_TO, 'ListsItems', $Field->Alias);
+                    break;
+				}
+			}
+		}
+        
+        
+		return $relations;
+	}
 
 	public function rules()
 	{
@@ -137,6 +172,9 @@ class Goods extends CActiveRecord
 						$rules[] = array($Field->Alias, 'numerical', 'max'=>$Field->PriceFields->MaxValue ,'allowEmpty'=>true);
 
 					break;
+    				case TypeFields::LISTS :
+						$rules[] = array($Field->Alias, 'numerical', 'integerOnly'=>true,'allowEmpty'=>true);
+					break;                    
 				}
 
 			}

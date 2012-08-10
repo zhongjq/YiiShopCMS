@@ -29,10 +29,22 @@ $this->renderPartial('GoodsSecondMenu',array('Product'=>$Product));
 
 		<? foreach($Goods as $Record) : ?>
 			<tr>
-				<? foreach($f as $name) : ?>
-					<td class="span2"><?= $Record->getAttribute($name) ?></td>
-				<? endforeach ?>
-                
+            	<? foreach($Product->productsFields() as $Field) : ?>
+        			<?php if( $Field->IsColumnTable ) : ?>
+        				<td class="span2">
+                        <?php 
+                            switch( $Field->FieldType ) {
+                                case TypeFields::LISTS :
+                                    echo $Record->{$Field->Alias."List"}->Name;
+                                break;
+                                default:
+                                    echo $Record->{$Field->Alias};
+        			        }                        
+                        ?>
+                        </td>
+        			<?php endif; ?>
+        		<? endforeach ?>
+
                 <td>
                 	<?= CHtml::link( '<span class="icon-pencil pointer" title="'.Yii::t('AdminModule.main','Редактировать').'"></span>',
                         $this->createUrl('/admin/product/editrecord',array('ProductID'=>$Field->ProductID,'RecordID'=>$Record->ID) )
@@ -42,9 +54,8 @@ $this->renderPartial('GoodsSecondMenu',array('Product'=>$Product));
             		<?= CHtml::link( '<span class="close" title="'.Yii::t('AdminModule.main','Удалить').'">&times;</span>',
             		    $this->createUrl('/admin/product/deleterecord',array('ProductID'=>$Field->ProductID,'RecordID'=>$Record->ID) )
             		) ?>
-            	</td>                
-                
-			</tr>
+            	</td>
+            </tr>
 		<? endforeach ?>
         
 	</tbody>

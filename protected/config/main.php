@@ -163,9 +163,9 @@ return array(
 		        '/admin/product/view/<ProductID:\d+>/add'                   =>  'admin/product/add',
                 '/admin/product/view/<ProductID:\d+>/record/<action:(edit|delete)>/<RecordID:\d+>'  =>  'admin/product/<action>record',
 		        
-                '/admin/product/edit/<id:\d+>/fields'                       =>  'admin/product/fields',
-		        '/admin/product/edit/<id:\d+>/fields/add'                   =>  'admin/product/addfield',
-		        '/admin/product/edit/<id:\d+>/fields/<action:(edit|delete)>/<FieldID:\d+>'  =>  'admin/product/<action>field',
+                '/admin/product/edit/<ProductID:\d+>/fields'                       =>  'admin/product/fields',
+		        '/admin/product/edit/<ProductID:\d+>/fields/add'                   =>  'admin/product/addfield',
+		        '/admin/product/edit/<ProductID:\d+>/fields/<action:(edit|delete)>/<FieldID:\d+>'  =>  'admin/product/<action>field',
 
 		        '/admin/products/lists'                                     =>  'admin/product/lists',
                 '/admin/products/lists/add'                                 =>  'admin/product/addlist',

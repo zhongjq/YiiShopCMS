@@ -29,8 +29,10 @@ class ProductController extends Controller
 		$Product->getAttributes();
 
 		$Goods = $Product->getGoodsObject();
-		$Goods = $Goods->findAll();
+        
+		$Goods = $Goods->with( implode(",",$Goods->getRelationsNameArray()) )->findAll();
 
+        
 		$this->render('view', array(
 			'Product' => $Product,
 			'Goods' => $Goods,
@@ -151,9 +153,9 @@ class ProductController extends Controller
 		$this->redirect(array('/admin/product'));
 	}
 
-	public function actionEdit($id)
+	public function actionEdit($ProductID)
 	{
-		$Product = Products::model()->findByPk($id);
+		$Product = Products::model()->findByPk($ProductID);
 
 		$this->performAjaxValidation($Product);
 
@@ -181,20 +183,25 @@ class ProductController extends Controller
 	}
 
 
-	public function actionFields($id)
+	public function actionFields($ProductID)
 	{
-		$Product = Products::model()->with('productsFields')->findByPk($id);
+		$Product = Products::model()->with('productsFields')->findByPk($ProductID);
 
-		$this->render('fields', array(
-			'Product' => $Product
+        $criteria=new CDbCriteria;
+    	$criteria->compare('ProductID',$ProductID);
+        $Fields = new CActiveDataProvider('ProductsFields',array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
+        
+		$this->render('fields/index', array(
+			'Product'   => $Product,
+            'Fields'    => $Fields
 		));
 	}
 
-	public function actionAddField($id)
+	public function actionAddField($ProductID)
 	{
-		$Product = Products::model()->findByPk($id);
+		$Product = Products::model()->findByPk($ProductID);
 		$ProductField = new ProductsFields('add');
-		$ProductField->ProductID = $id;
+		$ProductField->ProductID = $Product->ID;
 
 		$ArrayForm = array(
 			'attributes' => array(
@@ -274,17 +281,14 @@ class ProductController extends Controller
 
 		if ( $FieldType > 0 ){
 			$ClassName = TypeFields::$Fields[$FieldType]['class'];
-			$class = $ProductField::CreateField($FieldType);
+			$class = $ProductField->CreateField($FieldType);
 			$ArrayForm['elements'][$ClassName] = $class->getElementsMotelCForm();
-
 			$ProductField->moredata = $class;
 		}
 
 		$Form = new CForm($ArrayForm);
 		$Form['ProductsFields']->model = $ProductField;
-		if( Yii::app()->request->isAjaxRequest && $FieldType > 0  ){
-			$Form[$ClassName]->model = $class;
-		}
+		if( $FieldType > 0 ) $Form[$ClassName]->model = $class;
 
 		if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "FieldForm" ){
 			$validate = array($ProductField);
@@ -295,27 +299,27 @@ class ProductController extends Controller
 
 		if( isset($_POST['ProductsFields']) ) {
 			$ProductField->attributes = $_POST['ProductsFields'];
-
-			if ( isset($_POST[$ClassName]) ){
-				$class->attributes = $_POST[$ClassName];
-			}
+            
+            // чтобы сохранять значение
+            if( isset($_POST[$ClassName]) )
+                $class->attributes = $_POST[$ClassName];
 
 			$transaction = Yii::app()->db->beginTransaction();
 			try
 			{
 				if ( isset($_POST[$ClassName]) && $ProductField->save() ){
 					$transaction->commit();
-					$this->redirect($this->createUrl('/admin/product/fields',array('id'=>$Product->ID)));
+					$this->redirect($this->createUrl('/admin/product/fields',array('ProductID'=>$Product->ID)));
 				} else {
 					throw new CException("Error save");
 				}
+                
 			}
 			catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
 			{
 				$transaction->rollBack();
 			}
 		}
-
 
 		if( Yii::app()->request->isAjaxRequest && $FieldType > 0 ){
 			$Form = $Form->render();
@@ -324,16 +328,16 @@ class ProductController extends Controller
 			echo $Form.$sc;
 			Yii::app()->end();
 		}
-
-		$this->render('addfield', array(
+        
+		$this->render('fields/add', array(
 			'Product' => $Product,
 			'Form' => $Form,
 		));
 	}
 
-	public function actionEditField($id,$FieldID)
+	public function actionEditField($ProductID,$FieldID)
 	{
-		$Product = Products::model()->findByPk($id);
+		$Product = Products::model()->findByPk($ProductID);
 		$Product->setScenario('edit');
 		$ProductField = ProductsFields::model()->findByPk($FieldID);
 		$ProductField->setScenario('edit');
@@ -440,7 +444,7 @@ class ProductController extends Controller
 			{
 				if ( isset($_POST[$ClassName]) && $ProductField->save() ){
 					$transaction->commit();
-					$this->redirect($this->createUrl('/admin/product/fields',array('id'=>$Product->ID)));
+					$this->redirect($this->createUrl('/admin/product/fields',array('ProductID'=>$Product->ID)));
 				} else {
 					throw new CException("Error save");
 				}
@@ -451,22 +455,22 @@ class ProductController extends Controller
 			}
 		}
 
-		$this->render('addfield', array(
+		$this->render('fields/edit', array(
 			'Product' => $Product,
 			'Form' => $Form,
 		));
 	}
 
-	public function actionDeleteField($id,$FieldID)
+	public function actionDeleteField($ProductID,$FieldID)
 	{
-		$ProductField = ProductsFields::model()->find('ID=:ID AND ProductID=:ProductID',array(':ID'=>$FieldID,'ProductID'=>$id));
+		$ProductField = ProductsFields::model()->find('ID=:ID AND ProductID=:ProductID',array(':ID'=>$FieldID,'ProductID'=>$ProductID));
 
 		$transaction = Yii::app()->db->beginTransaction();
 		try
 		{
 			if( $ProductField->delete() ){
 				$transaction->commit();
-				$this->redirect($this->createUrl('/admin/product/fields',array('id'=>$id)));
+				$this->redirect($this->createUrl('/admin/product/fields',array('ProductID'=>$ProductID)));
 			}
 		}
 		catch(Exception $e)
@@ -586,7 +590,7 @@ class ProductController extends Controller
 		$criteria->compare('ListID',$ListID);
         $ListsItems = new CActiveDataProvider('ListsItems',array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
         
-    	$this->render('lists/items', array(
+    	$this->render('lists/items/index', array(
             "List" => $List,
             "ListsItems" => $ListsItems
         ));
@@ -629,7 +633,7 @@ class ProductController extends Controller
 			}
 		}        
         
-        $this->render('lists/AddItems', array(
+        $this->render('lists/items/add', array(
             "List" => $List,
             "ItemsList" => $ItemsList,
         ));
@@ -666,7 +670,7 @@ class ProductController extends Controller
         
         $Form = new CForm($Item->getCFormArray(),$Item);
         
-        $this->render('lists/EditItem', array(
+        $this->render('lists/items/edit', array(
             "Form" => $Form,
             "Item" => $Item,
         ));
