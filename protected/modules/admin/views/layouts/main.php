@@ -3,14 +3,17 @@
   <head>
     <meta charset="utf-8">
 
-	<!-- icons -->
+    <!-- icons -->
 	<link rel="shortcut icon" href="<?= Yii::app()->theme->baseUrl ?>/img/favicon.ico" type="image/x-icon">
 
     <!-- styles -->
-    <link href="<?= Yii::app()->theme->baseUrl ?>/css/bootstrap.min.css" rel="stylesheet">
-    <link href="<?= Yii::app()->theme->baseUrl ?>/css/bootstrap-responsive.min.css" rel="stylesheet">
-
-	<link href="<?= Yii::app()->theme->baseUrl ?>/css/style.css" rel="stylesheet">
+    <?php
+        Yii::app()->getClientScript()->registerCssFile(CHtml::asset($this->module->getlayoutPath().'/css/bootstrap.min.css'));
+        Yii::app()->getClientScript()->registerCssFile(CHtml::asset($this->module->getlayoutPath().'/css/bootstrap-responsive.min.css'));
+        Yii::app()->getAssetManager()->publish($this->module->getlayoutPath().'/img/glyphicons-halflings.png'); 
+        Yii::app()->getClientScript()->registerCssFile(CHtml::asset($this->module->getlayoutPath().'/css/style.css'));
+    ?>    
+    
 	<style type="text/css">
 		body {
 			padding-top: 60px;
@@ -32,9 +35,12 @@
 		<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 	<!--  <script src="<?= Yii::app()->theme->baseUrl ?>/js/jquery.min.js"></script>-->
-	  <?php Yii::app()->clientScript->registerCoreScript('jquery'); ?>
-	<script src="<?= Yii::app()->theme->baseUrl ?>/js/bootstrap.min.js"></script>
 
+    <?php
+        Yii::app()->clientScript->registerCoreScript('jquery');
+         
+        Yii::app()->getClientScript()->registerScriptFile(CHtml::asset($this->module->getlayoutPath().'/js/bootstrap.min.js'));
+    ?>
 
   </head>
 
