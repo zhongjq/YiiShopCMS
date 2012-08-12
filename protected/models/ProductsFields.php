@@ -205,10 +205,12 @@ class ProductsFields extends CActiveRecord
 			$this->moredata->FieldID = $this->ID;
 			if ( $this->moredata->save() ){
 				$Product = Products::model()->findByPk($this->ProductID);
-				Yii::app()->db->createCommand()->addColumn( $Product->Alias,
-					$this->Alias,
-					TypeFields::$Fields[$this->FieldType]['dbType']
-				);
+				
+				if ($this->isNewRecord)
+					Yii::app()->db->createCommand()->addColumn( $Product->Alias,
+						$this->Alias,
+						TypeFields::$Fields[$this->FieldType]['dbType']
+					);
 			}
 		}
 	}

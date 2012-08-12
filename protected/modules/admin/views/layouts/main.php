@@ -6,14 +6,7 @@
     <!-- icons -->
 	<link rel="shortcut icon" href="<?= Yii::app()->theme->baseUrl ?>/img/favicon.ico" type="image/x-icon">
 
-    <!-- styles -->
-    <?php
-        Yii::app()->getClientScript()->registerCssFile(CHtml::asset($this->module->getlayoutPath().'/css/bootstrap.min.css'));
-        Yii::app()->getClientScript()->registerCssFile(CHtml::asset($this->module->getlayoutPath().'/css/bootstrap-responsive.min.css'));
-        Yii::app()->getAssetManager()->publish($this->module->getlayoutPath().'/img/glyphicons-halflings.png'); 
-        Yii::app()->getClientScript()->registerCssFile(CHtml::asset($this->module->getlayoutPath().'/css/style.css'));
-    ?>    
-    
+    <!-- styles -->   
 	<style type="text/css">
 		body {
 			padding-top: 60px;

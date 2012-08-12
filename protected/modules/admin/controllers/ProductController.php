@@ -44,6 +44,11 @@ class ProductController extends Controller
 		$Product = Products::model()->with('productsFields')->findByPk($ProductID);
 		$Goods = $Product->getGoodsObject();
 
+		$extPth = CHtml::asset($this->module->getlayoutPath().'/js/chosen/');
+        Yii::app()->getClientScript()->registerCssFile($extPth.'/chosen.css');
+        Yii::app()->getClientScript()->registerScriptFile($extPth.'/chosen.jquery.js');
+		
+		
 		if(Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "GoodsForm" )
 		{
 			echo CActiveForm::validate($Goods);
@@ -64,6 +69,12 @@ class ProductController extends Controller
 
     public function actionEditRecord($ProductID,$RecordID)
 	{
+		
+		$extPth = CHtml::asset($this->module->getlayoutPath().'/js/chosen/');
+        Yii::app()->getClientScript()->registerCssFile($extPth.'/chosen.css');
+        Yii::app()->getClientScript()->registerScriptFile($extPth.'/chosen.jquery.js');
+	
+		
 		$Product = Products::model()->with('productsFields')->findByPk($ProductID);
 		$Goods = $Product->getGoodsObject();
         $Goods = $Goods->findByPk($RecordID);
@@ -419,7 +430,7 @@ class ProductController extends Controller
 		$class = $ProductField::CreateField($FieldType);
 		$class = $class::model()->findByPk($FieldID);
 		$ArrayForm['elements'][$ClassName] = $class->getElementsMotelCForm();
-		$ProductField->addRelatedRecord('moredata',$class,true);
+		$ProductField->moredata = $class;
 
 		$Form = new CForm($ArrayForm);
 		$Form['ProductsFields']->model = $ProductField;
@@ -435,9 +446,9 @@ class ProductController extends Controller
 		if( isset($_POST['ProductsFields']) ) {
 			$ProductField->attributes = $_POST['ProductsFields'];
 
-			if ( isset($_POST[$ClassName]) ){
-				$class->attributes = $_POST[$ClassName];
-			}
+            // чтобы сохранять значение
+            if( isset($_POST[$ClassName]) )
+                $class->attributes = $_POST[$ClassName];
 
 			$transaction = Yii::app()->db->beginTransaction();
 			try
@@ -493,7 +504,6 @@ class ProductController extends Controller
     
     public function actionAddList(){
         $List = new Lists('add');
-        
 
         
       	if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "ListsForm" ){
@@ -582,7 +592,7 @@ class ProductController extends Controller
 		}
 	} 
   
-     public function actionItemsList($ListID){
+    public function actionItemsList($ListID){
         
         $List = Lists::model()->with('ListsItems')->findbyPk($ListID);
         
@@ -638,7 +648,7 @@ class ProductController extends Controller
             "ItemsList" => $ItemsList,
         ));
 	}     
-     public function actionEditItem($ListID, $ItemID){
+    public function actionEditItem($ListID, $ItemID){
         
         $Item = ListsItems::model()->with('List')->find('ListID = :ListID AND t.ID = :ID', array(':ListID'=>$ListID,':ID'=>$ItemID));
         $Item->setScenario('edit');

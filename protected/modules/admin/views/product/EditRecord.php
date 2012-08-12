@@ -6,6 +6,14 @@ $this->breadcrumbs=array(
 );
 
 $this->renderPartial('GoodsSecondMenu',array('Product'=>$Product));
+?>
 
-echo $Form->render();
+<script type="text/javascript" language="JavaScript">
+    $(function(){
+		$('#tires_Size').chosen();
+    });
+</script>
+
+<?php
+	echo $Form->render();
 ?>

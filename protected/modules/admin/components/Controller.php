@@ -6,8 +6,18 @@
 class Controller extends CController
 {
 	public $layout='/layouts/main';
+	
+	public function beforeRender($view) {
+		
+		$extPth = CHtml::asset($this->module->getlayoutPath().'/css/');
+        Yii::app()->getClientScript()->registerCssFile($extPth.'/bootstrap.min.css');
+        Yii::app()->getClientScript()->registerCssFile($extPth.'/bootstrap-responsive.min.css');
+        Yii::app()->getClientScript()->registerCssFile($extPth.'/style.css');
+		
+		return parent::beforeRender($view);
+	}
 
-	/**
+		/**
 	 * @var array context menu items. This property will be assigned to {@link CMenu::items}.
 	 */
 	public $FirstMenu	=	array();

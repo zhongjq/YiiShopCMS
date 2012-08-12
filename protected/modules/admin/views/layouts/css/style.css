@@ -153,4 +153,7 @@ form .row {
 div.summary{
     margin-bottom: 5px;
 }    
-    
+
+.tab-content{
+	overflow: visible;
+}

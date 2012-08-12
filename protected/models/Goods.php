@@ -4,7 +4,7 @@ class Goods extends CActiveRecord
 {
 	private $ProductID;
 	private $ProductsFields = null;
-	public  function setProductID($v){
+	public function setProductID($v){
 		$this->ProductID = $v;
 	}
 	public function getProductID(){
@@ -90,6 +90,10 @@ class Goods extends CActiveRecord
 					break;
     				case TypeFields::LISTS :			
 						$Form['elements'][$Field->Alias]['items'] = CHtml::listData(ListsItems::model()->findAll('ListID = :ListID',array(':ListID'=>$Field->ListFields->ListID)), 'ID', 'Name');
+						if ( $Field->ListFields->IsMultipleSelect ){
+							$Form['elements'][$Field->Alias]['multiple'] = true;
+							$Form['elements'][$Field->Alias]['class'] = 'chzn-select';
+						}
 					break;                    
 				}
 			}
@@ -173,7 +177,12 @@ class Goods extends CActiveRecord
 
 					break;
     				case TypeFields::LISTS :
-						$rules[] = array($Field->Alias, 'numerical', 'integerOnly'=>true,'allowEmpty'=>true);
+						if ($Field->ListFields->IsMultipleSelect)
+							$rules[] = array($Field->Alias, 'ArrayValidator', 'validator'=>'numerical', 'params'=>array(
+												'integerOnly'=>true, 'allowEmpty'=>false
+											));
+						else
+							$rules[] = array($Field->Alias, 'numerical', 'integerOnly'=>true,'allowEmpty'=>true);
 					break;                    
 				}
 

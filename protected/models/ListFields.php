@@ -37,6 +37,7 @@ class ListFields extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('ListID', 'required', 'on'=>'add, edit'),
+			array('ListID', 'numerical', 'allowEmpty'=>false,'message'=>"asd" ),
 			array('ListID, IsMultipleSelect', 'numerical', 'integerOnly'=>true),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
