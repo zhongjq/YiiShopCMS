@@ -35,8 +35,16 @@ $this->renderPartial('GoodsSecondMenu',array('Product'=>$Product));
                         <?php 
                             switch( $Field->FieldType ) {
                                 case TypeFields::LISTS :
-									if ( $Record->{$Field->Alias."List"} )
-										echo $Record->{$Field->Alias."List"}->Name;
+                                   
+                                    if ( $Field->ListFields->IsMultipleSelect ) {
+                                        if ( $Record->{$Field->Alias."Items"} ) {
+                                            foreach( $Record->{$Field->Alias."Items"} as $Item ){
+                                                echo $Item->Name,", ";
+                                            }
+                                        
+                                        }                                    
+                                    } else
+								    	if ( $Record->{$Field->Alias."Item"} ) echo $Record->{$Field->Alias."Item"}->Name;
                                 break;
                                 default:
                                     echo $Record->{$Field->Alias};

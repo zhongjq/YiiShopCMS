@@ -10,10 +10,8 @@ $this->renderPartial('GoodsSecondMenu',array('Product'=>$Product));
 
 <script type="text/javascript" language="JavaScript">
     $(function(){
-		$('#tires_Size').chosen();
+		$('form select').chosen();
     });
 </script>
 
-<?php
-	echo $Form->render();
-?>
+<?= $Form->render(); ?>

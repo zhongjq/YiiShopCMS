@@ -91,8 +91,18 @@ class Goods extends CActiveRecord
     				case TypeFields::LISTS :			
 						$Form['elements'][$Field->Alias]['items'] = CHtml::listData(ListsItems::model()->findAll('ListID = :ListID',array(':ListID'=>$Field->ListFields->ListID)), 'ID', 'Name');
 						if ( $Field->ListFields->IsMultipleSelect ){
+                            
+                             if ( $this->{$Field->Alias."Items"} ) {
+                                $selected = array();
+                                foreach( $this->{$Field->Alias."Items"} as $Item ){
+                                    $selected[] = $Item->ID;
+                                }                                        
+                            }
+                            
+                            $this->{$Field->Alias} = $selected;                            
+                            
 							$Form['elements'][$Field->Alias]['multiple'] = true;
-							$Form['elements'][$Field->Alias]['class'] = 'chzn-select';
+							$Form['elements'][$Field->Alias]['class'] = 'chzn-select'; 
 						}
 					break;                    
 				}
@@ -112,7 +122,7 @@ class Goods extends CActiveRecord
 
 
 		$Form['elements'][]='</div></div>';
-
+        
 		return new CForm($Form,$this);
 	}
     
@@ -132,7 +142,10 @@ class Goods extends CActiveRecord
 			foreach( $ProductFields as $Field ){
 				switch( $Field->FieldType ){
 					case TypeFields::LISTS :
-                        $relations[$Field->Alias.'List'] = array(self::BELONGS_TO, 'ListsItems', $Field->Alias);
+                        if ($Field->ListFields->IsMultipleSelect)
+    						$relations[$Field->Alias.'Items'] = array(self::MANY_MANY, 'ListsItems', 'RecordsLists(RecordID, ListItemID)');
+						else                        
+                            $relations[$Field->Alias.'Item'] = array(self::BELONGS_TO, 'ListsItems', $Field->Alias);                            
                     break;
 				}
 			}
