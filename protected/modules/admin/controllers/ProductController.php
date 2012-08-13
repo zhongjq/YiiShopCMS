@@ -30,10 +30,11 @@ class ProductController extends Controller
 
 		$Goods = $Product->getGoodsObject();
         
-		$Goods = $Goods->with( implode(",",$Goods->getRelationsNameArray()) )->findAll();
+		
+		$Goods = $Goods->with( $Goods->getRelationsNameArray() )->findAll();
 
         
-		$this->render('view', array(
+		$this->render('records/view', array(
 			'Product' => $Product,
 			'Goods' => $Goods,
 		));
@@ -64,7 +65,7 @@ class ProductController extends Controller
 
 		$Form = $Goods->getMotelCForm();
 
-		$this->render('AddRecord',array('Product'=>$Product,'Form'=>$Form));
+		$this->render('records/add',array('Product'=>$Product,'Form'=>$Form));
 	}
 
     public function actionEditRecord($ProductID,$RecordID)
@@ -95,7 +96,7 @@ class ProductController extends Controller
 
 		$Form = $Goods->getMotelCForm();
 
-		$this->render('EditRecord',array('Product'=>$Product,'Form'=>$Form));
+		$this->render('records/edit',array('Product'=>$Product,'Form'=>$Form));
 	}
 
     public function actionDeleteRecord($ProductID,$RecordID)

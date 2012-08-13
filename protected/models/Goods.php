@@ -2,23 +2,29 @@
 
 class Goods extends CActiveRecord
 {
-	private $ProductID;
+	private $ProductID = null;
+	private $Product = null;
 	private $ProductsFields = null;
-	public function setProductID($v){
+	
+	public function setProductID($v)
+	{
 		$this->ProductID = $v;
 	}
-	public function getProductID(){
-		return $this->ProductID;
+	
+	public function getProductID()
+	{
+		return $this->Product->ID;
 	}
 
-	public function getProductFields($update = false){
-		if ( $this->getProductID() === null ) {
-             $Product = Products::model()->find('Alias = :Alias',array(':Alias'=> get_class($this)) );
+	public function getProductFields($update = false)
+	{
+		if ( $this->Product === null ) {
+			$this->Product = Products::model()->find('Alias = :Alias',array(':Alias'=> get_class($this)) );
 
-            if ( $Product )
-                $this->setProductID($Product->ID);
-            else
-                throw new CException("ID NOT ProductID");
+			if ( $this->Product )
+				$this->setProductID($this->Product->ID);
+			else
+				throw new CException("ID NOT ProductID");
 		}
         
 		if ( $this->ProductsFields === null && $update === false )
@@ -31,7 +37,8 @@ class Goods extends CActiveRecord
 		return $this->ProductsFields;
 	}
 
-	public function setGoodsAttributes(){
+	public function setGoodsAttributes()
+	{
 		$ProductFields = $this->getProductFields();
 
 		if ( $ProductFields ){
@@ -41,7 +48,8 @@ class Goods extends CActiveRecord
 		}
 	}
 
-	public function getMotelCForm(){
+	public function getMotelCForm()
+	{
 
 		$Form = array(
 			'attributes'    =>  array(
@@ -92,12 +100,12 @@ class Goods extends CActiveRecord
 						$Form['elements'][$Field->Alias]['items'] = CHtml::listData(ListsItems::model()->findAll('ListID = :ListID',array(':ListID'=>$Field->ListFields->ListID)), 'ID', 'Name');
 						if ( $Field->ListFields->IsMultipleSelect ){
                             
-                             if ( $this->{$Field->Alias."Items"} ) {
-                                $selected = array();
-                                foreach( $this->{$Field->Alias."Items"} as $Item ){
-                                    $selected[] = $Item->ID;
-                                }                                        
-                            }
+							$selected = array();
+							if ( $this->{$Field->Alias."Items"} ) {
+								foreach( $this->{$Field->Alias."Items"} as $Item ){
+									$selected[] = $Item->ID;
+								}                                        
+							}
                             
                             $this->{$Field->Alias} = $selected;                            
                             
@@ -126,13 +134,11 @@ class Goods extends CActiveRecord
 		return new CForm($Form,$this);
 	}
     
-    public function getRelationsNameArray(){
+    public function getRelationsNameArray()
+	{
         return array_keys($this->relations());
     }
     
-    /**
-	 * @return array relational rules.
-	 */
 	public function relations()
 	{
         $relations = array();
@@ -149,12 +155,43 @@ class Goods extends CActiveRecord
                     break;
 				}
 			}
-		}
-        
-        
+		}        
+ 
 		return $relations;
 	}
 
+	public function afterSave()
+	{
+		parent::afterSave();
+
+        $PostData = $_POST[$this->Product->Alias];
+		
+        $ProductFields = $this->getProductFields();
+    	if ( $ProductFields ){
+			foreach( $ProductFields as $Field ){
+				switch( $Field->FieldType ){
+					case TypeFields::LISTS :
+                        if ($Field->ListFields->IsMultipleSelect){	
+							
+							RecordsLists::model()->deleteAll('ProductID = :ProductID AND RecordID = :RecordID',array(":ProductID"=> $this->getProductID(),':RecordID'=> $this->ID));
+							
+							if ( isset($PostData[$Field->Alias]) ){								
+								foreach ($PostData[$Field->Alias] as $ListItemID) {
+									$RecordsLists = new RecordsLists();
+									$RecordsLists->ProductID = $this->getProductID();
+									$RecordsLists->RecordID = $this->ID;
+									$RecordsLists->ListItemID = $ListItemID;
+									if ( !$RecordsLists->save() ) throw new CException("ERROR SEVE LISTS"); 
+								}
+							}
+						}                          
+                    break;
+				}
+			}
+		}
+        
+	}	
+	
 	public function rules()
 	{
 		$rules      = array();
