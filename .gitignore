@@ -1,8 +1,7 @@
 phpmyadmin
 nbproject
-assets
+assets/
 yii/
 .idea
-#assets
 protected/runtime/
 sxd
