@@ -131,6 +131,7 @@ class Categories extends CActiveRecord
 		return $return;
 	}
 
+<<<<<<< HEAD
 	public static function getMenuItems($items) {
         
         Categories::toHierarchy($items);
@@ -212,5 +213,47 @@ class Categories extends CActiveRecord
             return $trees;
     }
     
+=======
+	/**
+	 * Возвращает массив пунктов меню для виджета CMenu
+	 * Параметры, тип меню и глубина
+	 * @param string $type
+	 * @param int $depth
+	 * @return array
+	 */
+	protected function getMenuItems($type, $depth = 1) {
+
+		$criteria = new CDbCriteria();
+		$criteria->condition = 'menu_type = :menu_type AND level <= :level AND level > 1';
+		// увеличиваем глубину на +1, т.к. 1ый уровень это рут.
+		$criteria->params = array(':menu_type'=>$type, ':level'=>$depth+1);
+		$models = Page::model()->active()->findAll($criteria);
+
+		$level = 2; // начинаем с второго уровня
+		$result = array();
+		foreach($models as $model) {
+			if($model->level > $level) {
+				$result[$model->level] = &$result[$level][count($result[$level])-1]['items'];
+			}
+
+			$result[$model->level][]=array(
+				'label'=>$model->title,
+				'url'=>($model->is_main == 1 ? array('/'.Yii::app()->defaultController) : array('pages/view', 'url'=>$model->url)),
+				'items'=>array()
+			);
+
+			if(($model->lft+1) != $model->rgt) {
+				current($result);
+			}
+
+			$level = $model->level;
+		}
+
+		if(isset($result[2]))
+			return $result[2];
+		else
+			return array();
+	}
+>>>>>>> 27832d0ce2b48c85a2c02eae7411f7c2ac3ec39f
 
 }

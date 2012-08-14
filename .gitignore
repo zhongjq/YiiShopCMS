@@ -1,6 +1,13 @@
 phpmyadmin
 nbproject
+<<<<<<< HEAD
 yii/
 .idea
+=======
+assets
+yii/
+.idea
+assets/
+>>>>>>> 27832d0ce2b48c85a2c02eae7411f7c2ac3ec39f
 protected/runtime/
 sxd
