@@ -3,6 +3,6 @@ nbproject
 assets
 yii/
 .idea
-assets
+#assets
 protected/runtime/
 sxd
