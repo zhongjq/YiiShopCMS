@@ -131,12 +131,15 @@ class Categories extends CActiveRecord
 		return $return;
 	}
 
-<<<<<<< HEAD
+	
+	public static function hasChildren($item){
+		return ($item->rgt - $item->lft) > 1 ? true : false;
+	}
+
 	public static function getMenuItems($items) {
         
-        Categories::toHierarchy($items);
-        
-        die();
+   		echo sizeof($items);
+		die();     
         
         $return = array();
         $SubMenu = array();
@@ -146,11 +149,11 @@ class Categories extends CActiveRecord
         
         echo $SizeMenu;
         
-        for($i = 0; $i <= $SizeMenu; $i++ ){
-            
-            echo $items[$i]->Name;
-            
-        }
+       foreach( $items as $Node ) {
+		   
+		   
+		   
+	   }
         
         /*
     	foreach( $items as $Node ) {
@@ -171,89 +174,4 @@ class Categories extends CActiveRecord
         
         return $return;
 	}
-    
-    public static function toHierarchy($collection)
-    {
-            // Trees mapped
-            $trees = array();
-            $l = 0;
-    
-            if (count($collection) > 0) {
-                    // Node Stack. Used to help building the hierarchy
-                    $stack = array();
-    
-                    foreach ($collection as $node) {
-                            $item = $node;
-                            $item['children'] = array();
-    
-                            // Number of stack items
-                            $l = count($stack);
-    
-                            // Check if we're dealing with different levels
-                            while($l > 0 && $stack[$l - 1]['depth'] >= $item['depth']) {
-                                    array_pop($stack);
-                                    $l--;
-                            }
-    
-                            // Stack is empty (we are inspecting the root)
-                            if ($l == 0) {
-                                    // Assigning the root node
-                                    $i = count($trees);
-                                    $trees[$i] = $item;
-                                    $stack[] = & $trees[$i];
-                            } else {
-                                    // Add node to parent
-                                    $i = count($stack[$l - 1]['children']);
-                                    $stack[$l - 1]['children'][$i] = $item;
-                                    $stack[] = & $stack[$l - 1]['children'][$i];
-                            }
-                    }
-            }
-    
-            return $trees;
-    }
-    
-=======
-	/**
-	 * Возвращает массив пунктов меню для виджета CMenu
-	 * Параметры, тип меню и глубина
-	 * @param string $type
-	 * @param int $depth
-	 * @return array
-	 */
-	protected function getMenuItems($type, $depth = 1) {
-
-		$criteria = new CDbCriteria();
-		$criteria->condition = 'menu_type = :menu_type AND level <= :level AND level > 1';
-		// увеличиваем глубину на +1, т.к. 1ый уровень это рут.
-		$criteria->params = array(':menu_type'=>$type, ':level'=>$depth+1);
-		$models = Page::model()->active()->findAll($criteria);
-
-		$level = 2; // начинаем с второго уровня
-		$result = array();
-		foreach($models as $model) {
-			if($model->level > $level) {
-				$result[$model->level] = &$result[$level][count($result[$level])-1]['items'];
-			}
-
-			$result[$model->level][]=array(
-				'label'=>$model->title,
-				'url'=>($model->is_main == 1 ? array('/'.Yii::app()->defaultController) : array('pages/view', 'url'=>$model->url)),
-				'items'=>array()
-			);
-
-			if(($model->lft+1) != $model->rgt) {
-				current($result);
-			}
-
-			$level = $model->level;
-		}
-
-		if(isset($result[2]))
-			return $result[2];
-		else
-			return array();
-	}
->>>>>>> 27832d0ce2b48c85a2c02eae7411f7c2ac3ec39f
-
 }
