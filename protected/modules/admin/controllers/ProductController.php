@@ -30,8 +30,15 @@ class ProductController extends Controller
 
 		$Goods = $Product->getGoodsObject();
         
+		$IsColumnTable = array();
+		foreach($Product->productsFields() as $Field) {
+			if( $Field->IsColumnTable ) $IsColumnTable[] = $Field->Alias;
+		}
 		
-		$Goods = $Goods->with( $Goods->getRelationsNameArray() )->findAll();
+		$Goods = $Goods->with( $Goods->getRelationsNameArray() )
+					->findAll(array(
+						'select'=> implode(',', $IsColumnTable) ,
+					));
 
         
 		$this->render('records/view', array(

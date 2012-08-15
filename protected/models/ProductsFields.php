@@ -47,7 +47,12 @@ class ProductsFields extends CActiveRecord
 			array('ProductID, FieldType, IsMandatory, IsFilter', 'numerical', 'integerOnly'=>true),
 			array('Name', 'length', 'max'=>255),
 			array('Alias', 'length', 'max'=>50),
-			array('Name, Alias', 'unique'),
+			array('Name, Alias', 'unique', 'criteria' => array(
+												'condition' => 'ProductID = :ProductID',
+												'params'=>array(':ProductID'=> $this->ProductID )
+											)),
+			
+				
 			array('IsColumnTable', 'boolean'),
 			array('Alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u',
 				'message' => Yii::t("AdminModule.products",'Field contains invalid characters.')),
@@ -84,7 +89,7 @@ class ProductsFields extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'ID'            =>  Yii::t("AdminModule.main",'Идентификатор'),
+			'ID'            =>  Yii::t("AdminModule.main",'ID'),
 			'ProductID'     =>  Yii::t("AdminModule.main",'Идентификатор продукта'),
 			'FieldType'     =>  Yii::t("AdminModule.main",'Тип поля'),
 			'Name'          =>  Yii::t("AdminModule.main",'Наименование'),

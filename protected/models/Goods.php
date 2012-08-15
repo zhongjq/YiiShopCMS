@@ -149,9 +149,13 @@ class Goods extends CActiveRecord
 				switch( $Field->FieldType ){
 					case TypeFields::LISTS :
                         if ($Field->ListFields->IsMultipleSelect)
-    						$relations[$Field->Alias.'Items'] = array(self::MANY_MANY, 'ListsItems', 'RecordsLists(RecordID, ListItemID)');
+    						$relations[$Field->Alias.'Items'] = array(	self::MANY_MANY, 
+																		'ListsItems', 'RecordsLists(RecordID, ListItemID)',																		
+																		'on' => 'ProductID = ' .$this->getProductID()
+																		
+																	);
 						else                        
-                            $relations[$Field->Alias.'Item'] = array(self::BELONGS_TO, 'ListsItems', $Field->Alias);                            
+                            $relations[$Field->Alias.'Item'] = array( self::BELONGS_TO,'ListsItems',$Field->Alias );                            
                     break;
 				}
 			}
