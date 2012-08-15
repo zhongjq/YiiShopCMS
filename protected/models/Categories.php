@@ -131,47 +131,27 @@ class Categories extends CActiveRecord
 		return $return;
 	}
 
-	
-	public static function hasChildren($item){
-		return ($item->rgt - $item->lft) > 1 ? true : false;
-	}
-
-	public static function getMenuItems($items) {
+	public static function getMenuItems($items, $start = 0) {
         
-   		echo sizeof($items);
-		die();     
-        
-        $return = array();
-        $SubMenu = array();
-        $level = 1;
-        
-        $SizeMenu = sizeof($items);
-        
-        echo $SizeMenu;
-        
-       foreach( $items as $Node ) {
-		   
-		   
-		   
-	   }
-        
-        /*
-    	foreach( $items as $Node ) {
-            
-            if ( $Node->Level > $level ) {
-                print_r( sizeof($children) );  
-                echo CHtml::encode($Node->Name);
-            }
-                
-            
-            $return[] = array(  'label'     =>  CHtml::encode($Node->Name),
-							    'url'       =>  array('/categories/view/','Alias'=>$Node->Alias),
-							    'active'    =>  CHttpRequest::getParam('Alias') == $Node->Alias,
-							    'items'     =>  $SubMenu
+		$return = array();
+		$SizeMenu = sizeof($items);
+		for( $i = $start; $i < $SizeMenu; $i++ ){
+            $return[$i] = array(	'label'     =>  CHtml::encode($items[$i]->Name),
+									'url'       =>  array('/categories/view/','Alias'=>$items[$i]->Alias),
+									'active'    =>  CHttpRequest::getParam('Alias') == $items[$i]->Alias,
 						      );
+			
+			$cn = $items[$i]->rgt - $items[$i]->lft;
+			if ( $cn != 1 ){
+				$return[$i]['items'] = Categories::getMenuItems($items,$i+1);
+				$i = ceil( $cn/2 );
+			}
 		}
-        */
-        
+                
         return $return;
+	}
+	
+	public static function getMenuArray($items) {
+		return Categories::getMenuItems($items);
 	}
 }

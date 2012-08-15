@@ -9,20 +9,18 @@ $this->renderPartial('records/SecondMenu',array('Product'=>$Product));
 ?>
 
 <?php if( $Goods ) : ?>
-<?php $f = array(); ?>
 <table id="Goods" class="table table-bordered table-striped">
 	<thead>
 	<tr>
 		<? foreach($Product->productsFields() as $Field) : ?>
 			<?php if( $Field->IsColumnTable ) : ?>
 				<th><?=$Field->Name?></th>
-				<?php $f[] = $Field->Alias; ?>
 			<?php endif; ?>
 		<? endforeach ?>
-		<?php if(!empty($f)) : ?>
+		
 		<th width="10"></th>
 		<th width="10"></th> 
-		<?php endif  ?>
+		
 	</tr>
 	</thead>
 	<tbody>
@@ -71,7 +69,7 @@ $this->renderPartial('records/SecondMenu',array('Product'=>$Product));
 	</tbody>
 	<tfoot>
 	<tr>
-		<td colspan="7">
+		<td colspan="100">
 		</td>
 	</tr>
 	</tfoot>

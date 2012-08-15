@@ -48,10 +48,14 @@ class CategoriesController extends Controller
 	 * Displays a particular model.
 	 * @param integer $id the ID of the model to be displayed
 	 */
-	public function actionView($id)
+	public function actionView($Alias)
 	{
+		$Category = Categories::model()->find('Alias = :Alias', array(':Alias'=>$Alias));
+		
+		if ( !$Category ) throw new CHttpException(404,'Category not found.');
+		
 		$this->render('view',array(
-			'model'=>$this->loadModel($id),
+			'Category' => $Category
 		));
 	}
 

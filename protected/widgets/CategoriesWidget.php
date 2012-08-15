@@ -7,7 +7,7 @@ class CategoriesWidget extends CWidget
 
 		$this->controller->renderPartial('//widgets/categories',array(
 			"title" =>  $Category,
-			"Categories" =>  $Category->getMenuItems(),
+			"Categories" =>  Categories::getMenuArray($Category),
 		));
 	}
 }

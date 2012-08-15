@@ -1,13 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 3.3.7deb7
+-- version 3.5.2.1
 -- http://www.phpmyadmin.net
 --
 -- Хост: localhost
--- Время создания: Авг 09 2012 г., 00:34
--- Версия сервера: 5.1.63
--- Версия PHP: 5.3.3-7+squeeze13
+-- Время создания: Авг 16 2012 г., 00:25
+-- Версия сервера: 5.5.24-0ubuntu0.12.04.1
+-- Версия PHP: 5.3.10-1ubuntu3.2
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -16,7 +17,7 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 /*!40101 SET NAMES utf8 */;
 
 --
--- База данных: `yiishop`
+-- База данных: `enchikiben_fbfde`
 --
 
 -- --------------------------------------------------------
@@ -45,9 +46,9 @@ CREATE TABLE IF NOT EXISTS `Categories` (
 INSERT INTO `Categories` (`ID`, `root`, `lft`, `rgt`, `Level`, `Status`, `Alias`, `Name`, `Description`) VALUES
 (1, 1, 1, 8, 1, 1, 'shiny', 'Шины', 'Шины'),
 (2, 2, 1, 2, 1, 1, 'diski', 'Диски', 'Диски'),
-(3, 1, 2, 3, 2, 1, 'letnie', 'Летние', 'Летние'),
-(4, 1, 4, 5, 2, 1, 'zimnie', 'Зимние', 'Зимние'),
-(5, 1, 6, 7, 2, 1, 'vsesezonnye', 'Всесезонные', 'Всесезонные');
+(3, 1, 2, 7, 2, 1, 'letnie', 'Летние', 'Летние'),
+(4, 1, 3, 6, 3, 1, 'zimnie', 'Зимние', 'Зимние'),
+(5, 1, 4, 5, 4, 1, 'vsesezonnye', 'Всесезонные', 'Всесезонные');
 
 -- --------------------------------------------------------
 
@@ -61,13 +62,17 @@ CREATE TABLE IF NOT EXISTS `disk` (
   `Title` text,
   `Keywords` text,
   `Description` text,
+  `Name` varchar(255) DEFAULT NULL,
+  `Size` int(11) DEFAULT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
 --
 -- Дамп данных таблицы `disk`
 --
 
+INSERT INTO `disk` (`ID`, `Alias`, `Title`, `Keywords`, `Description`, `Name`, `Size`) VALUES
+(1, '', '', '', '', 'Диск 1', 1);
 
 -- --------------------------------------------------------
 
@@ -92,6 +97,29 @@ INSERT INTO `IntegerFields` (`FieldID`, `MinValue`, `MaxValue`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `ListFields`
+--
+
+CREATE TABLE IF NOT EXISTS `ListFields` (
+  `FieldID` int(11) NOT NULL AUTO_INCREMENT,
+  `ListID` int(11) NOT NULL,
+  `IsMultipleSelect` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Множественный выбор списка',
+  PRIMARY KEY (`FieldID`),
+  KEY `ListID` (`ListID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=46 ;
+
+--
+-- Дамп данных таблицы `ListFields`
+--
+
+INSERT INTO `ListFields` (`FieldID`, `ListID`, `IsMultipleSelect`) VALUES
+(42, 2, 1),
+(43, 3, 0),
+(45, 2, 1);
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `Lists`
 --
 
@@ -99,12 +127,15 @@ CREATE TABLE IF NOT EXISTS `Lists` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Name` varchar(255) NOT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Списки' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Списки' AUTO_INCREMENT=4 ;
 
 --
 -- Дамп данных таблицы `Lists`
 --
 
+INSERT INTO `Lists` (`ID`, `Name`) VALUES
+(2, 'Размер'),
+(3, 'Тип');
 
 -- --------------------------------------------------------
 
@@ -120,12 +151,22 @@ CREATE TABLE IF NOT EXISTS `ListsItems` (
   `Name` varchar(255) NOT NULL,
   PRIMARY KEY (`ID`),
   KEY `ListID` (`ListID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Списки' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Списки' AUTO_INCREMENT=12 ;
 
 --
 -- Дамп данных таблицы `ListsItems`
 --
 
+INSERT INTO `ListsItems` (`ID`, `ListID`, `Status`, `Priority`, `Name`) VALUES
+(1, 2, 1, 0, '10'),
+(4, 2, 1, 0, '12\r'),
+(5, 2, 1, 0, '13\r'),
+(6, 2, 1, 0, '15\r'),
+(7, 2, 1, 0, '16\r'),
+(8, 2, 1, 0, '17'),
+(9, 3, 1, 0, 'Зима\r'),
+(10, 3, 1, 0, 'Дето\r'),
+(11, 3, 1, 0, 'фвфыв');
 
 -- --------------------------------------------------------
 
@@ -192,7 +233,7 @@ CREATE TABLE IF NOT EXISTS `ProductsFields` (
   `Hint` varchar(255) NOT NULL COMMENT 'Подсказка',
   PRIMARY KEY (`ID`),
   KEY `ProductID` (`ProductID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=46 ;
 
 --
 -- Дамп данных таблицы `ProductsFields`
@@ -202,7 +243,52 @@ INSERT INTO `ProductsFields` (`ID`, `Position`, `ProductID`, `FieldType`, `Name`
 (1, 0, 1, 2, 'Наименование товара', 'Name', 1, 1, 1, '', ''),
 (2, 0, 1, 1, 'Количество', 'Col', 0, 1, 1, '', ''),
 (3, 0, 1, 4, 'Описание', 'decs', 0, 0, 1, '', ''),
-(4, 0, 1, 3, 'Цена', 'Price', 1, 1, 1, '', '');
+(4, 0, 1, 3, 'Цена', 'Price', 1, 1, 1, '', ''),
+(42, 0, 1, 5, 'Размер', 'Size', 0, 0, 1, '', ''),
+(43, 0, 1, 5, 'Type', 'Type', 0, 0, 1, '', ''),
+(44, 0, 2, 2, 'Заголовок', 'Name', 1, 0, 1, '', ''),
+(45, 0, 2, 5, 'Размер', 'Size', 0, 0, 1, '', '');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `RecordsCategories`
+--
+
+CREATE TABLE IF NOT EXISTS `RecordsCategories` (
+  `ProductID` int(11) NOT NULL,
+  `RecordID` int(11) NOT NULL,
+  `CategoryID` int(11) unsigned NOT NULL,
+  KEY `ProductID` (`ProductID`),
+  KEY `CategoryID` (`CategoryID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Связь товаров со множественными списками';
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `RecordsLists`
+--
+
+CREATE TABLE IF NOT EXISTS `RecordsLists` (
+  `ProductID` int(11) NOT NULL,
+  `RecordID` int(11) NOT NULL,
+  `ListItemID` int(11) NOT NULL,
+  KEY `ProductID` (`ProductID`),
+  KEY `ListItemID` (`ListItemID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Связь товаров со множественными списками';
+
+--
+-- Дамп данных таблицы `RecordsLists`
+--
+
+INSERT INTO `RecordsLists` (`ProductID`, `RecordID`, `ListItemID`) VALUES
+(1, 1, 1),
+(1, 1, 7),
+(1, 1, 8),
+(1, 3, 5),
+(2, 1, 1),
+(2, 1, 5),
+(1, 4, 6);
 
 -- --------------------------------------------------------
 
@@ -222,7 +308,8 @@ CREATE TABLE IF NOT EXISTS `StringFields` (
 --
 
 INSERT INTO `StringFields` (`FieldID`, `MinLength`, `MaxLength`) VALUES
-(1, 0, 255);
+(1, 0, 255),
+(44, 0, 255);
 
 -- --------------------------------------------------------
 
@@ -261,15 +348,22 @@ CREATE TABLE IF NOT EXISTS `tires` (
   `Col` int(11) DEFAULT NULL,
   `decs` text,
   `Price` decimal(9,2) DEFAULT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+  `sadas` int(11) DEFAULT NULL,
+  `Size` int(11) DEFAULT NULL,
+  `Type` int(11) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `sadas` (`sadas`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
 --
 -- Дамп данных таблицы `tires`
 --
 
-INSERT INTO `tires` (`ID`, `Alias`, `Title`, `Keywords`, `Description`, `Name`, `Col`, `decs`, `Price`) VALUES
-(1, '', '', '', '', 'Шина 1', 3, '', '234.30');
+INSERT INTO `tires` (`ID`, `Alias`, `Title`, `Keywords`, `Description`, `Name`, `Col`, `decs`, `Price`, `sadas`, `Size`, `Type`) VALUES
+(1, '', '', '', '', 'Шина 1', 3, '', 234.30, 5, NULL, 10),
+(2, '', '', '', '', 'Шина 2', NULL, 'asd', 213.00, 4, NULL, NULL),
+(3, '', '', '', '', 'Шина 3', NULL, '', 323.00, 6, NULL, 11),
+(4, '', '', '', '', 'Шина 4', 23, '234', 12.50, 4, 1, 10);
 
 -- --------------------------------------------------------
 
@@ -310,10 +404,11 @@ ALTER TABLE `IntegerFields`
   ADD CONSTRAINT `IntegerFields_ibfk_1` FOREIGN KEY (`FieldID`) REFERENCES `ProductsFields` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Ограничения внешнего ключа таблицы `ListsItems`
+-- Ограничения внешнего ключа таблицы `ListFields`
 --
-ALTER TABLE `ListsItems`
-  ADD CONSTRAINT `ListsItems_ibfk_1` FOREIGN KEY (`ListID`) REFERENCES `Lists` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `ListFields`
+  ADD CONSTRAINT `ListFields_ibfk_1` FOREIGN KEY (`FieldID`) REFERENCES `ProductsFields` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `ListFields_ibfk_2` FOREIGN KEY (`ListID`) REFERENCES `Lists` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Ограничения внешнего ключа таблицы `PriceFields`
@@ -328,6 +423,19 @@ ALTER TABLE `ProductsFields`
   ADD CONSTRAINT `ProductsFields_ibfk_1` FOREIGN KEY (`ProductID`) REFERENCES `Products` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Ограничения внешнего ключа таблицы `RecordsCategories`
+--
+ALTER TABLE `RecordsCategories`
+  ADD CONSTRAINT `RecordsCategories_ibfk_1` FOREIGN KEY (`CategoryID`) REFERENCES `Categories` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Ограничения внешнего ключа таблицы `RecordsLists`
+--
+ALTER TABLE `RecordsLists`
+  ADD CONSTRAINT `RecordsLists_ibfk_2` FOREIGN KEY (`ProductID`) REFERENCES `Products` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `RecordsLists_ibfk_3` FOREIGN KEY (`ListItemID`) REFERENCES `ListsItems` (`ID`);
+
+--
 -- Ограничения внешнего ключа таблицы `StringFields`
 --
 ALTER TABLE `StringFields`
@@ -338,3 +446,13 @@ ALTER TABLE `StringFields`
 --
 ALTER TABLE `TextFields`
   ADD CONSTRAINT `TextFields_ibfk_1` FOREIGN KEY (`FieldID`) REFERENCES `ProductsFields` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Ограничения внешнего ключа таблицы `tires`
+--
+ALTER TABLE `tires`
+  ADD CONSTRAINT `tires_ibfk_1` FOREIGN KEY (`sadas`) REFERENCES `ListsItems` (`ID`);
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
