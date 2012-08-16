@@ -5,7 +5,8 @@ class Goods extends CActiveRecord
 	private $ProductID = null;
 	private $Product = null;
 	private $ProductsFields = null;
-	
+	private $TableFields = null;
+    
 	public function setProductID($v)
 	{
 		$this->ProductID = $v;
@@ -36,7 +37,52 @@ class Goods extends CActiveRecord
 
 		return $this->ProductsFields;
 	}
+    
+    public function getTableFields($update = false){
+        
+        if ( $this->TableFields === null && $update === false ){
+          	$ProductFields = $this->getProductFields();
+    
+    		if ( $ProductFields ){
+    			foreach( $ProductFields as $Field ){
+                    if( $Field->IsColumnTable ) 
+                    
+            			switch( $Field->FieldType ){
+        					case TypeFields::LISTS :
+                                if ($Field->ListFields->IsMultipleSelect)
+                                   $this->TableFields[] = array(
+                                        'name' => $Field->Alias,
+                                        'value' => '$data->getRecordItems("'.$Field->Alias.'Items")'
+                                        );
+        						else                        
+                                   $this->TableFields[] = array(
+                                        'name' => $Field->Alias,
+                                        'value' => '$data->'.$Field->Alias.'Item->Name'
+                                        );                 
+                            break;
+                            default:
+                                $this->TableFields[] = $Field->Alias;
+                            break;
+        				}                    
+                    
+    				
+    			}
+    		}
+        }
+        
+        return $this->TableFields;
+    }
+    
+    public function getRecordItems($Name, $sSep = ', ') {
 
+       $aRes = array();
+       foreach ($this->{$Name} as $Item) {
+          $aRes[] = $Item->Name;
+       }
+    
+       return implode($sSep, $aRes);
+    }    
+    
 	public function setGoodsAttributes()
 	{
 		$ProductFields = $this->getProductFields();

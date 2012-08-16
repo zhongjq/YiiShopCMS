@@ -34,16 +34,16 @@ class ProductController extends Controller
 		foreach($Product->productsFields() as $Field) {
 			if( $Field->IsColumnTable ) $IsColumnTable[] = $Field->Alias;
 		}
-		
-		$Goods = $Goods->with( $Goods->getRelationsNameArray() )
-					->findAll(array(
-						'select'=> implode(',', $IsColumnTable) ,
-					));
-
+		   
+        $criteria = new CDbCriteria;
+        $criteria->select = implode(',', $IsColumnTable);
+        $criteria->with = $Goods->getRelationsNameArray();
+        $GoodsData = new CActiveDataProvider($Goods,array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
         
 		$this->render('records/view', array(
-			'Product' => $Product,
-			'Goods' => $Goods,
+			'Product'   => $Product,
+			'Goods'     => $Goods,
+            'GoodsData' => $GoodsData
 		));
 	}
 
@@ -54,8 +54,7 @@ class ProductController extends Controller
 
 		$extPth = CHtml::asset($this->module->getlayoutPath().'/js/chosen/');
         Yii::app()->getClientScript()->registerCssFile($extPth.'/chosen.css');
-        Yii::app()->getClientScript()->registerScriptFile($extPth.'/chosen.jquery.js');
-		
+        Yii::app()->getClientScript()->registerScriptFile($extPth.'/chosen.jquery.js');		
 		
 		if(Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "GoodsForm" )
 		{

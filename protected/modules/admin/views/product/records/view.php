@@ -8,72 +8,62 @@ $this->renderPartial('records/SecondMenu',array('Product'=>$Product));
 
 ?>
 
-<?php if( $Goods ) : ?>
-<table id="Goods" class="table table-bordered table-striped">
-	<thead>
-	<tr>
-		<? foreach($Product->productsFields() as $Field) : ?>
-			<?php if( $Field->IsColumnTable ) : ?>
-				<th><?=$Field->Name?></th>
-			<?php endif; ?>
-		<? endforeach ?>
-		
-		<th width="10"></th>
-		<th width="10"></th> 
-		
-	</tr>
-	</thead>
-	<tbody>
+<?php if( $Goods && $GoodsData ) : ?>
+<?php
 
-		<? foreach($Goods as $Record) : ?>
-			<tr>
-				<? foreach($Product->productsFields() as $Field) : ?>
-					<?php if( $Field->IsColumnTable ) : ?>
-						<td class="span2">
-						<?php 
-							switch( $Field->FieldType ) {
-								case TypeFields::LISTS :
+    $this->widget('zii.widgets.grid.CGridView', array(
+        'dataProvider'=>$GoodsData,
+        'columns' => 
+            array_merge(
+                $Goods->getTableFields()
+                ,
+                array(       
+                    array(
+                        'htmlOptions'=>array('width'=>'10'),
+                        'class'=>'CButtonColumn',
+                        'template'=>'{update}',
+                        'buttons'=> array(
+                            'update' => array(
+                                'url'=> 'Yii::app()->createUrl("/admin/product/editrecord",array("ProductID"=>'.$Product->ID.',"RecordID"=>$data->ID) )',
+                                'imageUrl'=>null,
+                                'label'=>'<span class="icon-pencil pointer" title="'.Yii::t('AdminModule.main','Редактировать').'"></span>'
+                            )
+                        )
+                    ),
+                    array(
+                        'htmlOptions'=>array('width'=>'10'),
+                        'class'=>'CButtonColumn',
+                        'template'=>'{delete}',
+                        'buttons'=> array(
+                            'delete' => array(
+                                'url'=> 'Yii::app()->createUrl("/admin/product/deleterecord",array("ProductID"=>'.$Product->ID.',"RecordID"=>$data->ID) )',
+                                'imageUrl'=>null,
+                                'label'=>'<span class="close" title="'.Yii::t('AdminModule.main','Удалить').'">&times;</span>'
+                            )
+                        )                
+                    ),           
+                )
+            ),
+        'htmlOptions'=>array(
+            'class'=> ''   
+        ),
+        'itemsCssClass'=>'table table-bordered table-striped',
+        'template'=>'{summary} {items} {pager}',
+        'pagerCssClass'=>'pagination',
+        'pager'=>array(
+            'class'         =>'myLinkPager',
+            'cssFile'        => false,
+            'header'        => '',
+            'firstPageLabel'=> '&laquo;',
+        	'prevPageLabel'	=> '&larr;',
+        	'nextPageLabel'	=> '&rarr;',
+        	'lastPageLabel' => '&raquo;',
+        	'htmlOptions'	=> array("class"=>false),            
+        ),
+    ));
 
-									if ( $Field->ListFields->IsMultipleSelect ) {
-										if ( $Record->{$Field->Alias."Items"} ) {
-											$Items = array();
-											foreach( $Record->{$Field->Alias."Items"} as $Item ){
-												$Items[] = $Item->Name;
-											}            
-											echo implode(', ', $Items);
-										}                                    
-									} else
-										if ( $Record->{$Field->Alias."Item"} ) echo $Record->{$Field->Alias."Item"}->Name;
-								break;
-								default:
-									echo $Record->{$Field->Alias};
-							}                        
-						?>
-						</td>
-					<?php endif; ?>
-				<? endforeach ?>
+?>
 
-				<td>
-					<?= CHtml::link( '<span class="icon-pencil pointer" title="'.Yii::t('AdminModule.main','Редактировать').'"></span>',
-						$this->createUrl('/admin/product/editrecord',array('ProductID'=>$Field->ProductID,'RecordID'=>$Record->ID) )
-					) ?>
-				</td>
-				<td>
-					<?= CHtml::link( '<span class="close" title="'.Yii::t('AdminModule.main','Удалить').'">&times;</span>',
-						$this->createUrl('/admin/product/deleterecord',array('ProductID'=>$Field->ProductID,'RecordID'=>$Record->ID) )
-					) ?>
-				</td>
-			</tr>
-		<? endforeach ?>
-
-	</tbody>
-	<tfoot>
-	<tr>
-		<td colspan="100">
-		</td>
-	</tr>
-	</tfoot>
-</table>
 <?php else : ?>
 <h3><?=Yii::t('AdminModule.products',"У товара нет полей.")?></h3><br>
 	<?= CHtml::link("Добавить поле",
