@@ -15,7 +15,7 @@
  */
 class Categories extends CActiveRecord
 {
-	public $Parent = 0;
+	public $ParentID = 0;
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
@@ -70,15 +70,15 @@ class Categories extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'ID' => 'ID',
-			'lft' => 'Lft',
-			'rgt' => 'Rgt',
-			'Level' => 'Level',
-			'Status' => 'Статус',
-			'Alias' => 'Alias',
-			'Name' => 'Наименование',
-			'Description' => 'Описание',
-			'Parent' => 'Родитель',
+			'ID'			=>	Yii::t("AdminModule.main",'ID'),
+			'lft'			=> 'Lft',
+			'rgt'			=> 'Rgt',
+			'Level'			=> 'Level',
+			'Status'		=>	Yii::t("categories",'Status'),
+			'Alias'			=>	Yii::t("categories",'Alias'),
+			'Name'			=>	Yii::t("categories",'Name'),
+			'Description'	=>	Yii::t("categories",'Description'),
+			'Parent'		=>	Yii::t("categories",'Parent'),
 		);
 	}
 

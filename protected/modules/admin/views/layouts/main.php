@@ -46,21 +46,51 @@
 			<span class="i-bar"></span>
 			<span class="i-bar"></span>
 			</a>
-			<a class="brand" href="<?php echo Yii::app()->urlManager->baseUrl; ?>/admin"><?php echo CHtml::encode(Yii::app()->name); ?></a>
+			<a class="brand" href="<?php echo Yii::app()->urlManager->baseUrl; ?>/admin">
+				<?=Yii::t("AdminModule.main", "Shop") ?>
+			</a>
 			<div class="nav-collapse">
-
+				<script>
+					$(function(){
+						$('.dropdown-toggle').dropdown()
+					})
+				</script>
 			<? if(!Yii::app()->user->isGuest) : ?>
 				<?php
 					$this->FirstMenu=array(
-						array('label'=> Yii::t("AdminModule.main", "Категории"), 'url'=>array('/admin/categories'), 'active'=>$this->getId() =='categories'),
-						array('label'=> Yii::t("AdminModule.main", "Товары"), 'url'=>array('/admin/products'), 'active'=>$this->getId() =='product'),
-						array('label'=> Yii::t("AdminModule.main", "Заказы"), 'url'=>array('/admin/orders'), 'active'=>$this->getId() =='orders'),
-						array('label'=> Yii::t("AdminModule.main", "Пользователи"), 'url'=>array('/admin/users'), 'active'=>$this->getId() =='users'),
+						array(	'label'			=>	Yii::t("AdminModule.main", "Сatalog").'<b class="caret"></b>', 
+								'url'			=>	'#',
+								'itemOptions'	=>	array('class'=>'dropdown'),
+								'linkOptions'	=>	array('class'=>'dropdown-toggle','data-toggle'=>'dropdown-toggle'),
+								'encodeLabel'	=>	false,
+								'items'			=>	array(
+									array(	'label'	=>	Yii::t("AdminModule.categories", "Categories"), 
+											'url'	=>	array('/admin/categories'), 
+											'active'=>	$this->getId() =='categories'),
+									
+									array(	'label'	=>	Yii::t("AdminModule.manufacturers", "Manufacturers"), 
+											'url'	=>	array('/admin/manufacturers'), 
+											'active'=>	$this->getId() =='manufacturers'),
+									
+									array(	'label'	=>	Yii::t("AdminModule.products", "Products"),	
+											'url'	=>	array('/admin/products'), 
+											'active'=>	$this->getId() =='product'),
+						
+								)
+							),
+						
+						
+						//array('label'=> Yii::t("AdminModule.main", "Товары"),	'url'=>array('/admin/products'), 'active'=>$this->getId() =='product'),
+						//array('label'=> Yii::t("AdminModule.main", "Заказы"), 'url'=>array('/admin/orders'), 'active'=>$this->getId() =='orders'),
+						//array('label'=> Yii::t("AdminModule.main", "Пользователи"), 'url'=>array('/admin/users'), 'active'=>$this->getId() =='users'),
 					);
 				?>
 				<?php $this->widget('zii.widgets.CMenu',array(
-					'items'=>$this->FirstMenu,
-					'htmlOptions'=>array('class'=>'nav')
+					'items'			=>	$this->FirstMenu,
+					'htmlOptions'	=>	array('class'=>'nav'),
+					'submenuHtmlOptions'=>array('class'=>'dropdown-menu'),
+					'encodeLabel'=>false,
+
 				)); ?>
 			<? endif;?>
 

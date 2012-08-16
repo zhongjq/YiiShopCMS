@@ -1,12 +1,10 @@
 <?php
 $this->breadcrumbs=array(
-	'Категории'=>array('index'),
-	'Добавление категории',
+	Yii::t("AdminModule.categories", "Categories")	=>	array('/admin/categories'),
+	Yii::t("AdminModule.categories", "Add category")
 );
 
-$this->SecondMenu=array(
-	array('label'=>'Добавить категорию', 'url'=>array('add'), 'active'=>$this->getId() =='add'),
-);
+$this->renderPartial('SecondMenu');
 ?>
 
 <h1>Create Categories</h1>

@@ -38,40 +38,40 @@ class Goods extends CActiveRecord
 		return $this->ProductsFields;
 	}
     
-    public function getTableFields($update = false){
-        
-        if ( $this->TableFields === null && $update === false ){
-          	$ProductFields = $this->getProductFields();
-    
-    		if ( $ProductFields ){
-    			foreach( $ProductFields as $Field ){
-                    if( $Field->IsColumnTable ) 
-                    
-            			switch( $Field->FieldType ){
-        					case TypeFields::LISTS :
-                                if ($Field->ListFields->IsMultipleSelect)
-                                   $this->TableFields[] = array(
-                                        'name' => $Field->Alias,
-                                        'value' => '$data->getRecordItems("'.$Field->Alias.'Items")'
-                                        );
-        						else                        
-                                   $this->TableFields[] = array(
-                                        'name' => $Field->Alias,
-                                        'value' => '$data->'.$Field->Alias.'Item->Name'
-                                        );                 
-                            break;
-                            default:
-                                $this->TableFields[] = $Field->Alias;
-                            break;
-        				}                    
-                    
-    				
-    			}
-    		}
-        }
-        
-        return $this->TableFields;
-    }
+	public function getTableFields($update = false){
+
+		if ( $this->TableFields === null && $update === false ){
+			$ProductFields = $this->getProductFields();
+
+			if ( $ProductFields ){
+				foreach( $ProductFields as $Field ){
+					if( $Field->IsColumnTable ) 
+
+						switch( $Field->FieldType ){
+							case TypeFields::LISTS :
+								if ($Field->ListFields->IsMultipleSelect)
+								   $this->TableFields[] = array(
+										'name' => $Field->Alias,
+										'value' => '$data->getRecordItems("'.$Field->Alias.'Items")'
+										);
+								else                        
+								   $this->TableFields[] = array(
+										'name'	=> $Field->Alias,
+										'value' => 'isset($data->'.$Field->Alias.'Item) ? $data->'.$Field->Alias.'Item->Name : null'
+									);                 
+							break;
+							default:
+								$this->TableFields[] = $Field->Alias;
+							break;
+						}                    
+
+
+				}
+			}
+		}
+
+		return $this->TableFields;
+	}
     
     public function getRecordItems($Name, $sSep = ', ') {
 

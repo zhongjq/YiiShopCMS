@@ -18,11 +18,11 @@ class CategoriesController extends Controller
 			parent::accessRules(),
 			array(
 				array(  'allow',    // allow admin user to perform 'admin' and 'delete' actions
-					'actions'   =>  array('admin','delete'),
-					'roles'     =>  array('Administrator')
+						'actions'   =>  array('admin','delete'),
+						'roles'     =>  array('Administrator')
 				),
 				array(  'deny',  // deny all users
-					'users'=>array('*'),
+						'users'=>array('*'),
 				)
 			)
 		);
@@ -41,6 +41,20 @@ class CategoriesController extends Controller
 		));
 	}
 
+	/**
+	 * Lists all models.
+	 */
+	public function actionIndex()
+	{
+		$criteria = new CDbCriteria();
+		$criteria->order = 'root,lft';
+        $Categories	= new CActiveDataProvider('Categories',array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));		
+		
+		$this->render('index', array(
+			'Categories' => $Categories
+		));
+	}	
+	
 	/**
 	 * Creates a new model.
 	 * If creation is successful, the browser will be redirected to the 'view' page.
@@ -139,28 +153,7 @@ class CategoriesController extends Controller
 			throw new CHttpException(400,'Invalid request. Please do not repeat this request again.');
 	}
 
-	/**
-	 * Lists all models.
-	 */
-	public function actionIndex()
-	{
-		$criteria = new CDbCriteria();
-		$criteria->order = 'root,lft';
-		$count = Categories::model()->count($criteria);
 
-		$pages=new CPagination($count);
-
-		$pages->pageSize=10;
-		$pages->applyLimit($criteria);
-
-		$Categories = Categories::model()->findAll($criteria);
-
-		$this->render('index', array(
-			'Categories' => $Categories,
-			'pages' => $pages
-		));
-
-	}
 
 	/**
 	 * Manages all models.
