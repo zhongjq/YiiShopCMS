@@ -68,8 +68,10 @@ class ManufacturersController extends Controller
 		if(isset($_POST['Manufacturers']))
 		{
 			$Manufacturer->attributes = $_POST['Manufacturers'];
+			$Manufacturer->Logo	= CUploadedFile::getInstance($Manufacturer,'Logo');
 			if($Manufacturer->validate()){				
 				if ( $Manufacturer->save() ){
+					$Manufacturer->Logo->saveAs('/home/enchikiben/sites/yiishop/data/manufacturers/');
 					$this->redirect(array('/admin/manufacturers'));
 				}
 			}
@@ -97,8 +99,13 @@ class ManufacturersController extends Controller
     	if(isset($_POST['Manufacturers']))
 		{
 			$Manufacturer->attributes = $_POST['Manufacturers'];
+			$Manufacturer->Logo	= CUploadedFile::getInstance($Manufacturer,'Logo');
 			if($Manufacturer->validate()){				
 				if ( $Manufacturer->save() ){
+					$Manufacturer->Logo->saveAs(Yii::getPathOfAlias('manufacturersfiles')
+												.'/'.$Manufacturer->ID.'.'.$Manufacturer->Logo->getExtensionName());
+					
+					
 					$this->redirect(array('/admin/manufacturers'));
 				}
 			}

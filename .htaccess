@@ -13,3 +13,8 @@ AddCharset utf-8 *
 	RewriteCond %{REQUEST_FILENAME} !-d
 	RewriteRule . index.php [L]
 </IfModule>
+
+#кэширование css, javascript и txt-файлов на неделю
+<FilesMatch ".(js|css)$">
+	Header set Cache-Control "max-age=604800"
+</FilesMatch>

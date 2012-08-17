@@ -12,8 +12,16 @@
  */
 class Manufacturers extends CActiveRecord
 {
-    public $Logo;
-	/**
+	public $PathLogo; 
+	public $Logo;
+	
+	public function __construct($scenario = 'insert') {
+		parent::__construct($scenario);
+		
+		Yii::setPathOfAlias('manufacturersfiles', Yii::getPathOfAlias('webroot')."/data/manufacturers/");
+	}
+
+		/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
 	 * @return Manufacturers the static model class
@@ -46,7 +54,7 @@ class Manufacturers extends CActiveRecord
     		array('Alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u',
 				    'message' => Yii::t("manufacturers",'Alias contains invalid characters.')),            
 			array('Description', 'safe'),
-            array('Logo', 'file', 'types'=>'jpg, gif, png', 'maxSize' => 1048576),
+            array('Logo', 'file', 'types'=>'jpg, gif, png', 'maxSize' => 1048576, 'allowEmpty'=>true ),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('ID, Status, Alias, Name, Description', 'safe', 'on'=>'search'),
@@ -75,6 +83,7 @@ class Manufacturers extends CActiveRecord
 			'Alias'			=>	Yii::t("manufacturers",'Alias'),
 			'Name'			=>	Yii::t("manufacturers",'Name'),
 			'Description'	=>	Yii::t("manufacturers",'Description'),
+			'Logo'			=>	Yii::t("manufacturers",'Logo'),
 		);
 	}
 
@@ -110,11 +119,11 @@ class Manufacturers extends CActiveRecord
 			),
 			'activeForm' => array(
 				'class' => 'CActiveForm',
-				'enableAjaxValidation' => true,
+				'enableAjaxValidation' => false,
 				'enableClientValidation' => false,
 				'id' => "ManufacturersForm",
 				'clientOptions' => array(
-					'validateOnSubmit' => true,
+					'validateOnSubmit' => false,
 					'validateOnChange' => false,
 				),
 			),
@@ -137,7 +146,8 @@ class Manufacturers extends CActiveRecord
     				'rows'=>5
     			),
         		'Logo'=>array(
-    				'type'=>'file'
+    				'type'=>'file',
+					'class'=>'input-file'
     			),                
     		),
     		'buttons'=>array(
