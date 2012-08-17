@@ -1,12 +1,11 @@
 <?php
+$this->pageTitle    =	Yii::t("categories", "Add category");
 $this->breadcrumbs=array(
-	Yii::t("AdminModule.categories", "Categories")	=>	array('/admin/categories'),
-	Yii::t("AdminModule.categories", "Add category")
+	Yii::t("categories", "Categories")	=>	array('/admin/categories'),
+	Yii::t("categories", "Add category")
 );
 
 $this->renderPartial('SecondMenu');
+
+echo $Form;
 ?>
-
-<h1>Create Categories</h1>
-
-<?php echo $this->renderPartial('_form', array('model'=>$model)); ?>

@@ -1,6 +1,6 @@
 <?php
-$this->pageTitle	=	Yii::t("AdminModule.categories", "Categories");
-$this->breadcrumbs	=	array(Yii::t("AdminModule.categories", "Categories"));
+$this->pageTitle	=	Yii::t("categories", "Categories");
+$this->breadcrumbs	=	array(Yii::t("categories", "Categories"));
 
 $this->renderPartial('SecondMenu');
 
@@ -22,7 +22,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 				'update' => array(
 					'url'=> 'Yii::app()->createUrl("/admin/categories/edit",array("CategoryID"=>$data->ID) )',
 					'imageUrl'=>null,
-					'label'=>'<span class="icon-pencil pointer" title="'.Yii::t('AdminModule.main','Редактировать').'"></span>'
+					'label'=>'<span class="icon-pencil pointer" title="'.Yii::t('main','Edit').'"></span>'
 				)
 			)
 		),
@@ -34,7 +34,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 				'delete' => array(
 					'url'=> 'Yii::app()->createUrl("/admin/categories/delete",array("CategoryID"=>$data->ID) )',
 					'imageUrl'=>null,
-					'label'=>'<span class="close" title="'.Yii::t('AdminModule.main','Удалить').'">&times;</span>'
+					'label'=>'<span class="close" title="'.Yii::t('main','Delete').'">&times;</span>'
 				)
 			)                
 		),            

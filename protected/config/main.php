@@ -82,8 +82,8 @@ return array(
 		
 		// База
 		'db'=>array(
-			'connectionString' => 'mysql:host=localhost;dbname=enchikiben_fbfde',
-            //'connectionString' => 'mysql:host=mysql0.db.koding.com;dbname=enchikiben_fbfde',
+			//'connectionString' => 'mysql:host=localhost;dbname=enchikiben_fbfde',
+            'connectionString' => 'mysql:host=mysql0.db.koding.com;dbname=enchikiben_fbfde',
 			'emulatePrepare' => true,
 			'username' => 'enchikiben_fbfde',
 			'password' => '754089db',
@@ -153,7 +153,10 @@ return array(
                 /* АДМИНИСТРАТИРОВАНИЕ */
                 "/admin/login" => "admin/default/login",
                 // Категории
-                '/admin/category/<action:(add|edit|view|delete)>/<id>'      =>  'admin/categories/<action>',
+                '/admin/category/<action:(add|edit|delete)>/<CategoryID>'   =>  'admin/categories/<action>',
+                // Производители
+                '/admin/manufacturer/<action:(add|edit|delete)>/<ManufacturerID>'   =>  'admin/manufacturers/<action>',
+    			                
 				// Пользователи
 		        '/admin/user/<action:(edit|view|delete|passwordedit)>/<id>' =>  'admin/users/<action>',
                 // Продукты

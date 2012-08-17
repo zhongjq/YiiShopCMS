@@ -11,4 +11,8 @@ return array(
 	'Alias'			=> "Псевдоним (URL)",
 	'Description'	=> "Описание",
 	'Parent'		=> "Родитель",
+    // 
+    'Alias contains invalid characters.'=>'Псевдоним содержит недопустимые символы.',
+    //
+    'Edit category' => "Редактирование категории",
 );

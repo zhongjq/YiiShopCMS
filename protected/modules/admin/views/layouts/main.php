@@ -47,7 +47,7 @@
 			<span class="i-bar"></span>
 			</a>
 			<a class="brand" href="<?php echo Yii::app()->urlManager->baseUrl; ?>/admin">
-				<?=Yii::t("AdminModule.main", "Shop") ?>
+				<?=Yii::t("main", "Shop") ?>
 			</a>
 			<div class="nav-collapse">
 				<script>
@@ -58,21 +58,21 @@
 			<? if(!Yii::app()->user->isGuest) : ?>
 				<?php
 					$this->FirstMenu=array(
-						array(	'label'			=>	Yii::t("AdminModule.main", "Сatalog").'<b class="caret"></b>', 
+						array(	'label'			=>	Yii::t("main", "Сatalog").'<b class="caret"></b>', 
 								'url'			=>	'#',
 								'itemOptions'	=>	array('class'=>'dropdown'),
 								'linkOptions'	=>	array('class'=>'dropdown-toggle','data-toggle'=>'dropdown-toggle'),
 								'encodeLabel'	=>	false,
 								'items'			=>	array(
-									array(	'label'	=>	Yii::t("AdminModule.categories", "Categories"), 
+									array(	'label'	=>	Yii::t("categories", "Categories"), 
 											'url'	=>	array('/admin/categories'), 
 											'active'=>	$this->getId() =='categories'),
 									
-									array(	'label'	=>	Yii::t("AdminModule.manufacturers", "Manufacturers"), 
+									array(	'label'	=>	Yii::t("manufacturers", "Manufacturers"), 
 											'url'	=>	array('/admin/manufacturers'), 
 											'active'=>	$this->getId() =='manufacturers'),
 									
-									array(	'label'	=>	Yii::t("AdminModule.products", "Products"),	
+									array(	'label'	=>	Yii::t("products", "Products"),	
 											'url'	=>	array('/admin/products'), 
 											'active'=>	$this->getId() =='product'),
 						
