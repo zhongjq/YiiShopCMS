@@ -100,6 +100,10 @@ class TextFields extends CActiveRecord
 		return array(
 			'type'=>'form',
 			'elements'=>array(
+    			'IsMultipleSelect'=>array(
+    				'type'=>'checkbox',
+					'layout'=>'{input}{label}{error}{hint}',
+				),                
 				'MinLength'=>array(
 					'type'=>'text',
 					'maxlength'=>255

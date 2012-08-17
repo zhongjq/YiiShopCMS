@@ -61,35 +61,38 @@ class CategoriesController extends Controller
 	 */
 	public function actionAdd()
 	{
-		$model=new Categories;
+		$Category  =   new Categories('add');
 
-		// Uncomment the following line if AJAX validation is needed
-		// $this->performAjaxValidation($model);
+    	if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "CategoryForm" ){
+			echo CActiveForm::validate($Category);
+			Yii::app()->end();
+		}
 
 		if(isset($_POST['Categories']))
 		{
-			$model->attributes = $_POST['Categories'];
-			if($model->validate()){
-				$model->Alias = Controller::translit($model->Name);
+			$Category->attributes = $_POST['Categories'];
+			if($Category->validate()){
+				$Category->Alias = Controller::translit($Category->Name);
 
-				if ($model->Parent == 0){
-					$model->saveNode();
-					$this->redirect(array('view','id'=>$model->ID));
+				if ($Category->ParentID == 0){
+					$Category->saveNode();
+					$this->redirect(array('/admin/categories'));
 				} else {
-					$Root = Categories::model()->findByPk($model->Parent);
+					$Root = Categories::model()->findByPk($Category->ParentID);
 
 					if ( $Root ){
-						$model->appendTo($Root);
-						$this->redirect(array('view','id'=>$model->ID));
+						$Category->appendTo($Root);
+						$this->redirect(array('/admin/categories'));
 					}
 				}
 
 			}
-
 		}
-
+        
+        $Form = new CForm( $Category->getArrayCForm(), $Category );        
+        
 		$this->render('add',array(
-			'model'=>$model,
+			'Form'=>$Form,
 		));
 	}
 
@@ -98,38 +101,43 @@ class CategoriesController extends Controller
 	 * If update is successful, the browser will be redirected to the 'view' page.
 	 * @param integer $id the ID of the model to be updated
 	 */
-	public function actionEdit($id)
+	public function actionEdit($CategoryID)
 	{
-		$model=$this->loadModel($id);
+		$Category = $this->loadModel($CategoryID);
+        $Category->setScenario('edit');
+		if ( $Category->parent()->find() )
+			$Category->ParentID = $model->parent()->find()->ID;
 
-		if ( $model->parent()->find() )
-			$model->Parent = $model->parent()->find()->ID;
-		// Uncomment the following line if AJAX validation is needed
-		// $this->performAjaxValidation($model);
+        if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "CategoryForm" ){
+			echo CActiveForm::validate($Category);
+			Yii::app()->end();
+		}
 
 		if(isset($_POST['Categories']))
 		{
-			$model->attributes = $_POST['Categories'];
-			if($model->validate()){
-				$model->Alias = Controller::translit($model->Name);
+			$Category->attributes = $_POST['Categories'];
+			if($Category->validate()){
+				$Category->Alias = Controller::translit($model->Name);
 
-				if ($model->Parent == 0 && !$model->isRoot()){
-					$model->moveAsRoot();
+				if ($Category->ParentID == 0 && !$Category->isRoot()){
+					$Category->moveAsRoot();
 
 				} else {
-					$Root = Categories::model()->findByPk($model->Parent);
+					$Root = Categories::model()->findByPk($Category->ParentID);
 
 					if ( $Root ){
 						$model->moveAsFirst($Root);
 					}
 				}
-				$model->saveNode();
-				$this->redirect(array('view','id'=>$model->ID));
+				$Category->saveNode();
+				$this->redirect(array('/admin/categories'));
 			}
 		}
-
-		$this->render('update',array(
-			'model'=>$model,
+        
+        $Form = new CForm( $Category->getArrayCForm(), $Category );   
+        
+		$this->render('edit',array(
+			'Form'=>$Form,
 		));
 	}
 
@@ -183,16 +191,4 @@ class CategoriesController extends Controller
 		return $model;
 	}
 
-	/**
-	 * Performs the AJAX validation.
-	 * @param CModel the model to be validated
-	 */
-	protected function performAjaxValidation($model)
-	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='categories-form')
-		{
-			echo CActiveForm::validate($model);
-			Yii::app()->end();
-		}
-	}
 }

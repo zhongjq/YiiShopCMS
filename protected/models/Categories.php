@@ -42,10 +42,12 @@ class Categories extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('Status, Name', 'required'),
-			array('lft, rgt, Level, Status, Parent', 'numerical', 'integerOnly'=>true),
+			array('Name, Alias', 'required', 'on'=> 'add, edit'),
+			array('lft, rgt, Level, Status, ParentID', 'numerical', 'integerOnly'=>true),
 			array('Alias, Name', 'length', 'max'=>255),
 			array('Alias, Name', 'unique'),
+    		array('Alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u',
+				    'message' => Yii::t("categories",'Alias contains invalid characters.')),            
 			array('Description', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
@@ -78,7 +80,7 @@ class Categories extends CActiveRecord
 			'Alias'			=>	Yii::t("categories",'Alias'),
 			'Name'			=>	Yii::t("categories",'Name'),
 			'Description'	=>	Yii::t("categories",'Description'),
-			'Parent'		=>	Yii::t("categories",'Parent'),
+			'ParentID'		=>	Yii::t("categories",'Parent'),
 		);
 	}
 
@@ -154,4 +156,63 @@ class Categories extends CActiveRecord
 	public static function getMenuArray($items) {
 		return Categories::getMenuItems($items);
 	}
+    
+    // форма в формате CForm
+	public function getArrayCForm(){
+		return array(
+    		'attributes' => array(
+				'enctype' => 'application/form-data',
+				'class' => 'well',
+				'id'=>'CategoryForm'
+			),
+			'activeForm' => array(
+				'class' => 'CActiveForm',
+				'enableAjaxValidation' => true,
+				'enableClientValidation' => false,
+				'id' => "CategoryForm",
+				'clientOptions' => array(
+					'validateOnSubmit' => true,
+					'validateOnChange' => false,
+				),
+			),
+
+    		'elements'=>array(
+        		'Status'=>array(
+        			'type'=>'checkbox',
+    				'layout'=>'{input}{label}{error}{hint}',
+    			),
+    			'ParentID'=>array(
+					'type'  =>  'dropdownlist',
+					'items' =>  CHtml::listData(Categories::model()->findAll(array(
+    															'order'=>'lft',
+																'condition'=>'ID != :ID',
+																'params'=>array(':ID'=> $model->ID ? $model->ID : 0 )
+															)
+															), 'ID', 'Name'),
+					'empty'=>  '',
+				),                
+    			'Name'=>array(
+    				'type'=>'text',
+    				'maxlength'=>255
+    			),
+    			'Alias'=>array(
+    				'type'=>'text',
+    				'maxlength'=>255
+    			),
+    			'Description'=>array(
+    				'type'=>'textarea',
+    				'rows'=>5
+    			),
+    		),
+    		'buttons'=>array(
+				'<br/>',
+				'submit'=>array(
+					'type'  =>  'submit',
+					'label' =>  $this->isNewRecord ? Yii::t("main",'Add') : Yii::t("main",'Save'),
+					'class' =>  "btn"
+				),
+			),            
+        );
+	}    
+    
 }
