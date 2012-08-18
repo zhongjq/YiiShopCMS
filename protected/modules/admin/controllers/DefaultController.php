@@ -10,37 +10,44 @@ class DefaultController extends Controller
 		);
 	}
 
-
 	public function actionIndex()
 	{
 		$this->render('index');
 	}
 
-	public function actionError(){
-		if($error=Yii::app()->errorHandler->error)
+	public function actionError()
+	{
+		$error = Yii::app()->errorHandler->error;
+		if($error)
 			$this->render('error', $error);
 	}
-	/**
-	 * Displays the login page
-	 */
+
 	public function actionLogin()
 	{
 
-		$model = new Users('login');
+		$User = new Users('login');
 
 		if (!Yii::app()->user->isGuest) {
 			throw new CHttpException(403,'Недостаточно прав!');
 		} else {
 			if (!empty($_POST['Users'])) {
-				$model->attributes = $_POST['Users'];
-				if($model->validate()) {
-					$this->redirect(  Yii::app()->user->returnUrl );
+				$User->attributes = $_POST['Users'];
+				if($User->validate()) {
+					$this->redirect( $this->createUrl('/admin') );
 				}
 			}
 
 		}
 
-		$this->render('login', array('model'=>$model) );
+		$Form = new CForm( $User->getArrayLoginCForm(), $User );
+
+		$this->render('login', array('Form'=>$Form) );
 	}
 
+	public function actionLogout()
+	{
+		Yii::app()->user->logout();
+		$this->redirect( $this->createUrl('/admin') );
+		$this->redirect(Yii::app()->homeUrl);
+	}
 }

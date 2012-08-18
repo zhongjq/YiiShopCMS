@@ -17,11 +17,22 @@ class Users extends CActiveRecord
 {
 	public $PasswordRepeat;
 	// капча
-    public	$VerifyCode;	
+    public	$VerifyCode;
 
 	public $Role;
+	// Запомнить
+	public $Remember;
+	// Язык пользователя
+	public $Language;
 
-	/**
+	public function __construct($scenario = 'insert') {
+		parent::__construct($scenario);
+
+		if(isset(Yii::app()->request->cookies['language']))
+			$this->Language = Yii::app()->request->cookies['language']->value;
+	}
+
+		/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
 	 * @return Users the static model class
@@ -52,7 +63,7 @@ class Users extends CActiveRecord
 			// Длина логина должна быть в пределах от 5 до 30 символов
 			array('UserName', 'length', 'min'=>3, 'max'=>30),
 			// Статус, роль, и сервис цифры
-			array('Status, RoleID, ServiceID', 'numerical', 'integerOnly' => true, 'min'=> 0 ),
+			array('Status, RoleID, ServiceID, Remember, Language', 'numerical', 'integerOnly' => true, 'min'=> 0 ),
 			// Идентификатора пользователя если он зарегистрирован через внешний сервис
 			array('ServiceUserID', 'length', 'min'=> 3 ),
 			// Логин должен быть уникальным
@@ -71,6 +82,7 @@ class Users extends CActiveRecord
 			// Дата время регистрации пользователя
 			array('RegistrationDateTime','default','value'=>new CDbExpression('NOW()'),'on'=>'registration'),
 
+			// Капча
 			array(
 				'VerifyCode',
 				'captcha',
@@ -98,15 +110,17 @@ class Users extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'ID' => 'ID',
-			'Status' => 'Статус',
-			'RoleID' => 'Роль',
-			'RegistrationDateTime' => 'Дата/время регистрации',
-			'ServiceID' => 'Сервис',
-			'ServiceUserID' => 'Сервис идентификатор',
-			'Email' => 'Email',
-			'Password' => 'Пароль',
-			'UserName' => 'Имя пользователя',
+			'ID'					=> 'ID',
+			'Status'				=>	Yii::t('users','Status'),
+			'RoleID'				=>	Yii::t('users','Role'),
+			'RegistrationDateTime'	=>	Yii::t('users','Date/time registration'),
+			'ServiceID'				=> 'Сервис',
+			'ServiceUserID'			=> 'Сервис идентификатор',
+			'Email'					=>	Yii::t('users','E-mail'),
+			'Password'				=>	Yii::t('users','Password'),
+			'UserName'				=>	Yii::t('users','Username'),
+			'Remember'				=>	Yii::t('users','Remember'),
+			'Language'				=>	Yii::t('users','Language'),
 		);
 	}
 
@@ -173,25 +187,27 @@ class Users extends CActiveRecord
 			// Теперь мы проверяем есть ли ошибка..
 			switch($identity->errorCode)
 			{
-				// Если ошибки нету:
-				case UserIdentity::ERROR_NONE: {
-				// Данная строчка говорит что надо выдать пользователю
-				// соответствующие куки о том что он зарегистрирован, срок действий
-				// у которых указан вторым параметром.
+				case UserIdentity::ERROR_NONE:
+					$duration =	$this->Remember ? 3600*24*30 : 0; // 30 days
+					Yii::app()->user->login($identity, $duration);
 
-					Yii::app()->user->login($identity, 0);
+					// присваиваем язык пользователя
+					if ( $this->Language ){
+						$cookie = new CHttpCookie('language', Languages::$Languages[$this->Language]['value']);
+						$cookie->expire = $duration;
+						Yii::app()->request->cookies['language'] = $cookie;
+					}
+
 				break;
-				}
-				case UserIdentity::ERROR_USERNAME_INVALID: {
-				// Если логин был указан наверно - создаем ошибку
-				$this->addError('password','Введено неправильная электронная почта или пароль.');
+				case UserIdentity::ERROR_USERNAME_INVALID:
+					// Если логин был указан наверно - создаем ошибку
+					$this->addError('Password','Введено неправильная электронная почта или пароль.');
 				break;
-				}
-				case UserIdentity::ERROR_PASSWORD_INVALID: {
+				case UserIdentity::ERROR_PASSWORD_INVALID:
 					// Если пароль был указан наверно - создаем ошибку
-					$this->addError('password','Вы указали неверный пароль!');
-					break;
-				}
+					$this->addError('Password','Вы указали неверный пароль!');
+				break;
+
 			}
 		}
 	}
@@ -201,4 +217,55 @@ class Users extends CActiveRecord
 			$this->Password = md5($this->Password);
 	}
 
+    // форма в формате CForm
+    public function getArrayLoginCForm(){
+    	return array(
+			'attributes' => array(
+				'enctype' => 'application/form-data',
+				'class' => 'well',
+				'id'=>'ManufacturersForm',
+			),
+			'activeForm' => array(
+				'class' => 'CActiveForm',
+				'enableAjaxValidation' => false,
+				'enableClientValidation' => false,
+				'id' => "ManufacturersForm",
+				'clientOptions' => array(
+					'validateOnSubmit' => false,
+					'validateOnChange' => false,
+				),
+			),
+
+			'title' => Yii::t("users",'Login'),
+
+    		'elements'=>array(
+    			'Email'=>array(
+    				'type'=>'text',
+    				'maxlength'=>255
+    			),
+    			'Password'=>array(
+    				'type'=>'password',
+    				'maxlength'=>255
+    			),
+				'Language'=>array(
+					'type'  =>  'dropdownlist',
+					'items' =>  Languages::getLanguagesList(),
+					'empty'=>  '',
+				),
+				'Remember'=>array(
+        			'type'=>'checkbox',
+    				'layout'=>'{input}{label}{error}{hint}',
+    			),
+    		),
+			 'ErrorSummary',
+    		'buttons'=>array(
+				'<br/>',
+				'submit'=>array(
+					'type'  =>  'submit',
+					'label' =>  Yii::t("users",'Login'),
+					'class' =>  "btn"
+				),
+			),
+        );
+	}
 }

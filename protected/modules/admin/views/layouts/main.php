@@ -81,8 +81,8 @@
 						
 						
 						//array('label'=> Yii::t("AdminModule.main", "Товары"),	'url'=>array('/admin/products'), 'active'=>$this->getId() =='product'),
-						//array('label'=> Yii::t("AdminModule.main", "Заказы"), 'url'=>array('/admin/orders'), 'active'=>$this->getId() =='orders'),
-						//array('label'=> Yii::t("AdminModule.main", "Пользователи"), 'url'=>array('/admin/users'), 'active'=>$this->getId() =='users'),
+						array('label'=> Yii::t("AdminModule.main", "Заказы"), 'url'=>array('/admin/orders'), 'active'=>$this->getId() =='orders'),
+						array('label'=> Yii::t("AdminModule.main", "Пользователи"), 'url'=>array('/admin/users'), 'active'=>$this->getId() =='users'),
 					);
 				?>
 				<?php $this->widget('zii.widgets.CMenu',array(
@@ -103,10 +103,11 @@
 
 					<? if(!Yii::app()->user->isGuest) : ?>
 					<li class="dropdown">
-						<?php echo CHtml::link( Yii::app()->user->name.'<b class="caret"></b>', $this->createUrl('/user/view',array('id'=> Yii::app()->user->id  ) ), array("class"=>"dropdown-toggle", "data-toggle"=>"dropdown") )?>
+						<?php echo CHtml::link( Yii::app()->user->name.'<b class="caret"></b>', "#" , array("class"=>"dropdown-toggle", "data-toggle"=>"dropdown") )?>
 						<ul class="dropdown-menu">
+							<li><?=CHtml::link('Профиль', $this->createUrl('/admin/user/view',array('UserID'=> Yii::app()->user->id)) )?></li>
 							<li class="divider"></li>
-							<li><?=CHtml::link('Выйти',$this->createUrl('/logout'))?></li>
+							<li><?=CHtml::link('Выйти',$this->createUrl('/admin/default/logout'))?></li>
 						</ul>
 					</li>
 					<? else : ?>

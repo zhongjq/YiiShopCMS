@@ -151,7 +151,7 @@ return array(
 
 
                 /* АДМИНИСТРАТИРОВАНИЕ */
-                "/admin/login" => "admin/default/login",
+                "/admin/<action:(login|logout)>" => "admin/default/<action>",
                 // Категории
                 '/admin/category/<action:(add|edit|delete)>/<CategoryID>'   =>  'admin/categories/<action>',
                 // Производители

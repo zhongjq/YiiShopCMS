@@ -1,34 +1,30 @@
 <?php
-/**
- * Controller is the customized base controller class.
- * All controller classes for this application should extend from this base class.
- */
+
 class Controller extends CController
 {
 	public $layout='/layouts/main';
-	
+
+	public function __construct($id, $module = null) {
+		parent::__construct($id, $module);
+
+		if(isset(Yii::app()->request->cookies['language']))
+			Yii::app()->language = Yii::app()->request->cookies['language']->value;
+	}
+
 	public function beforeRender($view) {
-		
+
 		$extPth = CHtml::asset($this->module->getlayoutPath().'/css/');
         Yii::app()->getClientScript()->registerCssFile($extPth.'/bootstrap.min.css');
         Yii::app()->getClientScript()->registerCssFile($extPth.'/bootstrap-responsive.min.css');
         Yii::app()->getClientScript()->registerCssFile($extPth.'/style.css');
-		
+
 		return parent::beforeRender($view);
 	}
 
-		/**
-	 * @var array context menu items. This property will be assigned to {@link CMenu::items}.
-	 */
 	public $FirstMenu	=	array();
 	public $SecondMenu	=	array();
-	/**
-	 * @var array the breadcrumbs of the current page. The value of this property will
-	 * be assigned to {@link CBreadcrumbs::links}. Please refer to {@link CBreadcrumbs::links}
-	 * for more details on how to specify this property.
-	 */
-	public $breadcrumbs	=	array();
 
+	public $breadcrumbs	=	array();
 
 	public function accessRules()
 	{

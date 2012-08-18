@@ -7,5 +7,8 @@ $this->breadcrumbs=array(
 
 $this->renderPartial('SecondMenu');
 
+//put fancybox on page
+$this->widget('ext.fancybox.EFancyBox', array('target'=>'a#fancy-link','config'=>array()));
+
 echo $Form;
 ?>

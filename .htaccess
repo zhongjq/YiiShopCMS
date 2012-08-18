@@ -1,3 +1,6 @@
+# запрет просмотра директории
+Options -Indexes
+
 AddDefaultCharset utf-8
 AddCharset utf-8 *
 <IfModule mod_charset.c>
@@ -14,7 +17,7 @@ AddCharset utf-8 *
 	RewriteRule . index.php [L]
 </IfModule>
 
-#кэширование css, javascript и txt-файлов на неделю
+#кэширование css, javascript файлов на неделю
 <FilesMatch ".(js|css)$">
 	Header set Cache-Control "max-age=604800"
 </FilesMatch>

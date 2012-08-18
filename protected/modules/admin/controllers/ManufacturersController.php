@@ -48,13 +48,13 @@ class ManufacturersController extends Controller
 	{
 		$criteria = new CDbCriteria();
 		$criteria->order = 'Name';
-        $Manufacturers	= new CActiveDataProvider('Manufacturers',array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));		
-		
+        $Manufacturers	= new CActiveDataProvider('Manufacturers',array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
+
 		$this->render('index', array(
 			'Manufacturers' => $Manufacturers
 		));
-	}	
-	
+	}
+
 	/**
 	 * Creates a new model.
 	 * If creation is successful, the browser will be redirected to the 'view' page.
@@ -68,17 +68,25 @@ class ManufacturersController extends Controller
 		if(isset($_POST['Manufacturers']))
 		{
 			$Manufacturer->attributes = $_POST['Manufacturers'];
-			$Manufacturer->Logo	= CUploadedFile::getInstance($Manufacturer,'Logo');
-			if($Manufacturer->validate()){				
-				if ( $Manufacturer->save() ){
-					$Manufacturer->Logo->saveAs('/home/enchikiben/sites/yiishop/data/manufacturers/');
-					$this->redirect(array('/admin/manufacturers'));
+			$Manufacturer->LogoFile	= CUploadedFile::getInstance($Manufacturer,'Logo');
+			if($Manufacturer->validate()){
+				$transaction = Yii::app()->db->beginTransaction();
+				try
+				{
+					if ( $Manufacturer->save() ){
+						$transaction->commit();
+						$this->redirect(array('/admin/manufacturers'));
+					}
+				}
+				catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
+				{
+					$transaction->rollBack();
 				}
 			}
 		}
-        
-        $Form = new CForm( $Manufacturer->getArrayCForm(), $Manufacturer );        
-        
+
+        $Form = new CForm( $Manufacturer->getArrayCForm(), $Manufacturer );
+
 		$this->render('add',array(
 			'Form'=>$Form,
 		));
@@ -98,21 +106,27 @@ class ManufacturersController extends Controller
 
     	if(isset($_POST['Manufacturers']))
 		{
+			$Manufacturer->OldLogoFile = $Manufacturer->Logo;
 			$Manufacturer->attributes = $_POST['Manufacturers'];
-			$Manufacturer->Logo	= CUploadedFile::getInstance($Manufacturer,'Logo');
-			if($Manufacturer->validate()){				
-				if ( $Manufacturer->save() ){
-					$Manufacturer->Logo->saveAs(Yii::getPathOfAlias('manufacturersfiles')
-												.'/'.$Manufacturer->ID.'.'.$Manufacturer->Logo->getExtensionName());
-					
-					
-					$this->redirect(array('/admin/manufacturers'));
+			$Manufacturer->LogoFile	= CUploadedFile::getInstance($Manufacturer,'Logo');
+			if($Manufacturer->validate()){
+				$transaction = Yii::app()->db->beginTransaction();
+				try
+				{
+					if ( $Manufacturer->save() ){
+						$transaction->commit();
+						$this->redirect(array('/admin/manufacturers'));
+					}
+				}
+				catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
+				{
+					$transaction->rollBack();
 				}
 			}
 		}
-        
-        $Form = new CForm( $Manufacturer->getArrayCForm(), $Manufacturer );     
-        
+
+        $Form = new CForm( $Manufacturer->getArrayCForm(), $Manufacturer );
+
 		$this->render('edit',array(
 			'Form'=>$Form,
 		));
@@ -123,12 +137,12 @@ class ManufacturersController extends Controller
 	 * If deletion is successful, the browser will be redirected to the 'admin' page.
 	 * @param integer $id the ID of the model to be deleted
 	 */
-	public function actionDelete($id)
+	public function actionDelete($ManufacturerID)
 	{
 		if(Yii::app()->request->isPostRequest)
 		{
 			// we only allow deletion via POST request
-			$this->loadModel($id)->delete();
+			$this->loadModel($ManufacturerID)->delete();
 
 			// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
 			if(!isset($_GET['ajax']))
@@ -136,23 +150,6 @@ class ManufacturersController extends Controller
 		}
 		else
 			throw new CHttpException(400,'Invalid request. Please do not repeat this request again.');
-	}
-
-
-
-	/**
-	 * Manages all models.
-	 */
-	public function actionAdmin()
-	{
-		$model=new Categories('search');
-		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['Categories']))
-			$model->attributes=$_GET['Categories'];
-
-		$this->render('admin',array(
-			'model'=>$model,
-		));
 	}
 
 	/**
@@ -167,7 +164,7 @@ class ManufacturersController extends Controller
 			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;
 	}
-    
+
     /**
 	 * Performs the AJAX validation.
 	 * @param CModel the model to be validated
@@ -179,5 +176,5 @@ class ManufacturersController extends Controller
 			Yii::app()->end();
 		}
 	}
-  
+
 }

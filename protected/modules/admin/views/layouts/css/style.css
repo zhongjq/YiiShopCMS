@@ -157,3 +157,13 @@ div.summary{
 .tab-content{
 	overflow: visible;
 }
+
+.center {
+    float: none;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.alert .errorSummary {
+	
+}

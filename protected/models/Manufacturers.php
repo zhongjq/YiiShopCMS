@@ -12,20 +12,18 @@
  */
 class Manufacturers extends CActiveRecord
 {
-	public $PathLogo; 
-	public $Logo;
-	
-	public function __construct($scenario = 'insert') {
+	public $LogoFile;
+	public $OldLogoFile;
+	public $IsDeleteLogoFile;
+
+	public function __construct($scenario = 'add')
+	{
 		parent::__construct($scenario);
-		
+
 		Yii::setPathOfAlias('manufacturersfiles', Yii::getPathOfAlias('webroot')."/data/manufacturers/");
+		Yii::setPathOfAlias('manufacturersurl', Yii::app()->baseUrl."/data/manufacturers/");
 	}
 
-		/**
-	 * Returns the static model of the specified AR class.
-	 * @param string $className active record class name.
-	 * @return Manufacturers the static model class
-	 */
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
@@ -39,20 +37,17 @@ class Manufacturers extends CActiveRecord
 		return 'Manufacturers';
 	}
 
-	/**
-	 * @return array validation rules for model attributes.
-	 */
 	public function rules()
 	{
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
 			array('Alias, Name', 'required', 'on'=>'add, edit'),
-			array('Status', 'numerical', 'integerOnly'=>true),
+			array('Status, IsDeleteLogoFile', 'numerical', 'integerOnly'=>true),
     		array('Alias, Name', 'length', 'max'=>255),
 			array('Alias, Name', 'unique'),
     		array('Alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u',
-				    'message' => Yii::t("manufacturers",'Alias contains invalid characters.')),            
+				    'message' => Yii::t("manufacturers",'Alias contains invalid characters.')),
 			array('Description', 'safe'),
             array('Logo', 'file', 'types'=>'jpg, gif, png', 'maxSize' => 1048576, 'allowEmpty'=>true ),
 			// The following rule is used by search().
@@ -61,9 +56,6 @@ class Manufacturers extends CActiveRecord
 		);
 	}
 
-	/**
-	 * @return array relational rules.
-	 */
 	public function relations()
 	{
 		// NOTE: you may need to adjust the relation name and the related
@@ -72,9 +64,6 @@ class Manufacturers extends CActiveRecord
 		);
 	}
 
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
 	public function attributeLabels()
 	{
 		return array(
@@ -84,13 +73,10 @@ class Manufacturers extends CActiveRecord
 			'Name'			=>	Yii::t("manufacturers",'Name'),
 			'Description'	=>	Yii::t("manufacturers",'Description'),
 			'Logo'			=>	Yii::t("manufacturers",'Logo'),
+			'IsDeleteLogoFile' => Yii::t("manufacturers",'Delete an existing logo?'),
 		);
 	}
 
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
-	 */
 	public function search()
 	{
 		// Warning: Please modify the following code to remove attributes that
@@ -108,10 +94,11 @@ class Manufacturers extends CActiveRecord
 			'criteria'=>$criteria,
 		));
 	}
-    
+
     // форма в формате CForm
-    public function getArrayCForm(){
-    	return array(
+    public function getArrayCForm()
+	{
+    	$form = array(
     		'attributes' => array(
 				'enctype' => 'multipart/form-data',
 				'class' => 'well',
@@ -132,7 +119,7 @@ class Manufacturers extends CActiveRecord
         		'Status'=>array(
         			'type'=>'checkbox',
     				'layout'=>'{input}{label}{error}{hint}',
-    			),                
+    			),
     			'Name'=>array(
     				'type'=>'text',
     				'maxlength'=>255
@@ -148,7 +135,7 @@ class Manufacturers extends CActiveRecord
         		'Logo'=>array(
     				'type'=>'file',
 					'class'=>'input-file'
-    			),                
+    			),
     		),
     		'buttons'=>array(
 				'<br/>',
@@ -157,9 +144,84 @@ class Manufacturers extends CActiveRecord
 					'label' =>  $this->isNewRecord ? Yii::t("main",'Add') : Yii::t("main",'Save'),
 					'class' =>  "btn"
 				),
-			),            
+			),
         );
-	}    
-    
-    
+
+		// если есть логотип
+		if ( $this->Logo ){
+			$file = Yii::getPathOfAlias('manufacturersurl').'/'.$this->Logo;
+			$form['elements']['IsDeleteLogoFile'] = array(
+        		'type'=>'checkbox',
+    			'layout'=>'{input}{label}{error}{hint}',
+				'hint'=> CHtml::link('просмотреть',  $file , array("id"=>"fancy-link")),
+    		);
+		}
+
+		return $form;
+	}
+
+	// до сохранения
+	protected function beforeSave()
+	{
+		if (parent::beforeSave() ){
+			$this->Logo = $this->OldLogoFile;
+
+			// если стоит галка удалить логотип
+			if ( $this->IsDeleteLogoFile ){
+				if ( $this->deleteLogoFile() ) $this->Logo = null;
+			}
+
+			if ( $this->LogoFile ){
+				// если загружается новый файл то удаляем старый
+				if ( $this->deleteLogoFile() )
+					$this->Logo = null;
+				else
+					throw new CException("Не могу удалить файл");
+				// получаем новый
+				$this->Logo = Controller::translit($this->Name).'.'.$this->LogoFile->getExtensionName();
+			}
+
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	// после сохранения
+    protected function afterSave()
+	{
+		parent::afterSave();
+
+		if ( $this->LogoFile ){
+			$file = Yii::getPathOfAlias('manufacturersfiles').'/'.$this->Logo;
+			$this->LogoFile->saveAs($file);
+			/*
+			Yii::import('ext.wideimage.WideImage');
+			WideImage::load($file)->resize(50, 30)->saveToFile('small.jpg');
+			WideImage::load($file)->crop('center', 'center', 90, 50)->saveToFile('small.png');
+			*/
+		}
+
+	}
+
+	// после удаления
+	protected function beforeDelete()
+	{
+		if (parent::beforeDelete()){
+			if (!$this->deleteLogoFile()) throw new CException("Не могу удалить файл");
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	// удаление логотипа
+	public function deleteLogoFile(){
+		if ( $this->Logo ){
+			$NameFileLogo = Yii::getPathOfAlias('manufacturersfiles').DIRECTORY_SEPARATOR.$this->Logo;
+
+			return (is_file($NameFileLogo) && is_writable($NameFileLogo) && unlink($NameFileLogo) ) ? true : false;
+		}
+		return true;
+	}
 }

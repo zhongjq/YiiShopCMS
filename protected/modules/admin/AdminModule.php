@@ -8,17 +8,16 @@ class AdminModule extends CWebModule
 		$this->setImport(array(
 			'application.models.*',
 			'application.components.*',
-		
+
 			'admin.models.*',
 			'admin.components.*',
 		));
-		
+
 		Yii::app()->setComponents(array(
             'errorHandler'=>array(
 				'errorAction'=>'/admin/default/error',
 			),
 			'user' => array(
-				'class'     => 'CWebUser',
 				'loginUrl'  => Yii::app()->createUrl('admin/default/login'),
 			)
 		));

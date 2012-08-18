@@ -11,10 +11,10 @@ return array(
 	'Alias'			=> "Псевдоним (URL)",
 	'Description'	=> "Описание",
 	'Logo'			=> "Логотип",
-    
-    // 
+
+    //
     'Alias contains invalid characters.'=>'Псевдоним содержит недопустимые символы.',
     //
-    'Edit manufacturer' => "Редактирование производителя",    
-    
+    'Edit manufacturer' => "Редактирование производителя",
+    'Delete an existing logo?'=>'Удалить имеющийся логотип?',
 );
