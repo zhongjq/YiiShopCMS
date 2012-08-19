@@ -6,12 +6,12 @@ class Goods extends CActiveRecord
 	private $Product = null;
 	private $ProductsFields = null;
 	private $TableFields = null;
-    
+
 	public function setProductID($v)
 	{
 		$this->ProductID = $v;
 	}
-	
+
 	public function getProductID()
 	{
 		return $this->Product->ID;
@@ -27,7 +27,7 @@ class Goods extends CActiveRecord
 			else
 				throw new CException("ID NOT ProductID");
 		}
-        
+
 		if ( $this->ProductsFields === null && $update === false )
 			$this->ProductsFields = ProductsFields::model()
 										->with('StringFields','TextFields','IntegerFields','PriceFields','ListFields')
@@ -37,33 +37,40 @@ class Goods extends CActiveRecord
 
 		return $this->ProductsFields;
 	}
-    
-	public function getTableFields($update = false){
+
+	public function getTableFields($update = false)
+	{
 
 		if ( $this->TableFields === null && $update === false ){
 			$ProductFields = $this->getProductFields();
 
 			if ( $ProductFields ){
 				foreach( $ProductFields as $Field ){
-					if( $Field->IsColumnTable ) 
+					if( $Field->IsColumnTable )
 
 						switch( $Field->FieldType ){
 							case TypeFields::LISTS :
 								if ($Field->ListFields->IsMultipleSelect)
-								   $this->TableFields[] = array(
+									$this->TableFields[] = array(
 										'name' => $Field->Alias,
 										'value' => '$data->getRecordItems("'.$Field->Alias.'Items")'
-										);
-								else                        
-								   $this->TableFields[] = array(
+									);
+								else
+									$this->TableFields[] = array(
 										'name'	=> $Field->Alias,
 										'value' => 'isset($data->'.$Field->Alias.'Item) ? $data->'.$Field->Alias.'Item->Name : null'
-									);                 
+									);
+							break;
+							case TypeFields::CATEGORIES :
+									$this->TableFields[] = array(
+										'name' => $Field->Alias,
+										'value' => '$data->getRecordCategories("'.$Field->Alias.'")'
+									);
 							break;
 							default:
 								$this->TableFields[] = $Field->Alias;
 							break;
-						}                    
+						}
 
 
 				}
@@ -72,17 +79,29 @@ class Goods extends CActiveRecord
 
 		return $this->TableFields;
 	}
-    
-    public function getRecordItems($Name, $sSep = ', ') {
+
+    public function getRecordItems($Name, $sSep = ', ')
+	{
 
        $aRes = array();
        foreach ($this->{$Name} as $Item) {
           $aRes[] = $Item->Name;
        }
-    
+
        return implode($sSep, $aRes);
-    }    
-    
+    }
+
+    public function getRecordCategories($Name, $sSep = ', ')
+	{
+
+       $aRes = array();
+       foreach ($this->{$Name} as $Item) {
+          $aRes[] = $Item->Name;
+       }
+
+       return implode($sSep, $aRes);
+    }
+
 	public function setGoodsAttributes()
 	{
 		$ProductFields = $this->getProductFields();
@@ -139,26 +158,43 @@ class Goods extends CActiveRecord
 			foreach( $ProductFields as $Field ){
                 $Form['elements'][$Field->Alias] = TypeFields::$Fields[$Field->FieldType]['form'];
 				switch( $Field->FieldType ){
-					case TypeFields::TEXT :						
+					case TypeFields::TEXT :
 						$Form['elements'][$Field->Alias]['rows'] = $Field->TextFields->Rows;
 					break;
-    				case TypeFields::LISTS :			
+    				case TypeFields::LISTS :
 						$Form['elements'][$Field->Alias]['items'] = CHtml::listData(ListsItems::model()->findAll('ListID = :ListID',array(':ListID'=>$Field->ListFields->ListID)), 'ID', 'Name');
 						if ( $Field->ListFields->IsMultipleSelect ){
-                            
+
 							$selected = array();
 							if ( $this->{$Field->Alias."Items"} ) {
 								foreach( $this->{$Field->Alias."Items"} as $Item ){
 									$selected[] = $Item->ID;
-								}                                        
+								}
 							}
-                            
-                            $this->{$Field->Alias} = $selected;                            
-                            
+
+                            $this->{$Field->Alias} = $selected;
+
 							$Form['elements'][$Field->Alias]['multiple'] = true;
-							$Form['elements'][$Field->Alias]['class'] = 'chzn-select'; 
+							$Form['elements'][$Field->Alias]['class'] = 'chzn-select';
 						}
-					break;                    
+					break;
+
+    				case TypeFields::CATEGORIES :
+						$Form['elements'][$Field->Alias]['items'] = CHtml::listData(Categories::model()->findAll(), 'ID', 'Name');
+
+							$selected = array();
+							if ( $this->{$Field->Alias} ) {
+								foreach( $this->{$Field->Alias} as $Item ){
+									$selected[] = $Item->ID;
+								}
+							}
+
+                            $this->{$Field->Alias} = $selected;
+
+							$Form['elements'][$Field->Alias]['multiple'] = true;
+							$Form['elements'][$Field->Alias]['class'] = 'chzn-select';
+
+					break;
 				}
 			}
 		}
@@ -176,37 +212,45 @@ class Goods extends CActiveRecord
 
 
 		$Form['elements'][]='</div></div>';
-        
+
 		return new CForm($Form,$this);
 	}
-    
+
     public function getRelationsNameArray()
 	{
         return array_keys($this->relations());
     }
-    
+
 	public function relations()
 	{
         $relations = array();
-        
+
         $ProductFields = $this->getProductFields();
     	if ( $ProductFields ){
 			foreach( $ProductFields as $Field ){
 				switch( $Field->FieldType ){
 					case TypeFields::LISTS :
                         if ($Field->ListFields->IsMultipleSelect)
-    						$relations[$Field->Alias.'Items'] = array(	self::MANY_MANY, 
-																		'ListsItems', 'RecordsLists(RecordID, ListItemID)',																		
+    						$relations[$Field->Alias.'Items'] = array(	self::MANY_MANY,
+																		'ListsItems', 'RecordsLists(RecordID, ListItemID)',
 																		'on' => 'ProductID = ' .$this->getProductID()
-																		
+
 																	);
-						else                        
-                            $relations[$Field->Alias.'Item'] = array( self::BELONGS_TO,'ListsItems',$Field->Alias );                            
+						else
+                            $relations[$Field->Alias.'Item'] = array( self::BELONGS_TO,'ListsItems',$Field->Alias );
+                    break;
+					case TypeFields::CATEGORIES :
+
+    						$relations[$Field->Alias] = array(	self::MANY_MANY,
+																		'Categories', 'RecordsCategories(RecordID, CategoryID)',
+																		//'on' => 'ProductID = ' .$this->getProductID()
+
+																	);
                     break;
 				}
 			}
-		}        
- 
+		}
+
 		return $relations;
 	}
 
@@ -215,33 +259,48 @@ class Goods extends CActiveRecord
 		parent::afterSave();
 
         $PostData = $_POST[$this->Product->Alias];
-		
+
         $ProductFields = $this->getProductFields();
     	if ( $ProductFields ){
 			foreach( $ProductFields as $Field ){
 				switch( $Field->FieldType ){
 					case TypeFields::LISTS :
-                        if ($Field->ListFields->IsMultipleSelect){	
-							
+                        if ($Field->ListFields->IsMultipleSelect){
+
 							RecordsLists::model()->deleteAll('ProductID = :ProductID AND RecordID = :RecordID',array(":ProductID"=> $this->getProductID(),':RecordID'=> $this->ID));
-							
-							if ( isset($PostData[$Field->Alias]) ){								
+
+							if ( isset($PostData[$Field->Alias]) ){
 								foreach ($PostData[$Field->Alias] as $ListItemID) {
 									$RecordsLists = new RecordsLists();
 									$RecordsLists->ProductID = $this->getProductID();
 									$RecordsLists->RecordID = $this->ID;
 									$RecordsLists->ListItemID = $ListItemID;
-									if ( !$RecordsLists->save() ) throw new CException("ERROR SEVE LISTS"); 
+									if ( !$RecordsLists->save() ) throw new CException("ERROR SEVE LISTS");
 								}
 							}
-						}                          
+						}
+                    break;
+					case TypeFields::CATEGORIES :
+
+						RecordsCategories::model()->deleteAll('ProductID = :ProductID AND RecordID = :RecordID',array(":ProductID"=> $this->getProductID(),':RecordID'=> $this->ID));
+
+						if ( isset($PostData[$Field->Alias]) ){
+							foreach ($PostData[$Field->Alias] as $CategoryID) {
+								$RecordsCategories = new RecordsCategories();
+								$RecordsCategories->ProductID = $this->getProductID();
+								$RecordsCategories->RecordID = $this->ID;
+								$RecordsCategories->CategoryID = $CategoryID;
+								if ( !$RecordsCategories->save() ) throw new CException("ERROR SEVE CATEGORIES");
+							}
+						}
+
                     break;
 				}
 			}
 		}
-        
-	}	
-	
+
+	}
+
 	public function rules()
 	{
 		$rules      = array();
@@ -283,7 +342,12 @@ class Goods extends CActiveRecord
 											));
 						else
 							$rules[] = array($Field->Alias, 'numerical', 'integerOnly'=>true,'allowEmpty'=>true);
-					break;                    
+					break;
+    				case TypeFields::CATEGORIES :
+							$rules[] = array($Field->Alias, 'ArrayValidator', 'validator'=>'numerical', 'params'=>array(
+												'integerOnly'=>true, 'allowEmpty'=>false
+											));
+					break;
 				}
 
 			}

@@ -37,10 +37,11 @@
 
 	    <div class="container-fluid">
 		    <div class="row-fluid">
-			    <div class="span2">
+			    <div class="span3">
 				    <?php $this->widget('CategoriesWidget', array("ID"=>1) ) ?>
+					<?php $this->widget('ManufacturersWidget', array("title"=>"Производители") ) ?>
 			    </div>
-			    <div class="span10">
+			    <div class="span9">
 				    <?php echo $content; ?>
 				    <?=CHtml::link('О проекте',$this->createUrl('/products/view/',array('product'=>'bus',"id"=>"asd")))?>
 			    </div>

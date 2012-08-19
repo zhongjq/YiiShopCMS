@@ -6,7 +6,7 @@
     <!-- icons -->
 	<link rel="shortcut icon" href="<?= Yii::app()->theme->baseUrl ?>/img/favicon.ico" type="image/x-icon">
 
-    <!-- styles -->   
+    <!-- styles -->
 	<style type="text/css">
 		body {
 			padding-top: 60px;
@@ -31,7 +31,7 @@
 
     <?php
         Yii::app()->clientScript->registerCoreScript('jquery');
-         
+
         Yii::app()->getClientScript()->registerScriptFile(CHtml::asset($this->module->getlayoutPath().'/js/bootstrap.min.js'));
     ?>
 
@@ -58,28 +58,28 @@
 			<? if(!Yii::app()->user->isGuest) : ?>
 				<?php
 					$this->FirstMenu=array(
-						array(	'label'			=>	Yii::t("main", "Сatalog").'<b class="caret"></b>', 
+						array(	'label'			=>	Yii::t("main", "Сatalog").'<b class="caret"></b>',
 								'url'			=>	'#',
 								'itemOptions'	=>	array('class'=>'dropdown'),
 								'linkOptions'	=>	array('class'=>'dropdown-toggle','data-toggle'=>'dropdown-toggle'),
 								'encodeLabel'	=>	false,
 								'items'			=>	array(
-									array(	'label'	=>	Yii::t("categories", "Categories"), 
-											'url'	=>	array('/admin/categories'), 
+									array(	'label'	=>	Yii::t("categories", "Categories"),
+											'url'	=>	array('/admin/category'),
 											'active'=>	$this->getId() =='categories'),
-									
-									array(	'label'	=>	Yii::t("manufacturers", "Manufacturers"), 
-											'url'	=>	array('/admin/manufacturers'), 
+
+									array(	'label'	=>	Yii::t("manufacturers", "Manufacturers"),
+											'url'	=>	array('/admin/manufacturer'),
 											'active'=>	$this->getId() =='manufacturers'),
-									
-									array(	'label'	=>	Yii::t("products", "Products"),	
-											'url'	=>	array('/admin/products'), 
+
+									array(	'label'	=>	Yii::t("products", "Products"),
+											'url'	=>	array('/admin/product'),
 											'active'=>	$this->getId() =='product'),
-						
+
 								)
 							),
-						
-						
+
+
 						//array('label'=> Yii::t("AdminModule.main", "Товары"),	'url'=>array('/admin/products'), 'active'=>$this->getId() =='product'),
 						array('label'=> Yii::t("AdminModule.main", "Заказы"), 'url'=>array('/admin/orders'), 'active'=>$this->getId() =='orders'),
 						array('label'=> Yii::t("AdminModule.main", "Пользователи"), 'url'=>array('/admin/users'), 'active'=>$this->getId() =='users'),

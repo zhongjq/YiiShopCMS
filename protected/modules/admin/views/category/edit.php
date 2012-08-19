@@ -1,11 +1,11 @@
 <?php
 $this->pageTitle    =	Yii::t("categories", "Edit category");
 $this->breadcrumbs=array(
-	Yii::t("categories", "Categories")	=>	array('/admin/categories'),
+	Yii::t("categories", "Categories")	=>	array('/admin/category'),
 	Yii::t("categories", "Edit category")
 );
 
-$this->renderPartial('SecondMenu');
+$this->renderPartial('secondMenu');
 
-echo $Form;
+echo $form;
 ?>

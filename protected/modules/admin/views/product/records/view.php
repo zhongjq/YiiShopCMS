@@ -13,11 +13,11 @@ $this->renderPartial('records/SecondMenu',array('Product'=>$Product));
 
     $this->widget('zii.widgets.grid.CGridView', array(
         'dataProvider'=>$GoodsData,
-        'columns' => 
+        'columns' =>
             array_merge(
                 $Goods->getTableFields()
                 ,
-                array(       
+                array(
                     array(
                         'htmlOptions'=>array('width'=>'10'),
                         'class'=>'CButtonColumn',
@@ -40,12 +40,12 @@ $this->renderPartial('records/SecondMenu',array('Product'=>$Product));
                                 'imageUrl'=>null,
                                 'label'=>'<span class="close" title="'.Yii::t('AdminModule.main','Удалить').'">&times;</span>'
                             )
-                        )                
-                    ),           
+                        )
+                    ),
                 )
             ),
         'htmlOptions'=>array(
-            'class'=> ''   
+            'class'=> ''
         ),
         'itemsCssClass'=>'table table-bordered table-striped',
         'template'=>'{summary} {items} {pager}',
@@ -58,7 +58,7 @@ $this->renderPartial('records/SecondMenu',array('Product'=>$Product));
         	'prevPageLabel'	=> '&larr;',
         	'nextPageLabel'	=> '&rarr;',
         	'lastPageLabel' => '&raquo;',
-        	'htmlOptions'	=> array("class"=>false),            
+        	'htmlOptions'	=> array("class"=>false),
         ),
     ));
 

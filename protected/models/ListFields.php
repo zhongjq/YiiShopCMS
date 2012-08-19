@@ -33,14 +33,11 @@ class ListFields extends CActiveRecord
 	 */
 	public function rules()
 	{
-		// NOTE: you should only define rules for those attributes that
-		// will receive user inputs.
 		return array(
-			array('ListID', 'required', 'on'=>'add, edit'),
-			array('ListID', 'numerical', 'allowEmpty'=>false,'message'=>"asd" ),
+			array('ListID', 'required', 'on'=>'add'),
+			array('FieldID, ListID', 'required', 'on'=>'edit'),
+			array('ListID', 'numerical', 'allowEmpty'=>false, 'message'=> Yii::t('fields','Select list') ),
 			array('ListID, IsMultipleSelect', 'numerical', 'integerOnly'=>true),
-			// The following rule is used by search().
-			// Please remove those attributes that should not be searched.
 			array('FieldID, ListID, IsMultipleSelect', 'safe', 'on'=>'search'),
 		);
 	}
@@ -50,8 +47,6 @@ class ListFields extends CActiveRecord
 	 */
 	public function relations()
 	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
 		return array(
 		);
 	}
@@ -62,9 +57,9 @@ class ListFields extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'FieldID' => 'Field',
-			'ListID' => 'List',
-			'IsMultipleSelect' => 'Is Multiple Select',
+			'FieldID'			=> Yii::t('fields','FieldID'),
+			'ListID'			=> Yii::t('fields','List'),
+			'IsMultipleSelect'	=> Yii::t('fields','Multiple Select'),
 		);
 	}
 
@@ -96,7 +91,7 @@ class ListFields extends CActiveRecord
 				'ListID'=> array(
     		    	'type'  =>  'dropdownlist',
 				    'items' =>  CHtml::listData(Lists::model()->findAll(), 'ID', 'Name'),
-				    'empty'=>  '',				
+				    'empty'=>  '',
 			    ),
 				'IsMultipleSelect'=>array(
     				'type'=>'checkbox',
@@ -105,5 +100,5 @@ class ListFields extends CActiveRecord
 			)
 		);
 	}
-    
+
 }

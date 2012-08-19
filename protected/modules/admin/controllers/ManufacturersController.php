@@ -171,7 +171,7 @@ class ManufacturersController extends Controller
 	 */
 	protected function performAjaxValidation($manufacturer)
 	{
-        if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "ManufacturersForm" ){
+        if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "manufacturersForm" ){
     		echo CActiveForm::validate($manufacturer);
 			Yii::app()->end();
 		}

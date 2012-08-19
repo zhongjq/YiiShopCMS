@@ -13,9 +13,9 @@
  * @property string $Name
  * @property string $Description
  */
-class Categories extends CActiveRecord
+class Category extends CActiveRecord
 {
-	public $ParentID = 0;
+	public $parentId = 0;
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
@@ -31,7 +31,7 @@ class Categories extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'Categories';
+		return 'category';
 	}
 
 	/**
@@ -42,16 +42,16 @@ class Categories extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('Name, Alias', 'required', 'on'=> 'add, edit'),
-			array('lft, rgt, Level, Status, ParentID', 'numerical', 'integerOnly'=>true),
-			array('Alias, Name', 'length', 'max'=>255),
-			array('Alias, Name', 'unique'),
-    		array('Alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u',
-				    'message' => Yii::t("categories",'Alias contains invalid characters.')),            
-			array('Description', 'safe'),
+			array('name, alias', 'required', 'on'=> 'add, edit'),
+			array('lft, rgt, level, status, parentId', 'numerical', 'integerOnly'=>true),
+			array('alias, name', 'length', 'max'=>255),
+			array('alias, name', 'unique'),
+    		array('alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u',
+				    'message' => Yii::t("categories",'Alias contains invalid characters.')),
+			array('description', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('ID, lft, rgt, Level, Status, Alias, Name, Description', 'safe', 'on'=>'search'),
+			array('id, lft, rgt, level, status, alias, name, description', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -72,15 +72,15 @@ class Categories extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'ID'			=>	Yii::t("AdminModule.main",'ID'),
+			'id'			=>	Yii::t("AdminModule.main",'ID'),
 			'lft'			=> 'Lft',
 			'rgt'			=> 'Rgt',
-			'Level'			=> 'Level',
-			'Status'		=>	Yii::t("categories",'Status'),
-			'Alias'			=>	Yii::t("categories",'Alias'),
-			'Name'			=>	Yii::t("categories",'Name'),
-			'Description'	=>	Yii::t("categories",'Description'),
-			'ParentID'		=>	Yii::t("categories",'Parent'),
+			'level'			=> 'Level',
+			'status'		=>	Yii::t("categories",'Status'),
+			'alias'			=>	Yii::t("categories",'Alias'),
+			'name'			=>	Yii::t("categories",'Name'),
+			'description'	=>	Yii::t("categories",'Description'),
+			'parentId'		=>	Yii::t("categories",'Parent'),
 		);
 	}
 
@@ -113,10 +113,10 @@ class Categories extends CActiveRecord
 	{
 		return array(
 			'NestedSetBehavior'=>array(
-				'class'				=>	'application.extensions.nestedset.NestedSetBehavior',
+				'class'				=>	'ext.nestedset.NestedSetBehavior',
 				'leftAttribute'		=>	'lft',
 				'rightAttribute'	=>	'rgt',
-				'levelAttribute'	=>	'Level',
+				'levelAttribute'	=>	'level',
 				'hasManyRoots'      =>  true
 			),
 		);
@@ -127,14 +127,14 @@ class Categories extends CActiveRecord
 
 		$Categories = Categories::model()->findAll(array('order'=>'lft'));
 		foreach($Categories as $Category){
-			$return[$Category->ID] = $Category->Name;
+			$return[$Category->id] = $Category->name;
 		}
 
 		return $return;
 	}
 
 	public static function getMenuItems($items, $start = 0) {
-        
+
 		$return = array();
 		$SizeMenu = sizeof($items);
 		for( $i = $start; $i < $SizeMenu; $i++ ){
@@ -142,34 +142,33 @@ class Categories extends CActiveRecord
 									'url'       =>  array('/categories/view/','Alias'=>$items[$i]->Alias),
 									'active'    =>  CHttpRequest::getParam('Alias') == $items[$i]->Alias,
 						      );
-			
+
 			$cn = $items[$i]->rgt - $items[$i]->lft;
 			if ( $cn != 1 ){
-				$return[$i]['items'] = Categories::getMenuItems($items,$i+1);
+				$return[$i]['items'] = Category::getMenuItems($items,$i+1);
 				$i = ceil( $cn/2 );
 			}
 		}
-                
+
         return $return;
 	}
-	
+
 	public static function getMenuArray($items) {
 		return Categories::getMenuItems($items);
 	}
-    
+
     // форма в формате CForm
 	public function getArrayCForm(){
 		return array(
     		'attributes' => array(
 				'enctype' => 'application/form-data',
 				'class' => 'well',
-				'id'=>'CategoryForm'
 			),
 			'activeForm' => array(
 				'class' => 'CActiveForm',
 				'enableAjaxValidation' => true,
 				'enableClientValidation' => false,
-				'id' => "CategoryForm",
+				'id' => "categoryForm",
 				'clientOptions' => array(
 					'validateOnSubmit' => true,
 					'validateOnChange' => false,
@@ -177,29 +176,30 @@ class Categories extends CActiveRecord
 			),
 
     		'elements'=>array(
-        		'Status'=>array(
+        		'status'=>array(
         			'type'=>'checkbox',
     				'layout'=>'{input}{label}{error}{hint}',
     			),
-    			'ParentID'=>array(
+    			'parentId'=>array(
 					'type'  =>  'dropdownlist',
-					'items' =>  CHtml::listData(Categories::model()->findAll(array(
+					'items' =>  CHtml::listData(Category::model()->findAll(array(
+																'select'=>"id,name",
     															'order'=>'lft',
-																'condition'=>'ID != :ID',
-																'params'=>array(':ID'=> $model->ID ? $model->ID : 0 )
+																'condition'=>'id != :id',
+																'params'=>array(':id' => $this->id ? $this->id : 0 )
 															)
-															), 'ID', 'Name'),
+															), 'id', 'name'),
 					'empty'=>  '',
-				),                
-    			'Name'=>array(
+				),
+    			'name'=>array(
     				'type'=>'text',
     				'maxlength'=>255
     			),
-    			'Alias'=>array(
+    			'alias'=>array(
     				'type'=>'text',
     				'maxlength'=>255
     			),
-    			'Description'=>array(
+    			'description'=>array(
     				'type'=>'textarea',
     				'rows'=>5
     			),
@@ -211,8 +211,8 @@ class Categories extends CActiveRecord
 					'label' =>  $this->isNewRecord ? Yii::t("main",'Add') : Yii::t("main",'Save'),
 					'class' =>  "btn"
 				),
-			),            
+			),
         );
-	}    
-    
+	}
+
 }

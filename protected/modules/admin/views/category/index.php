@@ -2,17 +2,17 @@
 $this->pageTitle	=	Yii::t("categories", "Categories");
 $this->breadcrumbs	=	array(Yii::t("categories", "Categories"));
 
-$this->renderPartial('SecondMenu');
+$this->renderPartial('secondMenu');
 
 $this->widget('zii.widgets.grid.CGridView', array(
-	'dataProvider'	=>	$Categories,
+	'dataProvider'	=>	$categories,
 	'enableSorting'	=>	false,
 	'ajaxUpdate'	=>	false,
 	'columns' => array(
-		array('name'=>'ID','htmlOptions'=>array('width'=>'10')),
-		array(	'name'	=>	'Name',
+		array('name'=>'id','htmlOptions'=>array('width'=>'10')),
+		array(	'name'	=>	'name',
 				'type'	=>	'raw',
-				'value'	=>	'str_repeat("&nbsp;&nbsp;&nbsp;&nbsp;", $data->Level <= 1 ? 0 : $data->Level-1 ).$data->Name'
+				'value'	=>	'str_repeat("&nbsp;&nbsp;&nbsp;&nbsp;", $data->level <= 1 ? 0 : $data->level-1 ).$data->name'
 		),
 		array(
 			'htmlOptions'=>array('width'=>'10'),
@@ -20,7 +20,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 			'template'=>'{update}',
 			'buttons'=> array(
 				'update' => array(
-					'url'=> 'Yii::app()->createUrl("/admin/categories/edit",array("CategoryID"=>$data->ID) )',
+					'url'=> 'Yii::app()->createUrl("/admin/category/edit",array("id"=>$data->id) )',
 					'imageUrl'=>null,
 					'label'=>'<span class="icon-pencil pointer" title="'.Yii::t('main','Edit').'"></span>'
 				)
@@ -32,15 +32,15 @@ $this->widget('zii.widgets.grid.CGridView', array(
 			'template'=>'{delete}',
 			'buttons'=> array(
 				'delete' => array(
-					'url'=> 'Yii::app()->createUrl("/admin/categories/delete",array("CategoryID"=>$data->ID) )',
+					'url'=> 'Yii::app()->createUrl("/admin/category/delete",array("id"=>$data->id) )',
 					'imageUrl'=>null,
 					'label'=>'<span class="close" title="'.Yii::t('main','Delete').'">&times;</span>'
 				)
-			)                
-		),            
+			)
+		),
 	),
 	'htmlOptions'=>array(
-		'class'=> ''   
+		'class'=> ''
 	),
 	'itemsCssClass'=>'table table-bordered table-striped',
 	'template'=>'{summary} {items} {pager}',
@@ -53,7 +53,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 		'prevPageLabel'	=> '&larr;',
 		'nextPageLabel'	=> '&rarr;',
 		'lastPageLabel' => '&raquo;',
-		'htmlOptions'	=> array("class"=>false),            
+		'htmlOptions'	=> array("class"=>false),
 	),
 ));
 

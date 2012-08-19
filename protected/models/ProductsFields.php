@@ -51,8 +51,8 @@ class ProductsFields extends CActiveRecord
 												'condition' => 'ProductID = :ProductID',
 												'params'=>array(':ProductID'=> $this->ProductID )
 											)),
-			
-				
+
+
 			array('IsColumnTable', 'boolean'),
 			array('Alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u',
 				'message' => Yii::t("AdminModule.products",'Field contains invalid characters.')),
@@ -89,16 +89,16 @@ class ProductsFields extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'ID'            =>  Yii::t("AdminModule.main",'ID'),
-			'ProductID'     =>  Yii::t("AdminModule.main",'Идентификатор продукта'),
-			'FieldType'     =>  Yii::t("AdminModule.main",'Тип поля'),
-			'Name'          =>  Yii::t("AdminModule.main",'Наименование'),
-			'Alias'         =>  Yii::t("AdminModule.main",'Псевдоним'),
-			'IsMandatory'   =>  Yii::t("AdminModule.main",'Обязательно'),
-			'IsFilter'      =>  Yii::t("AdminModule.main",'Использовать в фильтрации'),
-			'IsColumnTable' =>  Yii::t("AdminModule.main",'Used In Table Header?'),
-			'UnitName'      =>  Yii::t("AdminModule.main",'Used In Table Header?'),
-			'Hint'          =>  Yii::t("AdminModule.main",'Used In Table Header?'),
+			'ID'            =>  Yii::t("fields",'ID'),
+			'ProductID'     =>  Yii::t("fields",'Идентификатор продукта'),
+			'FieldType'     =>  Yii::t("fields",'Тип поля'),
+			'Name'          =>  Yii::t("fields",'Наименование'),
+			'Alias'         =>  Yii::t("fields",'Псевдоним'),
+			'IsMandatory'   =>  Yii::t("fields",'Обязательно'),
+			'IsFilter'      =>  Yii::t("fields",'Использовать в фильтрации'),
+			'IsColumnTable' =>  Yii::t("fields",'Used In Table Header?'),
+			'UnitName'      =>  Yii::t("fields",'Used In Table Header?'),
+			'Hint'          =>  Yii::t("fields",'Used In Table Header?'),
 		);
 	}
 
@@ -205,17 +205,19 @@ class ProductsFields extends CActiveRecord
 
 	public function afterSave(){
 		parent::afterSave();
-        
+
 		if ( $this->moredata ) {
 			$this->moredata->FieldID = $this->ID;
 			if ( $this->moredata->save() ){
 				$Product = Products::model()->findByPk($this->ProductID);
-				
+
 				if ($this->isNewRecord)
 					Yii::app()->db->createCommand()->addColumn( $Product->Alias,
 						$this->Alias,
 						TypeFields::$Fields[$this->FieldType]['dbType']
 					);
+
+				return true;
 			}
 		}
 	}

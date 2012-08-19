@@ -224,4 +224,18 @@ class Manufacturers extends CActiveRecord
 		}
 		return true;
 	}
+
+	public static function getMenuArray($Manufacturers) {
+
+		$return = array();
+		foreach ($Manufacturers as $Manufacturer) {
+            $return[] = array(	'label'     =>  CHtml::encode($Manufacturer->Name),
+								'url'       =>  array('manufacturers/view','alias'=>$Manufacturer->Alias),
+								'active'    =>  CHttpRequest::getParam('alias') == $Manufacturer->Alias,
+						      );
+		}
+
+        return $return;
+	}
+
 }

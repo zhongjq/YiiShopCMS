@@ -7,13 +7,15 @@ class TypeFields
 	const PRICE = 3;
 	const TEXT = 4;
     const LISTS = 5;
-    
+    const CATEGORIES = 6;
+
 	public static $TypeToIDFields = array(
 		'integer'   => self::INTEGER,
 		'string'    => self::STRING,
 		'price'     => self::PRICE,
 		'text'      => self::TEXT,
         'list'      => self::LISTS,
+        'categories'=> self::CATEGORIES,
 	);
 
 	public static $Fields = array(
@@ -61,7 +63,16 @@ class TypeFields
 			'type'      =>  "list",
 			'class'     =>  "ListFields",
 			'dbType'    =>  "int(11)",
-			'form'      =>  array(    
+			'form'      =>  array(
+                'type'  =>  'dropdownlist',
+				'empty' =>  '',
+            ),
+		),
+    	self::CATEGORIES     => array(
+			'name'      =>  "Категория(и)",
+			'type'      =>  "categories",
+			'dbType'    =>  "int(11)",
+			'form'      =>  array(
                 'type'  =>  'dropdownlist',
 				'empty' =>  '',
             ),

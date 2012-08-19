@@ -1,6 +1,6 @@
 <?php
 
-class ProductsUrlRule extends CBaseUrlRule
+class UrlRule extends CBaseUrlRule
 {
 	public $connectionID = 'db';
 
@@ -11,10 +11,15 @@ class ProductsUrlRule extends CBaseUrlRule
 				return $params['Alias'].$manager->urlSuffix;
 			break;
 			case "products/view":
-				if (isset($params['Product'], $params['id']))
-					return $params['Product'] . '/' . $params['id'].$manager->urlSuffix;
-				else if (isset($params['Product'], $params['Alias']))
-					return $params['Product'] . '/' . $params['Alias'].$manager->urlSuffix;
+				if (isset($params['product'], $params['id']))
+					return $params['product'] . '/' . $params['id'].$manager->urlSuffix;
+				else if (isset($params['product'], $params['alias']))
+					return $params['product'] . '/' . $params['alias'].$manager->urlSuffix;
+			break;
+
+			case "manufacturers/view":
+				if (isset($params['alias']))
+					return 'manufacturer/' . $params['alias'].$manager->urlSuffix;
 			break;
 		}
 		return false;  // не применяем данное правило
@@ -26,7 +31,7 @@ class ProductsUrlRule extends CBaseUrlRule
 		{
 			// Ищем товар
 			if ( Products::model()->find('Alias=:Alias', array(':Alias'=>$matches[1])) ){
-				$_GET['Alias'] = $matches[1];
+				$_GET['alias'] = $matches[1];
 				return 'products/index';
 			}
 		}

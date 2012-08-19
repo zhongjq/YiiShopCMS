@@ -36,7 +36,7 @@ class ProductController extends Controller
 		}
 
         $criteria = new CDbCriteria;
-        $criteria->select = implode(',', $IsColumnTable);
+        //$criteria->select = implode(',', $IsColumnTable);
         $criteria->with = $Goods->getRelationsNameArray();
         $GoodsData = new CActiveDataProvider($Goods,array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
 
@@ -230,15 +230,15 @@ class ProductController extends Controller
 
 	public function actionFields($ProductID)
 	{
-		$Product = Products::model()->with('productsFields')->findByPk($ProductID);
+		$product = Products::model()->with('productsFields')->findByPk($ProductID);
 
         $criteria=new CDbCriteria;
     	$criteria->compare('ProductID',$ProductID);
-        $Fields = new CActiveDataProvider('ProductsFields',array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
+        $fields = new CActiveDataProvider('ProductsFields',array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
 
 		$this->render('fields/index', array(
-			'Product'   => $Product,
-            'Fields'    => $Fields
+			'Product'   => $product,
+            'Fields'    => $fields
 		));
 	}
 
@@ -321,19 +321,20 @@ class ProductController extends Controller
 
 		$class = null;
 		$FieldType = null;
+		$className = null;
 		if ( isset($_POST['ProductsFields']['FieldType']) )
 			$FieldType = $_POST['ProductsFields']['FieldType'];
 
-		if ( $FieldType > 0 ){
-			$ClassName = TypeFields::$Fields[$FieldType]['class'];
+		if ( $FieldType > 0 && isset(TypeFields::$Fields[$FieldType]['class']) ){
+			$className = TypeFields::$Fields[$FieldType]['class'];
 			$class = $ProductField->CreateField($FieldType);
-			$ArrayForm['elements'][$ClassName] = $class->getElementsMotelCForm();
+			$ArrayForm['elements'][$className] = $class->getElementsMotelCForm();
 			$ProductField->moredata = $class;
 		}
 
 		$Form = new CForm($ArrayForm);
 		$Form['ProductsFields']->model = $ProductField;
-		if( $FieldType > 0 ) $Form[$ClassName]->model = $class;
+		if( $FieldType > 0 && $class ) $Form[$className]->model = $class;
 
 		if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "FieldForm" ){
 			$validate = array($ProductField);
@@ -346,13 +347,13 @@ class ProductController extends Controller
 			$ProductField->attributes = $_POST['ProductsFields'];
 
             // чтобы сохранять значение
-            if( isset($_POST[$ClassName]) )
+            if( $className && isset($_POST[$className]) )
                 $class->attributes = $_POST[$ClassName];
 
 			$transaction = Yii::app()->db->beginTransaction();
 			try
 			{
-				if ( isset($_POST[$ClassName]) && $ProductField->save() ){
+				if ( $ProductField->save() ){
 					$transaction->commit();
 					$this->redirect($this->createUrl('/admin/product/fields',array('ProductID'=>$Product->ID)));
 				} else {
@@ -459,16 +460,24 @@ class ProductController extends Controller
 			),
 		);
 
+		$class = null;
+		$FieldType = null;
+		$className = null;
 		$FieldType = $ProductField->FieldType;
-		$ClassName = TypeFields::$Fields[$FieldType]['class'];
-		$class = $ProductField::CreateField($FieldType);
-		$class = $class::model()->findByPk($FieldID);
-		$ArrayForm['elements'][$ClassName] = $class->getElementsMotelCForm();
-		$ProductField->moredata = $class;
+		if ( isset(TypeFields::$Fields[$FieldType]['class']) ){
+			$className = TypeFields::$Fields[$FieldType]['class'];
+			$class = $ProductField::CreateField($FieldType);
+			$class = $class::model()->findByPk($FieldID);
+			$ArrayForm['elements'][$className] = $class->getElementsMotelCForm();
+			$ProductField->moredata = $class;
+
+		}
+
 
 		$Form = new CForm($ArrayForm);
 		$Form['ProductsFields']->model = $ProductField;
-		$Form[$ClassName]->model = $class;
+
+		if ( $class ) $Form[$className]->model = $class;
 
 		if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "FieldForm" ){
 			$validate = array($ProductField);
@@ -481,13 +490,13 @@ class ProductController extends Controller
 			$ProductField->attributes = $_POST['ProductsFields'];
 
             // чтобы сохранять значение
-            if( isset($_POST[$ClassName]) )
-                $class->attributes = $_POST[$ClassName];
+            if( $className && isset($_POST[$className]) )
+                $class->attributes = $_POST[$className];
 
 			$transaction = Yii::app()->db->beginTransaction();
 			try
 			{
-				if ( isset($_POST[$ClassName]) && $ProductField->save() ){
+				if ( $ProductField->save() ){
 					$transaction->commit();
 					$this->redirect($this->createUrl('/admin/product/fields',array('ProductID'=>$Product->ID)));
 				} else {

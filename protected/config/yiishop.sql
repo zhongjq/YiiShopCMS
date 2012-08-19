@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 3.5.2
+-- version 3.5.2.1
 -- http://www.phpmyadmin.net
 --
--- Host: mysql0.db.koding.com
--- Generation Time: Aug 17, 2012 at 06:07 AM
--- Server version: 5.1.61-log
--- PHP Version: 5.3.3
+-- Хост: localhost
+-- Время создания: Авг 20 2012 г., 00:46
+-- Версия сервера: 5.5.24-0ubuntu0.12.04.1
+-- Версия PHP: 5.3.10-1ubuntu3.2
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -17,44 +17,43 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 --
--- Database: `enchikiben_fbfde`
+-- База данных: `enchikiben_fbfde`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Categories`
+-- Структура таблицы `category`
 --
 
-CREATE TABLE IF NOT EXISTS `Categories` (
-  `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `category` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `root` int(10) unsigned DEFAULT NULL,
   `lft` int(10) unsigned NOT NULL,
   `rgt` int(10) unsigned NOT NULL,
-  `Level` smallint(5) unsigned NOT NULL,
-  `Status` int(1) NOT NULL COMMENT 'Тип категории',
-  `Alias` varchar(255) NOT NULL,
-  `Name` varchar(255) NOT NULL,
-  `Description` text,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Категории' AUTO_INCREMENT=7 ;
+  `level` smallint(5) unsigned NOT NULL,
+  `status` int(1) NOT NULL DEFAULT '1',
+  `alias` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Категории' AUTO_INCREMENT=8 ;
 
 --
--- Dumping data for table `Categories`
+-- Дамп данных таблицы `category`
 --
 
-INSERT INTO `Categories` (`ID`, `root`, `lft`, `rgt`, `Level`, `Status`, `Alias`, `Name`, `Description`) VALUES
-(1, 1, 1, 10, 1, 1, 'shiny', 'Шины', 'Шины'),
+INSERT INTO `category` (`id`, `root`, `lft`, `rgt`, `level`, `status`, `alias`, `name`, `description`) VALUES
+(1, 1, 1, 8, 1, 1, 'shiny', 'Шины', 'Шины'),
 (2, 2, 1, 2, 1, 1, 'diski', 'Диски', 'Диски'),
-(3, 1, 2, 9, 2, 1, 'letnie', 'Летние', 'Летние'),
-(4, 1, 3, 8, 3, 1, 'zimnie', 'Зимние', 'Зимние'),
-(5, 1, 4, 5, 4, 1, 'vsesezonnye', 'Всесезонные', 'Всесезонные'),
-(6, 1, 6, 7, 4, 0, '123', '123', '123');
+(3, 1, 2, 7, 2, 1, 'letnie', 'Летние', 'Летние'),
+(4, 1, 3, 6, 3, 1, 'zimnie', 'Зимние', 'Зимние'),
+(5, 1, 4, 5, 4, 1, 'vsesezonnye', 'Всесезонные', 'Всесезонные');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `disk`
+-- Структура таблицы `disk`
 --
 
 CREATE TABLE IF NOT EXISTS `disk` (
@@ -69,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `disk` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
 --
--- Dumping data for table `disk`
+-- Дамп данных таблицы `disk`
 --
 
 INSERT INTO `disk` (`ID`, `Alias`, `Title`, `Keywords`, `Description`, `Name`, `Size`) VALUES
@@ -78,7 +77,7 @@ INSERT INTO `disk` (`ID`, `Alias`, `Title`, `Keywords`, `Description`, `Name`, `
 -- --------------------------------------------------------
 
 --
--- Table structure for table `IntegerFields`
+-- Структура таблицы `IntegerFields`
 --
 
 CREATE TABLE IF NOT EXISTS `IntegerFields` (
@@ -89,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `IntegerFields` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Числовые поля';
 
 --
--- Dumping data for table `IntegerFields`
+-- Дамп данных таблицы `IntegerFields`
 --
 
 INSERT INTO `IntegerFields` (`FieldID`, `MinValue`, `MaxValue`) VALUES
@@ -98,7 +97,7 @@ INSERT INTO `IntegerFields` (`FieldID`, `MinValue`, `MaxValue`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ListFields`
+-- Структура таблицы `ListFields`
 --
 
 CREATE TABLE IF NOT EXISTS `ListFields` (
@@ -110,7 +109,7 @@ CREATE TABLE IF NOT EXISTS `ListFields` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=46 ;
 
 --
--- Dumping data for table `ListFields`
+-- Дамп данных таблицы `ListFields`
 --
 
 INSERT INTO `ListFields` (`FieldID`, `ListID`, `IsMultipleSelect`) VALUES
@@ -121,7 +120,7 @@ INSERT INTO `ListFields` (`FieldID`, `ListID`, `IsMultipleSelect`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Lists`
+-- Структура таблицы `Lists`
 --
 
 CREATE TABLE IF NOT EXISTS `Lists` (
@@ -131,7 +130,7 @@ CREATE TABLE IF NOT EXISTS `Lists` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Списки' AUTO_INCREMENT=4 ;
 
 --
--- Dumping data for table `Lists`
+-- Дамп данных таблицы `Lists`
 --
 
 INSERT INTO `Lists` (`ID`, `Name`) VALUES
@@ -141,7 +140,7 @@ INSERT INTO `Lists` (`ID`, `Name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ListsItems`
+-- Структура таблицы `ListsItems`
 --
 
 CREATE TABLE IF NOT EXISTS `ListsItems` (
@@ -155,7 +154,7 @@ CREATE TABLE IF NOT EXISTS `ListsItems` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Списки' AUTO_INCREMENT=12 ;
 
 --
--- Dumping data for table `ListsItems`
+-- Дамп данных таблицы `ListsItems`
 --
 
 INSERT INTO `ListsItems` (`ID`, `ListID`, `Status`, `Priority`, `Name`) VALUES
@@ -172,7 +171,7 @@ INSERT INTO `ListsItems` (`ID`, `ListID`, `Status`, `Priority`, `Name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Manufacturers`
+-- Структура таблицы `Manufacturers`
 --
 
 CREATE TABLE IF NOT EXISTS `Manufacturers` (
@@ -181,21 +180,22 @@ CREATE TABLE IF NOT EXISTS `Manufacturers` (
   `Alias` varchar(255) NOT NULL,
   `Name` varchar(255) NOT NULL,
   `Description` text NOT NULL,
+  `Logo` varchar(255) NOT NULL,
   PRIMARY KEY (`ID`),
   KEY `Status` (`Status`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Производители' AUTO_INCREMENT=2 ;
 
 --
--- Dumping data for table `Manufacturers`
+-- Дамп данных таблицы `Manufacturers`
 --
 
-INSERT INTO `Manufacturers` (`ID`, `Status`, `Alias`, `Name`, `Description`) VALUES
-(1, 1, 'p1', 'Производитель 1', 'Производитель 1');
+INSERT INTO `Manufacturers` (`ID`, `Status`, `Alias`, `Name`, `Description`, `Logo`) VALUES
+(1, 1, 'p1', 'Производитель 1', '', 'proizvoditel_1.jpg');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `PriceFields`
+-- Структура таблицы `PriceFields`
 --
 
 CREATE TABLE IF NOT EXISTS `PriceFields` (
@@ -205,7 +205,7 @@ CREATE TABLE IF NOT EXISTS `PriceFields` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Ценовые поля';
 
 --
--- Dumping data for table `PriceFields`
+-- Дамп данных таблицы `PriceFields`
 --
 
 INSERT INTO `PriceFields` (`FieldID`, `MaxValue`) VALUES
@@ -214,7 +214,7 @@ INSERT INTO `PriceFields` (`FieldID`, `MaxValue`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Products`
+-- Структура таблицы `Products`
 --
 
 CREATE TABLE IF NOT EXISTS `Products` (
@@ -230,7 +230,7 @@ CREATE TABLE IF NOT EXISTS `Products` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Таблица продуктов магазина' AUTO_INCREMENT=3 ;
 
 --
--- Dumping data for table `Products`
+-- Дамп данных таблицы `Products`
 --
 
 INSERT INTO `Products` (`ID`, `Status`, `Name`, `Alias`, `Title`, `Keywords`, `Description`) VALUES
@@ -240,7 +240,7 @@ INSERT INTO `Products` (`ID`, `Status`, `Name`, `Alias`, `Title`, `Keywords`, `D
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ProductsFields`
+-- Структура таблицы `ProductsFields`
 --
 
 CREATE TABLE IF NOT EXISTS `ProductsFields` (
@@ -257,10 +257,10 @@ CREATE TABLE IF NOT EXISTS `ProductsFields` (
   `Hint` varchar(255) NOT NULL COMMENT 'Подсказка',
   PRIMARY KEY (`ID`),
   KEY `ProductID` (`ProductID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=46 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=47 ;
 
 --
--- Dumping data for table `ProductsFields`
+-- Дамп данных таблицы `ProductsFields`
 --
 
 INSERT INTO `ProductsFields` (`ID`, `Position`, `ProductID`, `FieldType`, `Name`, `Alias`, `IsMandatory`, `IsFilter`, `IsColumnTable`, `UnitName`, `Hint`) VALUES
@@ -271,12 +271,13 @@ INSERT INTO `ProductsFields` (`ID`, `Position`, `ProductID`, `FieldType`, `Name`
 (42, 0, 1, 5, 'Размер', 'Size', 0, 0, 1, '', ''),
 (43, 0, 1, 5, 'Type', 'Type', 0, 0, 1, '', ''),
 (44, 0, 2, 2, 'Заголовок', 'Name', 1, 0, 1, '', ''),
-(45, 0, 2, 5, 'Размер', 'Size', 0, 0, 1, '', '');
+(45, 0, 2, 5, 'Размер', 'Size', 0, 0, 1, '', ''),
+(46, 0, 1, 6, 'Категория', 'categories', 1, 1, 1, '', '');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `RecordsCategories`
+-- Структура таблицы `RecordsCategories`
 --
 
 CREATE TABLE IF NOT EXISTS `RecordsCategories` (
@@ -287,10 +288,19 @@ CREATE TABLE IF NOT EXISTS `RecordsCategories` (
   KEY `CategoryID` (`CategoryID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Связь товаров со множественными списками';
 
+--
+-- Дамп данных таблицы `RecordsCategories`
+--
+
+INSERT INTO `RecordsCategories` (`ProductID`, `RecordID`, `CategoryID`) VALUES
+(1, 1, 1),
+(1, 1, 4),
+(1, 4, 3);
+
 -- --------------------------------------------------------
 
 --
--- Table structure for table `RecordsLists`
+-- Структура таблицы `RecordsLists`
 --
 
 CREATE TABLE IF NOT EXISTS `RecordsLists` (
@@ -302,17 +312,13 @@ CREATE TABLE IF NOT EXISTS `RecordsLists` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Связь товаров со множественными списками';
 
 --
--- Dumping data for table `RecordsLists`
+-- Дамп данных таблицы `RecordsLists`
 --
 
 INSERT INTO `RecordsLists` (`ProductID`, `RecordID`, `ListItemID`) VALUES
-(1, 1, 1),
-(1, 1, 7),
-(1, 1, 8),
 (1, 3, 5),
 (2, 1, 1),
 (2, 1, 5),
-(1, 4, 6),
 (1, 6, 6),
 (1, 8, 6),
 (1, 9, 4),
@@ -324,12 +330,16 @@ INSERT INTO `RecordsLists` (`ProductID`, `RecordID`, `ListItemID`) VALUES
 (1, 11, 1),
 (1, 12, 4),
 (1, 17, 4),
-(1, 22, 1);
+(1, 22, 1),
+(1, 1, 1),
+(1, 1, 7),
+(1, 1, 8),
+(1, 4, 6);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `StringFields`
+-- Структура таблицы `StringFields`
 --
 
 CREATE TABLE IF NOT EXISTS `StringFields` (
@@ -340,7 +350,7 @@ CREATE TABLE IF NOT EXISTS `StringFields` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Строковые поля';
 
 --
--- Dumping data for table `StringFields`
+-- Дамп данных таблицы `StringFields`
 --
 
 INSERT INTO `StringFields` (`FieldID`, `MinLength`, `MaxLength`) VALUES
@@ -350,7 +360,7 @@ INSERT INTO `StringFields` (`FieldID`, `MinLength`, `MaxLength`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `TextFields`
+-- Структура таблицы `TextFields`
 --
 
 CREATE TABLE IF NOT EXISTS `TextFields` (
@@ -362,7 +372,7 @@ CREATE TABLE IF NOT EXISTS `TextFields` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Текстовые поля';
 
 --
--- Dumping data for table `TextFields`
+-- Дамп данных таблицы `TextFields`
 --
 
 INSERT INTO `TextFields` (`FieldID`, `MinLength`, `MaxLength`, `Rows`) VALUES
@@ -371,7 +381,7 @@ INSERT INTO `TextFields` (`FieldID`, `MinLength`, `MaxLength`, `Rows`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tires`
+-- Структура таблицы `tires`
 --
 
 CREATE TABLE IF NOT EXISTS `tires` (
@@ -392,37 +402,37 @@ CREATE TABLE IF NOT EXISTS `tires` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=23 ;
 
 --
--- Dumping data for table `tires`
+-- Дамп данных таблицы `tires`
 --
 
 INSERT INTO `tires` (`ID`, `Alias`, `Title`, `Keywords`, `Description`, `Name`, `Col`, `decs`, `Price`, `sadas`, `Size`, `Type`) VALUES
-(1, '', '', '', '', 'Шина 1', 3, '', '234.30', 5, NULL, 10),
-(2, '', '', '', '', 'Шина 2', NULL, 'asd', '213.00', 4, NULL, NULL),
-(3, '', '', '', '', 'Шина 3', NULL, '', '323.00', 6, NULL, 11),
-(4, '', '', '', '', 'Шина 4', 23, '234', '12.50', 4, 1, 10),
-(5, '', '', '', '', 'Шина 5', NULL, '', '3.00', NULL, NULL, NULL),
-(6, '', '', '', '', 'Шина 6', NULL, '', '6.00', NULL, 1, NULL),
-(7, '', '', '', '', 'Шина 7', NULL, '', '7.00', NULL, NULL, 9),
-(8, '', '', '', '', 'Шина 8', NULL, 'dfg', '8.00', NULL, 1, NULL),
-(9, '', '', '', '', 'Шина 9', NULL, '', '9.00', NULL, 1, 10),
-(10, '', '', '', '', 'Шина 10', NULL, '', '5.00', NULL, 1, 10),
-(11, '', '', '', '', 'Шина 11', 34, '343', '11.00', NULL, 1, 9),
-(12, '', '', '', '', 'Шина 12', NULL, '123', '12.00', NULL, 1, NULL),
-(13, '', '', '', '', 'Шина 13', NULL, '123', '13.00', NULL, NULL, 11),
-(14, '', '', '', '', 'Шина 14', 1, '123', '14.00', NULL, NULL, NULL),
-(15, '', '', '', '', 'Шина 15', 15, '', '15.00', NULL, NULL, NULL),
-(16, '', '', '', '', 'Шина 16', NULL, '', '16.00', NULL, NULL, NULL),
-(17, '', '', '', '', 'Шина 17', NULL, '', '17.00', NULL, 1, 9),
-(18, '', '', '', '', 'Шина 18', NULL, '', '17.00', NULL, NULL, 9),
-(19, '', '', '', '', 'Шина 18', NULL, '', '18.00', NULL, NULL, NULL),
-(20, '', '', '', '', 'Шина 19', NULL, '', '19.00', NULL, NULL, NULL),
-(21, '', '', '', '', 'Шина 20', NULL, '', '20.00', NULL, NULL, NULL),
-(22, '', '', '', '', 'Шина 21', 21, '', '21.00', NULL, 1, NULL);
+(1, '', '', '', '', 'Шина 1', 3, '', 234.30, 5, 1, 10),
+(2, '', '', '', '', 'Шина 2', NULL, 'asd', 213.00, 4, NULL, NULL),
+(3, '', '', '', '', 'Шина 3', NULL, '', 323.00, 6, NULL, 11),
+(4, '', '', '', '', 'Шина 4', 23, '234', 12.50, 4, 1, 10),
+(5, '', '', '', '', 'Шина 5', NULL, '', 3.00, NULL, NULL, NULL),
+(6, '', '', '', '', 'Шина 6', NULL, '', 6.00, NULL, 1, NULL),
+(7, '', '', '', '', 'Шина 7', NULL, '', 7.00, NULL, NULL, 9),
+(8, '', '', '', '', 'Шина 8', NULL, 'dfg', 8.00, NULL, 1, NULL),
+(9, '', '', '', '', 'Шина 9', NULL, '', 9.00, NULL, 1, 10),
+(10, '', '', '', '', 'Шина 10', NULL, '', 5.00, NULL, 1, 10),
+(11, '', '', '', '', 'Шина 11', 34, '343', 11.00, NULL, 1, 9),
+(12, '', '', '', '', 'Шина 12', NULL, '123', 12.00, NULL, 1, NULL),
+(13, '', '', '', '', 'Шина 13', NULL, '123', 13.00, NULL, NULL, 11),
+(14, '', '', '', '', 'Шина 14', 1, '123', 14.00, NULL, NULL, NULL),
+(15, '', '', '', '', 'Шина 15', 15, '', 15.00, NULL, NULL, NULL),
+(16, '', '', '', '', 'Шина 16', NULL, '', 16.00, NULL, NULL, NULL),
+(17, '', '', '', '', 'Шина 17', NULL, '', 17.00, NULL, 1, 9),
+(18, '', '', '', '', 'Шина 18', NULL, '', 17.00, NULL, NULL, 9),
+(19, '', '', '', '', 'Шина 18', NULL, '', 18.00, NULL, NULL, NULL),
+(20, '', '', '', '', 'Шина 19', NULL, '', 19.00, NULL, NULL, NULL),
+(21, '', '', '', '', 'Шина 20', NULL, '', 20.00, NULL, NULL, NULL),
+(22, '', '', '', '', 'Шина 21', 21, '', 21.00, NULL, 1, NULL);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `Users`
+-- Структура таблицы `Users`
 --
 
 CREATE TABLE IF NOT EXISTS `Users` (
@@ -440,7 +450,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Таблица пользователей' AUTO_INCREMENT=3 ;
 
 --
--- Dumping data for table `Users`
+-- Дамп данных таблицы `Users`
 --
 
 INSERT INTO `Users` (`ID`, `Status`, `RoleID`, `RegistrationDateTime`, `ServiceID`, `ServiceUserID`, `Email`, `Password`, `UserName`) VALUES
@@ -448,61 +458,62 @@ INSERT INTO `Users` (`ID`, `Status`, `RoleID`, `RegistrationDateTime`, `ServiceI
 (2, 0, 1, '2012-07-04 00:41:25', 3, 'http://openid.yandex.ru/EnChikiben/', NULL, NULL, 'EnChikiben');
 
 --
--- Constraints for dumped tables
+-- Ограничения внешнего ключа сохраненных таблиц
 --
 
 --
--- Constraints for table `IntegerFields`
+-- Ограничения внешнего ключа таблицы `IntegerFields`
 --
 ALTER TABLE `IntegerFields`
   ADD CONSTRAINT `IntegerFields_ibfk_1` FOREIGN KEY (`FieldID`) REFERENCES `ProductsFields` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `ListFields`
+-- Ограничения внешнего ключа таблицы `ListFields`
 --
 ALTER TABLE `ListFields`
   ADD CONSTRAINT `ListFields_ibfk_1` FOREIGN KEY (`FieldID`) REFERENCES `ProductsFields` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `ListFields_ibfk_2` FOREIGN KEY (`ListID`) REFERENCES `Lists` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `PriceFields`
+-- Ограничения внешнего ключа таблицы `PriceFields`
 --
 ALTER TABLE `PriceFields`
   ADD CONSTRAINT `PriceFields_ibfk_1` FOREIGN KEY (`FieldID`) REFERENCES `ProductsFields` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `ProductsFields`
+-- Ограничения внешнего ключа таблицы `ProductsFields`
 --
 ALTER TABLE `ProductsFields`
   ADD CONSTRAINT `ProductsFields_ibfk_1` FOREIGN KEY (`ProductID`) REFERENCES `Products` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `RecordsCategories`
+-- Ограничения внешнего ключа таблицы `RecordsCategories`
 --
 ALTER TABLE `RecordsCategories`
-  ADD CONSTRAINT `RecordsCategories_ibfk_1` FOREIGN KEY (`CategoryID`) REFERENCES `Categories` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `RecordsCategories_ibfk_2` FOREIGN KEY (`ProductID`) REFERENCES `Products` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `RecordsCategories_ibfk_1` FOREIGN KEY (`CategoryID`) REFERENCES `category` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `RecordsLists`
+-- Ограничения внешнего ключа таблицы `RecordsLists`
 --
 ALTER TABLE `RecordsLists`
   ADD CONSTRAINT `RecordsLists_ibfk_2` FOREIGN KEY (`ProductID`) REFERENCES `Products` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `RecordsLists_ibfk_3` FOREIGN KEY (`ListItemID`) REFERENCES `ListsItems` (`ID`);
 
 --
--- Constraints for table `StringFields`
+-- Ограничения внешнего ключа таблицы `StringFields`
 --
 ALTER TABLE `StringFields`
   ADD CONSTRAINT `StringFields_ibfk_1` FOREIGN KEY (`FieldID`) REFERENCES `ProductsFields` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `TextFields`
+-- Ограничения внешнего ключа таблицы `TextFields`
 --
 ALTER TABLE `TextFields`
   ADD CONSTRAINT `TextFields_ibfk_1` FOREIGN KEY (`FieldID`) REFERENCES `ProductsFields` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `tires`
+-- Ограничения внешнего ключа таблицы `tires`
 --
 ALTER TABLE `tires`
   ADD CONSTRAINT `tires_ibfk_1` FOREIGN KEY (`sadas`) REFERENCES `ListsItems` (`ID`);
