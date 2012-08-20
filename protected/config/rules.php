@@ -15,7 +15,7 @@ return array(
 				// подтверждение регистрации
 				'/confirmation/<code>' => 'site/confirmation',
 
-                
+
                 /* АДМИНИСТРАТИРОВАНИЕ */
                 "/admin/<action:(login|logout)>" => "admin/default/<action>",
                 // Категории
@@ -29,22 +29,23 @@ return array(
 				// Пользователи
 		        '/admin/user/<action:(edit|view|delete|passwordedit)>/<id>' => 'admin/users/<action>',
                 // Продукты
-		        '/admin/products' => 'admin/product/index',                
-                '/admin/product/<action:(edit|view|delete)>/<id:\d+>'=>  'admin/product/<action>',
+		        '/admin/constructor' => 'admin/constructor/index',
+                '/admin/constructor/<action:(edit|view|delete)>/<id:\d+>'=>  'admin/constructor/<action>',
+					// поля
+                '/admin/constructor/<id:\d+>/fields' => 'admin/constructor/fields',
+		        '/admin/constructor/<id:\d+>/fields/add' => 'admin/constructor/addfield',
+		        '/admin/constructor/<productId:\d+>/field/<action:(edit|delete)>/<fieldId:\d+>' => 'admin/constructor/<action>field',
+
                     // записи
-                '/admin/product/view/<productId:\d+>/add' => 'admin/product/add',		        
+                '/admin/product/view/<productId:\d+>/add' => 'admin/product/add',
                 '/admin/product/view/<productId:\d+>/record/<action:(edit|delete)>/<fieldId:\d+>' => 'admin/product/<action>record',
-                    // поля
-                '/admin/product/edit/<productId:\d+>/fields' => 'admin/product/fields',
-		        '/admin/product/edit/<productId:\d+>/fields/add' => 'admin/product/addfield',
-		        '/admin/product/edit/<productId:\d+>/fields/<action:(edit|delete)>/<fieldId:\d+>' => 'admin/product/<action>field',
-                // Списки
-		        '/admin/products/lists' => 'admin/product/lists',
-                '/admin/products/lists/add' => 'admin/product/addlist',
-		        '/admin/products/list/<action:(edit|delete)>/<ListID:\d+>' => 'admin/product/<action>list',
-                '/admin/products/list/<ListID:\d+>/items' => 'admin/product/itemslist',
-                '/admin/products/list/<ListID:\d+>/items/add' => 'admin/product/additems',
-                '/admin/products/list/<ListID:\d+>/item/<action:(edit|delete)>/<ItemID:\d+>' => 'admin/product/<action>item',
+
+				// Списки
+                '/admin/lists/add' => 'admin/lists/add',
+		        '/admin/list/<action:(edit|delete)>/<id:\d+>' => 'admin/lists/<action>list',
+                '/admin/list/<id:\d+>/items' => 'admin/lists/items',
+                '/admin/list/<id:\d+>/items/add' => 'admin/lists/additems',
+                '/admin/list/<listId:\d+>/item/<action:(edit|delete)>/<itemId:\d+>' => 'admin/lists/<action>item',
 
 		         // своё правило для URL вида '/Производитель/Модель'
 		         array(

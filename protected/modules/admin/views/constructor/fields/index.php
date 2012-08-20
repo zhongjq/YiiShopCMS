@@ -1,8 +1,7 @@
 <?php
 $this->breadcrumbs=array(
-	'Товары'    =>  array('index'),
-	'Редактирование товара #'.$product->id => $this->createUrl('/admin/product/edit',array('id'=>$product->id)),
-	'Поля товара',
+	Yii::t("products","Constructor Goods") => array('index'),
+	Yii::t('products',"Fields product"),
 );
 
 $this->renderPartial('fields/secondMenu',array('product'=>$product));
@@ -16,7 +15,6 @@ $this->widget('zii.widgets.grid.CGridView', array(
 			'name'=>'id',
 			'htmlOptions'=>array('width'=> '10'),
 		),
-		'name',
 		'name',
 		'alias',
 		array(
@@ -33,7 +31,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 			'template'=>'{update}',
 			'buttons'=> array(
 				'update' => array(
-					'url'=> 'Yii::app()->createUrl("/admin/product/editfield",array("productId"=>'.$product->id.',"fieldId"=>$data->id) )',
+					'url'=> 'Yii::app()->createUrl("/admin/constructor/editfield",array("productId"=>'.$product->id.',"fieldId"=>$data->id) )',
 					'imageUrl'=>null,
 					'label'=>'<span class="icon-pencil pointer" title="'.Yii::t('main','Редактировать').'"></span>'
 				)
@@ -45,7 +43,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 			'template'=>'{delete}',
 			'buttons'=> array(
 				'delete' => array(
-					'url'=> 'Yii::app()->createUrl("/admin/product/deletefield",array("productId"=>'.$product->id.',"fieldId"=>$data->id) )',
+					'url'=> 'Yii::app()->createUrl("/admin/constructor/deletefield",array("productId"=>'.$product->id.',"fieldId"=>$data->id) )',
 					'imageUrl'=>null,
 					'label'=>'<span class="close" title="'.Yii::t('main','Удалить').'">&times;</span>'
 				)

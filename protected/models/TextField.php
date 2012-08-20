@@ -4,15 +4,15 @@
  * This is the model class for table "TextFields".
  *
  * The followings are the available columns in table 'TextFields':
- * @property integer $FieldID
- * @property integer $MinLength
- * @property integer $MaxLength
- * @property integer $Rows
+ * @property integer $field_id
+ * @property integer $min_length
+ * @property integer $max_length
+ * @property integer $rows
  *
  * The followings are the available model relations:
  * @property ProductsFields $field
  */
-class TextFields extends CActiveRecord
+class TextField extends CActiveRecord
 {
 	/**
 	 * Returns the static model of the specified AR class.
@@ -23,13 +23,13 @@ class TextFields extends CActiveRecord
 	{
 		return parent::model($className);
 	}
-	
+
 	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
 	{
-		return 'TextFields';
+		return 'text_field';
 	}
 
 	/**
@@ -40,12 +40,12 @@ class TextFields extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('MinLength, MaxLength, Rows', 'required', 'on'=>'add'),
-			array('FieldID, MinLength, MaxLength, Rows', 'required', 'on'=>'edit'),
-			array('FieldID, MinLength, MaxLength, Rows', 'numerical', 'integerOnly'=>true),
+			array('min_length, max_length, rows', 'required', 'on'=>'add'),
+			array('field_id, min_length, max_length, rows', 'required', 'on'=>'edit'),
+			array('field_id, min_length, max_length, rows', 'numerical', 'integerOnly'=>true),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('FieldID, MinLength, MaxLength, Rows', 'safe', 'on'=>'search'),
+			array('field_id, min_length, max_length, rows', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -57,7 +57,7 @@ class TextFields extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'field' => array(self::BELONGS_TO, 'ProductsFields', 'FieldID'),
+			'field' => array(self::BELONGS_TO, 'product_field', 'field_id'),
 		);
 	}
 
@@ -67,52 +67,27 @@ class TextFields extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'FieldID' => 'Field',
-			'MinLength' => 'Min Length',
-			'MaxLength' => 'Max Length',
-			'Rows' => 'Rows',
+			'min_length' => Yii::t('fields','Min length'),
+			'max_length' => Yii::t('fields','Max length'),
+			'rows' => Yii::t('fields','Rows'),
 		);
 	}
 
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// Warning: Please modify the following code to remove attributes that
-		// should not be searched.
-
-		$criteria=new CDbCriteria;
-
-		$criteria->compare('FieldID',$this->FieldID);
-		$criteria->compare('MinLength',$this->MinLength);
-		$criteria->compare('MaxLength',$this->MaxLength);
-		$criteria->compare('Rows',$this->Rows);
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
-	}
 
 	// форма в формате CForm
 	public function getElementsMotelCForm(){
 		return array(
 			'type'=>'form',
 			'elements'=>array(
-    			'IsMultipleSelect'=>array(
-    				'type'=>'checkbox',
-					'layout'=>'{input}{label}{error}{hint}',
-				),                
-				'MinLength'=>array(
+				'min_length'=>array(
 					'type'=>'text',
 					'maxlength'=>255
 				),
-				'MaxLength'=>array(
+				'max_length'=>array(
 					'type'=>'text',
 					'maxlength'=>255
 				),
-				'Rows'=>array(
+				'rows'=>array(
 					'type'=>'text',
 					'maxlength'=>255
 				),

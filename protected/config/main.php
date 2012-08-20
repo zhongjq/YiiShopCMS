@@ -82,8 +82,8 @@ return array(
 
 		// База
 		'db'=>array(
-			//'connectionString' => 'mysql:host=localhost;dbname=enchikiben_fbfde',
-            'connectionString' => 'mysql:host=mysql0.db.koding.com;dbname=enchikiben_fbfde',
+			'connectionString' => 'mysql:host=localhost;dbname=enchikiben_fbfde',
+            //'connectionString' => 'mysql:host=mysql0.db.koding.com;dbname=enchikiben_fbfde',
 			'emulatePrepare' => true,
 			'username' => 'enchikiben_fbfde',
 			'password' => '754089db',
@@ -102,6 +102,7 @@ return array(
         ),
 
         'user' => array(
+			'class' => 'WebUser',
 			'allowAutoLogin'	=> true,
 			'allowAutoLogin'	=> true,
             //'identityCookie'	=> array('domain' => '.'.$_SERVER['SERVER_NAME']  ),

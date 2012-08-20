@@ -4,14 +4,14 @@
  * This is the model class for table "IntegerFields".
  *
  * The followings are the available columns in table 'IntegerFields':
- * @property integer $FieldID
+ * @property integer $field_id
  * @property integer $MinLength
  * @property integer $MaxLength
  *
  * The followings are the available model relations:
  * @property ProductsFields $field
  */
-class IntegerFields extends CActiveRecord
+class IntegerField extends CActiveRecord
 {
 	/**
 	 * Returns the static model of the specified AR class.
@@ -28,7 +28,7 @@ class IntegerFields extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'IntegerFields';
+		return 'integer_field';
 	}
 
 	/**
@@ -39,12 +39,13 @@ class IntegerFields extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('MinValue, MaxValue', 'required', 'on'=>'add'),
-			array('FieldID, MinValue, MaxValue', 'required', 'on'=>'edit'),
-			array('FieldID, MinValue, MaxValue', 'numerical', 'integerOnly'=>true),
+			//array('min_value, max_value', 'required', 'on'=>'add'),
+			array('field_id', 'required', 'on'=>'edit'),
+			array('field_id, min_value, max_value', 'numerical','integerOnly'=>true),
+			array('min_value, max_value', 'numerical','integerOnly'=>true, 'allowEmpty'=>true),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('FieldID, MinValue, MaxValue', 'safe', 'on'=>'search'),
+			array('field_id, min_value, max_value', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -56,7 +57,7 @@ class IntegerFields extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'field' => array(self::BELONGS_TO, 'ProductsFields', 'FieldID'),
+			'field' => array(self::BELONGS_TO, 'ProductsFields', 'field_id'),
 		);
 	}
 
@@ -66,30 +67,9 @@ class IntegerFields extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'FieldID' => 'Field',
-			'MinValue' => 'Min Value',
-			'MaxValue' => 'Max Value',
+			'min_value' => Yii::t('fields','Min value'),
+			'max_value' => Yii::t('fields','Max value'),
 		);
-	}
-
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// Warning: Please modify the following code to remove attributes that
-		// should not be searched.
-
-		$criteria=new CDbCriteria;
-
-		$criteria->compare('FieldID',$this->FieldID);
-		$criteria->compare('MinValue',$this->MinLength);
-		$criteria->compare('MaxValue',$this->MaxLength);
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
 	}
 
 	// форма в формате CForm
@@ -97,11 +77,11 @@ class IntegerFields extends CActiveRecord
 		return array(
 			'type'=>'form',
 			'elements'=>array(
-				'MinValue'=>array(
+				'min_value'=>array(
 					'type'=>'text',
 					'maxlength'=>11
 				),
-				'MaxValue'=>array(
+				'max_value'=>array(
 					'type'=>'text',
 					'maxlength'=>11
 				),

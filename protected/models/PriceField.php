@@ -4,14 +4,14 @@
  * This is the model class for table "IntegerFields".
  *
  * The followings are the available columns in table 'IntegerFields':
- * @property integer $FieldID
+ * @property integer $field_id
  * @property integer $MinLength
  * @property integer $MaxLength
  *
  * The followings are the available model relations:
  * @property ProductsFields $field
  */
-class PriceFields extends CActiveRecord
+class PriceField extends CActiveRecord
 {
 	/**
 	 * Returns the static model of the specified AR class.
@@ -28,7 +28,7 @@ class PriceFields extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'PriceFields';
+		return 'price_field';
 	}
 
 	/**
@@ -39,12 +39,13 @@ class PriceFields extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('MaxValue', 'required', 'on'=>'add'),
-			array('FieldID, MaxValue', 'required', 'on'=>'edit'),
-			array('FieldID, MaxValue', 'numerical', 'integerOnly'=>true),
+			//array('max_value', 'required', 'on'=>'add'),
+			array('field_id', 'required', 'on'=>'edit'),
+			array('field_id, max_value', 'numerical', 'integerOnly'=>true),
+			array('max_value', 'numerical', 'integerOnly'=>true, 'allowEmpty'=>true),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('FieldID, MinValue, MaxValue', 'safe', 'on'=>'search'),
+			array('field_id, max_value', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -56,7 +57,7 @@ class PriceFields extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'field' => array(self::BELONGS_TO, 'ProductsFields', 'FieldID'),
+			'field' => array(self::BELONGS_TO, 'ProductsFields', 'field_id'),
 		);
 	}
 
@@ -66,9 +67,7 @@ class PriceFields extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'FieldID' => 'Field',
-			'MinValue' => 'Min Value',
-			'MaxValue' => 'Max Value',
+			'max_value' => Yii::t('fields','Max value'),
 		);
 	}
 
@@ -83,9 +82,9 @@ class PriceFields extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('FieldID',$this->FieldID);
-		$criteria->compare('MinValue',$this->MinLength);
-		$criteria->compare('MaxValue',$this->MaxLength);
+		$criteria->compare('field_id',$this->field_id);
+		$criteria->compare('min_value',$this->MinLength);
+		$criteria->compare('max_value',$this->MaxLength);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -97,11 +96,11 @@ class PriceFields extends CActiveRecord
 		return array(
 			'type'=>'form',
 			'elements'=>array(
-				'MinValue'=>array(
+				'min_value'=>array(
 					'type'=>'text',
 					'maxlength'=>11
 				),
-				'MaxValue'=>array(
+				'max_value'=>array(
 					'type'=>'text',
 					'maxlength'=>11
 				),

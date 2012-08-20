@@ -71,9 +71,11 @@
 									array(	'label'	=>	Yii::t("manufacturers", "Manufacturers"),
 											'url'	=>	array('/admin/manufacturer'),
 											'active'=>	$this->getId() =='manufacturers'),
-
-									array(	'label'	=>	Yii::t("products", "Products"),
-											'url'	=>	array('/admin/product'),
+									array(  'label' => Yii::t('lists',"Lists"),
+											'url'   => array('/admin/lists'),
+											'active'=> $this->getAction()->getId() == 'lists' ),
+									array(	'label'	=>	Yii::t("products", "Constructor Goods"),
+											'url'	=>	array('/admin/constructor'),
 											'active'=>	$this->getId() =='product'),
 
 								)

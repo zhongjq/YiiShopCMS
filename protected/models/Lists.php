@@ -4,15 +4,15 @@
  * This is the model class for table "Lists".
  *
  * The followings are the available columns in table 'Lists':
- * @property integer $ID
- * @property string $Name
+ * @property integer $id
+ * @property string $name
  *
  * The followings are the available model relations:
  * @property ListsItems[] $listsItems
  */
 class Lists extends CActiveRecord
 {
-    
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
@@ -28,7 +28,7 @@ class Lists extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'Lists';
+		return 'list';
 	}
 
 	/**
@@ -39,11 +39,11 @@ class Lists extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('Name', 'required', 'on'=> 'add, edit'),
-			array('Name', 'length', 'max'=>255),
+			array('name', 'required', 'on'=> 'add, edit'),
+			array('name', 'length', 'max'=>255),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('ID, Name', 'safe', 'on'=>'search'),
+			array('id, name', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -55,7 +55,7 @@ class Lists extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'ListsItems' => array(self::HAS_MANY, 'ListsItems', 'ListID'),
+			'listsItems' => array(self::HAS_MANY, 'ListItem', 'list_id'),
 		);
 	}
 
@@ -65,53 +65,34 @@ class Lists extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'ID' => 'ID',
-			'Name' => 'Name',
+			'id' => Yii::t('lists',"ID"),
+			'name' => Yii::t('lists',"Name"),
 		);
 	}
 
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// Warning: Please modify the following code to remove attributes that
-		// should not be searched.
-
-		$criteria=new CDbCriteria;
-
-		$criteria->compare('ID',$this->ID);
-		$criteria->compare('Name',$this->Name,true);
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
-	}
-    
     public function getCFormArray(){
         return array(
             'attributes' => array(
     			'enctype' => 'application/form-data',
 				'class' => 'well',
-				'id'=>'ListsForm'
+				'id'=>'listsForm'
 			),
 			'activeForm' => array(
 				'class' => 'CActiveForm',
 				'enableAjaxValidation' => true,
 				'enableClientValidation' => false,
-				'id' => "ListsForm",
+				'id' => "listsForm",
 				'clientOptions' => array(
 					'validateOnSubmit' => true,
 					'validateOnChange' => false,
 				),
 			),
-			
+
 			'elements'=>array(
-				'Name'=>array(
+				'name'=>array(
 					'type'=>'text',
 					'maxlength' =>255,
-                    'placeholder'=>"Name"
+                    'placeholder'=>"name"
 				)
 			),
 
@@ -122,12 +103,12 @@ class Lists extends CActiveRecord
 					'class' =>  "btn"
 				),
 			),
-		);    
-    }    
+		);
+    }
 
     public function afterDelete(){
 		parent::afterDelete();
-		ListsItems::model()->findAll('ListID = :ID',array(':ID'=>$this->ID));
+		ListsItems::model()->findAll('list_id = :id',array(':id'=>$this->id));
 	}
 
 }

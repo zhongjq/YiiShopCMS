@@ -5,15 +5,15 @@
  *
  * The followings are the available columns in table 'ListsItems':
  * @property integer $ID
- * @property integer $ListID
- * @property integer $Status
- * @property integer $Priority
- * @property string $Name
+ * @property integer $list_id
+ * @property integer $status
+ * @property integer $priority
+ * @property string $name
  *
  * The followings are the available model relations:
  * @property Lists $list
  */
-class ListsItems extends CActiveRecord
+class ListItem extends CActiveRecord
 {
 	/**
 	 * Returns the static model of the specified AR class.
@@ -30,7 +30,7 @@ class ListsItems extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'ListsItems';
+		return 'list_item';
 	}
 
 	/**
@@ -41,12 +41,12 @@ class ListsItems extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('ListID, Name', 'required', 'on' => 'add, edit'),
-			array('ListID, Status, Priority', 'numerical', 'integerOnly'=>true),
-			array('Name', 'length', 'max'=>255),
+			array('list_id, name', 'required', 'on' => 'add, edit'),
+			array('list_id, status, priority', 'numerical', 'integerOnly'=>true),
+			array('name', 'length', 'max'=>255),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('ID, ListID, Status, Priority, Name', 'safe', 'on'=>'search'),
+			array('ID, list_id, status, priority, name', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -58,7 +58,7 @@ class ListsItems extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'List' => array(self::BELONGS_TO, 'Lists', 'ListID'),
+			'list' => array(self::BELONGS_TO, 'Lists', 'list_id'),
 		);
 	}
 
@@ -68,11 +68,11 @@ class ListsItems extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'ID' => 'ID',
-			'ListID' => 'List',
-			'Status' => 'Status',
-			'Priority' => 'Priority',
-			'Name' => 'Name',
+			//'ID' => 'ID',
+			//'list_id' => 'List',
+			'status' => 'status',
+			'priority' => 'priority',
+			'name' => 'name',
 		);
 	}
 
@@ -88,47 +88,47 @@ class ListsItems extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('ID',$this->ID);
-		$criteria->compare('ListID',$this->ListID);
-		$criteria->compare('Status',$this->Status);
-		$criteria->compare('Priority',$this->Priority);
-		$criteria->compare('Name',$this->Name,true);
+		$criteria->compare('list_id',$this->list_id);
+		$criteria->compare('status',$this->status);
+		$criteria->compare('priority',$this->priority);
+		$criteria->compare('name',$this->name,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
 		));
 	}
-    
+
     public function getCFormArray(){
         return array(
             'attributes' => array(
         		'enctype' => 'application/form-data',
 				'class' => 'well',
-				'id'=>'ListsForm'
+				'id'=>'listsForm'
 			),
 			'activeForm' => array(
 				'class' => 'CActiveForm',
 				'enableAjaxValidation' => true,
 				'enableClientValidation' => false,
-				'id' => "ListsForm",
+				'id' => "listsForm",
 				'clientOptions' => array(
 					'validateOnSubmit' => true,
 					'validateOnChange' => false,
 				),
 			),
-			
-			'elements'=>array(                
-    		    'Status'=>array(
+
+			'elements'=>array(
+    		    'status'=>array(
 					'type'=>'checkbox',
 					'layout'=>'{input}{label}{error}{hint}',
 				),
-				'Priority'=>array(
+				'priority'=>array(
 					'type'          =>  'text',
 					'maxlength'     =>  255,
 				),
-    			'Name'=>array(
+    			'name'=>array(
 					'type'          =>  'text',
 					'maxlength'     =>  255,
-				),                
+				),
 			),
 
 			'buttons'=>array(
@@ -138,6 +138,6 @@ class ListsItems extends CActiveRecord
 					'class' =>  "btn"
 				),
 			),
-		);    
-    }      
+		);
+    }
 }

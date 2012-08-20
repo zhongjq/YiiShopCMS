@@ -5,25 +5,25 @@ class ProductController extends Controller
 	public $layout='/layouts/main';
 
 	public function actionIndex()
-	{    
+	{
     	$criteria = new CDbCriteria();
 		$criteria->with = 'productsFields';
         $products	= new CActiveDataProvider('Product',array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
 
 		$this->render('index', array(
 			'products' => $products
-		));        
+		));
 	}
 
 	public function actionView($ProductID)
 	{
-		$Product = Products::model()->with('productsFields')->findByPk($ProductID);
-		$Product->getAttributes();
+		$product = Product::model()->with('productsFields')->findByPk($ProductID);
+		$product->getAttributes();
 
-		$Goods = $Product->getGoodsObject();
+		$Goods = $product->getGoodsObject();
 
 		$IsColumnTable = array();
-		foreach($Product->productsFields() as $Field) {
+		foreach($product->productsFields() as $Field) {
 			if( $Field->IsColumnTable ) $IsColumnTable[] = $Field->Alias;
 		}
 
@@ -33,7 +33,7 @@ class ProductController extends Controller
         $GoodsData = new CActiveDataProvider($Goods,array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
 
 		$this->render('records/view', array(
-			'Product'   => $Product,
+			'Product'   => $product,
 			'Goods'     => $Goods,
             'GoodsData' => $GoodsData
 		));
@@ -41,8 +41,8 @@ class ProductController extends Controller
 
 	public function actionAdd($ProductID)
 	{
-		$Product = Products::model()->with('productsFields')->findByPk($ProductID);
-		$Goods = $Product->getGoodsObject();
+		$product = Product::model()->with('productsFields')->findByPk($ProductID);
+		$Goods = $product->getGoodsObject();
 
 		$extPth = CHtml::asset($this->module->getlayoutPath().'/js/chosen/');
         Yii::app()->getClientScript()->registerCssFile($extPth.'/chosen.css');
@@ -62,7 +62,7 @@ class ProductController extends Controller
 			{
 				if(isset($_POST['submit']) && $Goods->save()){
 					$transaction->commit();
-					$this->redirect($this->createUrl('/admin/product/view',array('ProductID'=>$Product->ID)));
+					$this->redirect($this->createUrl('/admin/product/view',array('ProductID'=>$product->ID)));
 				}
 			}
 			catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
@@ -71,9 +71,9 @@ class ProductController extends Controller
 			}
 		}
 
-		$Form = $Goods->getMotelCForm();
+		$form = $Goods->getMotelCForm();
 
-		$this->render('records/add',array('Product'=>$Product,'Form'=>$Form));
+		$this->render('records/add',array('Product'=>$product,'Form'=>$form));
 	}
 
     public function actionEditRecord($ProductID,$RecordID)
@@ -84,8 +84,8 @@ class ProductController extends Controller
         Yii::app()->getClientScript()->registerScriptFile($extPth.'/chosen.jquery.js');
 
 
-		$Product = Products::model()->with('productsFields')->findByPk($ProductID);
-		$Goods = $Product->getGoodsObject();
+		$product = Product::model()->with('productsFields')->findByPk($ProductID);
+		$Goods = $product->getGoodsObject();
         $Goods = $Goods->findByPk($RecordID);
         $Goods->setProductID($ProductID);
 
@@ -102,7 +102,7 @@ class ProductController extends Controller
 			{
 				if(isset($_POST['submit']) && $Goods->save()){
 					$transaction->commit();
-					$this->redirect($this->createUrl('/admin/product/view',array('ProductID'=>$Product->ID)));
+					$this->redirect($this->createUrl('/admin/product/view',array('ProductID'=>$product->ID)));
 				}
 			}
 			catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
@@ -111,15 +111,15 @@ class ProductController extends Controller
 			}
 		}
 
-		$Form = $Goods->getMotelCForm();
+		$form = $Goods->getMotelCForm();
 
-		$this->render('records/edit',array('Product'=>$Product,'Form'=>$Form));
+		$this->render('records/edit',array('Product'=>$product,'Form'=>$form));
 	}
 
     public function actionDeleteRecord($ProductID,$RecordID)
     {
-		$Product = Products::model()->with('productsFields')->findByPk($ProductID);
-		$Goods = $Product->getGoodsObject();
+		$product = Product::model()->with('productsFields')->findByPk($ProductID);
+		$Goods = $product->getGoodsObject();
         $Goods = $Goods->findByPk($RecordID);
         $Goods->setProductID($ProductID);
 
@@ -128,7 +128,7 @@ class ProductController extends Controller
 		{
 			if( $Goods->delete() ){
 				$transaction->commit();
-				$this->redirect($this->createUrl('/admin/product/view',array('ProductID'=>$Product->ID)));
+				$this->redirect($this->createUrl('/admin/product/view',array('ProductID'=>$product->ID)));
 			}
 		}
 		catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
@@ -186,7 +186,7 @@ class ProductController extends Controller
 
 	public function actionDelete($id)
 	{
-		Products::model()->findByPk($id)->delete();
+		Product::model()->findByPk($id)->delete();
 		$this->redirect(array('/admin/product'));
 	}
 
@@ -220,12 +220,12 @@ class ProductController extends Controller
 	}
 
 
-	public function actionFields($productId)
+	public function actionFields($id)
 	{
-		$product = Product::model()->with('productsFields')->findByPk($productId);
+		$product = Product::model()->with('productsFields')->findByPk($id);
 
         $criteria=new CDbCriteria;
-    	$criteria->compare('product_id',$productId);
+    	$criteria->compare('product_id',$id);
         $fields = new CActiveDataProvider('ProductField',array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
 
 		$this->render('fields/index', array(
@@ -234,9 +234,9 @@ class ProductController extends Controller
 		));
 	}
 
-	public function actionAddField($productId)
+	public function actionAddField($id)
 	{
-		$product = Product::model()->findByPk($productId);
+		$product = Product::model()->findByPk($id);
 		$productField = new ProductField('add');
 		$productField->product_id = $product->id;
 
@@ -245,14 +245,14 @@ class ProductController extends Controller
 		$class = null;
 		$fieldType = null;
 		$className = null;
-		if ( isset($_POST['ProductsFields']['FieldType']) )
-			$FieldType = $_POST['ProductsFields']['FieldType'];
+		if ( isset($_POST['ProductField']['field_type']) )
+			$fieldType = $_POST['ProductField']['field_type'];
 
-		if ( $FieldType > 0 && isset(TypeFields::$Fields[$FieldType]['class']) ){
-			$className = TypeFields::$Fields[$FieldType]['class'];
-			$class = $ProductField->CreateField($FieldType);
-			$ArrayForm['elements'][$className] = $class->getElementsMotelCForm();
-			$ProductField->moredata = $class;
+		if ( $fieldType > 0 && isset(TypeField::$Fields[$fieldType]['class']) ){
+			$className = TypeField::$Fields[$fieldType]['class'];
+			$class = $productField->CreateField($fieldType);
+			$arProductFieldForm['elements'][$className] = $class->getElementsMotelCForm();
+			$productField->moredata = $class;
 		}
 
 		$form = new CForm($arProductFieldForm);
@@ -260,25 +260,25 @@ class ProductController extends Controller
 		if( $fieldType > 0 && $class ) $form[$className]->model = $class;
 
 		if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "fieldForm" ){
-			$validate = array($ProductField);
+			$validate = array($productField);
 			if ( $class ) $validate[] = $class;
 			echo CActiveForm::validate($validate);
 			Yii::app()->end();
 		}
 
-		if( isset($_POST['ProductsFields']) ) {
-			$ProductField->attributes = $_POST['ProductsFields'];
+		if( isset($_POST['ProductField']) ) {
+			$productField->attributes = $_POST['ProductField'];
 
             // чтобы сохранять значение
             if( $className && isset($_POST[$className]) )
-                $class->attributes = $_POST[$ClassName];
+                $class->attributes = $_POST[$className];
 
 			$transaction = Yii::app()->db->beginTransaction();
 			try
 			{
-				if ( $ProductField->save() ){
+				if ( $form->submitted() && $productField->save() ){
 					$transaction->commit();
-					$this->redirect($this->createUrl('/admin/product/fields',array('ProductID'=>$Product->ID)));
+					$this->redirect($this->createUrl('/admin/product/fields',array('id'=>$product->id)));
 				} else {
 					throw new CException("Error save");
 				}
@@ -304,113 +304,42 @@ class ProductController extends Controller
 		));
 	}
 
-	public function actionEditField($ProductID,$FieldID)
+	public function actionEditField($productId,$fieldId)
 	{
-		$Product = Products::model()->findByPk($ProductID);
-		$Product->setScenario('edit');
-		$ProductField = ProductsFields::model()->findByPk($FieldID);
-		$ProductField->setScenario('edit');
+		$product = Product::model()->findByPk($productId);
+		$product->setScenario('edit');
+		$productField = ProductField::model()->findByPk($fieldId);
+		$productField->setScenario('edit');
 
-		$ArrayForm = array(
-			'attributes' => array(
-				'enctype' => 'application/form-data',
-				'class' => 'well',
-				'id'=>'FieldForm'
-			),
-			'activeForm' => array(
-				'class' => 'CActiveForm',
-				'enableAjaxValidation' => true,
-				'enableClientValidation' => false,
-				'id' => "FieldForm",
-				'clientOptions' => array(
-					'validateOnSubmit' => true,
-					'validateOnChange' => false,
-				),
-			),
-
-			'elements'=>array(
-				'ProductsFields'=> array(
-					'type'=>'form',
-					'elements'=>array(
-						'FieldType'=>array(
-							'type'  =>  'dropdownlist',
-							'items' =>  TypeFields::getFieldsList(),
-							'empty'=>  '',
-							'disabled'=>'disabled',
-							'ajax' => array(
-								'type'  =>  'POST',
-								'url'   =>  "",
-								'update'=>  '#FieldForm',
-							)
-
-						),
-						'Name'=>array(
-							'type'=>'text',
-							'maxlength'=>255
-						),
-						'Alias'=>array(
-							'type'      =>  'text',
-							'maxlength' =>  255,
-							'disabled'=>'disabled',
-						),
-						'IsMandatory'=>array(
-							'type'=>'checkbox',
-							'layout'=>'{input}{label}{error}{hint}',
-						),
-						'IsFilter'=>array(
-							'type'=>'checkbox',
-							'layout'=>'{input}{label}{error}{hint}',
-						),
-						'IsColumnTable'=>array(
-							'type'=>'checkbox',
-							'layout'=>'{input}{label}{error}{hint}',
-						),
-						'Name'=>array(
-							'type'=>'text',
-							'maxlength'=>255
-						),
-					)
-				)
-			),
-
-			'buttons'=>array(
-				'<br/>',
-				'submit'=>array(
-					'type'  =>  'submit',
-					'label' =>  'Сохранить',
-					'class' =>  "btn"
-				),
-			),
-		);
+		$arProductFieldForm = $productField->getMotelArrayCForm();
 
 		$class = null;
-		$FieldType = null;
+		$fieldType = null;
 		$className = null;
-		$FieldType = $ProductField->FieldType;
-		if ( isset(TypeFields::$Fields[$FieldType]['class']) ){
-			$className = TypeFields::$Fields[$FieldType]['class'];
-			$class = $ProductField::CreateField($FieldType);
-			$class = $class::model()->findByPk($FieldID);
-			$ArrayForm['elements'][$className] = $class->getElementsMotelCForm();
-			$ProductField->moredata = $class;
-
+		$fieldType = $productField->field_type;
+		if ( isset(TypeField::$Fields[$fieldType]['class']) ){
+			$className = TypeField::$Fields[$fieldType]['class'];
+			$class = $productField::CreateField($fieldType);
+			$class = $class::model()->findByPk($fieldId);
+			$arProductFieldForm['elements'][$className] = $class->getElementsMotelCForm();
+			$productField->moredata = $class;
 		}
 
 
-		$Form = new CForm($ArrayForm);
-		$Form['ProductsFields']->model = $ProductField;
+		$form = new CForm($arProductFieldForm);
+		$form['productField']->model = $productField;
 
-		if ( $class ) $Form[$className]->model = $class;
+		if ( $class ) $form[$className]->model = $class;
 
-		if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "FieldForm" ){
-			$validate = array($ProductField);
+		if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "fieldForm" ){
+			$validate = array($productField);
 			if ( $class ) $validate[] = $class;
 			echo CActiveForm::validate($validate);
 			Yii::app()->end();
 		}
 
-		if( isset($_POST['ProductsFields']) ) {
-			$ProductField->attributes = $_POST['ProductsFields'];
+		if( isset($_POST['ProductField']) ) {
+			$productField->attributes = $_POST['ProductField'];
 
             // чтобы сохранять значение
             if( $className && isset($_POST[$className]) )
@@ -419,9 +348,9 @@ class ProductController extends Controller
 			$transaction = Yii::app()->db->beginTransaction();
 			try
 			{
-				if ( $ProductField->save() ){
+				if ( $form->submitted() && $productField->save() ){
 					$transaction->commit();
-					$this->redirect($this->createUrl('/admin/product/fields',array('ProductID'=>$Product->ID)));
+					$this->redirect($this->createUrl('/admin/product/fields',array('id'=>$product->id)));
 				} else {
 					throw new CException("Error save");
 				}
@@ -433,21 +362,21 @@ class ProductController extends Controller
 		}
 
 		$this->render('fields/edit', array(
-			'Product' => $Product,
-			'Form' => $Form,
+			'product' => $product,
+			'form' => $form,
 		));
 	}
 
-	public function actionDeleteField($ProductID,$FieldID)
+	public function actionDeleteField($productId,$fieldId)
 	{
-		$ProductField = ProductsFields::model()->find('ID=:ID AND ProductID=:ProductID',array(':ID'=>$FieldID,'ProductID'=>$ProductID));
+		$productField = ProductField::model()->find('id=:id AND product_id=:product_id',array(':id'=>$fieldId,':product_id'=>$productId));
 
 		$transaction = Yii::app()->db->beginTransaction();
 		try
 		{
-			if( $ProductField->delete() ){
+			if( $productField && $productField->delete() ){
 				$transaction->commit();
-				$this->redirect($this->createUrl('/admin/product/fields',array('ProductID'=>$ProductID)));
+				$this->redirect($this->createUrl('/admin/product/fields',array('id'=>$productId)));
 			}
 		}
 		catch(Exception $e)
@@ -496,10 +425,10 @@ class ProductController extends Controller
 			}
 		}
 
-        $Form = new CForm($List->getCFormArray(),$List);
+        $form = new CForm($List->getCFormArray(),$List);
 
 		$this->render('lists/add', array(
-            "Form" => $Form
+            "Form" => $form
         ));
 	}
 
@@ -531,10 +460,10 @@ class ProductController extends Controller
 			}
 		}
 
-        $Form = new CForm($List->getCFormArray(),$List);
+        $form = new CForm($List->getCFormArray(),$List);
 
 		$this->render('lists/edit', array(
-            "Form" => $Form
+            "Form" => $form
         ));
 	}
 
@@ -644,10 +573,10 @@ class ProductController extends Controller
 			}
 		}
 
-        $Form = new CForm($Item->getCFormArray(),$Item);
+        $form = new CForm($Item->getCFormArray(),$Item);
 
         $this->render('lists/items/edit', array(
-            "Form" => $Form,
+            "Form" => $form,
             "Item" => $Item,
         ));
 	}

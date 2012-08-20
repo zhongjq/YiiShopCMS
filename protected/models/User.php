@@ -16,7 +16,7 @@ class User extends CActiveRecord
     // повтор пароля при регистрации
 	public $passwordRepeat;
 	// капча
-    public	$verifyCode;
+    public $verifyCode;
     // роль
 	public $role;
 	// Запомнить
@@ -59,7 +59,7 @@ class User extends CActiveRecord
 			array('email, password', 'required', 'on' => 'login, registration'),
 			array('password', 'required', 'on' => 'passwordedit'),
 			array('email', 'required', 'on' => 'edit'),
-            array('email', 'email', 'on' => 'login, registration, edit'),
+			array('email', 'email', 'on' => 'login, registration, edit'),
 			// Длина логина должна быть в пределах от 5 до 30 символов
 			array('username', 'length', 'min'=>3, 'max'=>30),
 			// Статус, роль, и сервис цифры
@@ -197,11 +197,11 @@ class User extends CActiveRecord
 				break;
 				case UserIdentity::ERROR_USERNAME_INVALID:
 					// Если логин был указан наверно - создаем ошибку
-					$this->addError('Password','Введено неправильная электронная почта или пароль.');
+					$this->addError('password','Введено неправильная электронная почта или пароль.');
 				break;
 				case UserIdentity::ERROR_PASSWORD_INVALID:
 					// Если пароль был указан наверно - создаем ошибку
-					$this->addError('Password','Вы указали неверный пароль!');
+					$this->addError('password','Вы указали неверный пароль!');
 				break;
 
 			}

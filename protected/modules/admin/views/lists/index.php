@@ -1,31 +1,26 @@
 <?php
-$this->breadcrumbs=array(
-	'Товары'    =>  array('index'),
-	'Редактирование товара #'.$product->id => $this->createUrl('/admin/product/edit',array('id'=>$product->id)),
-	'Поля товара',
-);
+$this->breadcrumbs=array( Yii::t('lists',"Lists") );
 
-$this->renderPartial('fields/secondMenu',array('product'=>$product));
+$this->renderPartial('secondMenu');
 
 
 $this->widget('zii.widgets.grid.CGridView', array(
-	"id"=>'fields',
-	'dataProvider'=>$fields,
+	'dataProvider'=>$lists,
 	'columns' => array(
 		array(
 			'name'=>'id',
-			'htmlOptions'=>array('width'=> '10'),
+			'htmlOptions'=>array(
+				'width'=> '10'
+			),
 		),
 		'name',
-		'name',
-		'alias',
 		array(
-			"name"=>'is_mandatory',
-			'value'=> '$data->is_mandatory ? Yii::t("main","Yes") : Yii::t("main","No")'
+			'type'=>'raw',
+			'value'=>   'sizeof($data->listsItems)'
 		),
 		array(
-			"name"=>'is_filter',
-			'value'=> '$data->is_filter ? Yii::t("main","Yes") : Yii::t("main","No")'
+			'type'=>'raw',
+			'value'=>   'CHtml::link(Yii::t("lists","items"),Yii::app()->createUrl("admin/lists/items",array("id"=>$data->id)));'
 		),
 		array(
 			'htmlOptions'=>array('width'=>'10'),
@@ -33,7 +28,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 			'template'=>'{update}',
 			'buttons'=> array(
 				'update' => array(
-					'url'=> 'Yii::app()->createUrl("/admin/product/editfield",array("productId"=>'.$product->id.',"fieldId"=>$data->id) )',
+					'url'=> 'Yii::app()->createUrl("/admin/lists/edit",array("id"=>$data->id) )',
 					'imageUrl'=>null,
 					'label'=>'<span class="icon-pencil pointer" title="'.Yii::t('main','Редактировать').'"></span>'
 				)
@@ -45,7 +40,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 			'template'=>'{delete}',
 			'buttons'=> array(
 				'delete' => array(
-					'url'=> 'Yii::app()->createUrl("/admin/product/deletefield",array("productId"=>'.$product->id.',"fieldId"=>$data->id) )',
+					'url'=> 'Yii::app()->createUrl("/admin/lists/delete",array("id"=>$data->id) )',
 					'imageUrl'=>null,
 					'label'=>'<span class="close" title="'.Yii::t('main','Удалить').'">&times;</span>'
 				)
@@ -57,11 +52,11 @@ $this->widget('zii.widgets.grid.CGridView', array(
 	),
 	'itemsCssClass'=>'table table-bordered table-striped',
 	'template'=>'{summary} {items} {pager}',
-	'emptyText' => $this->renderPartial('fields/noResult',array('product'=>$product),true),
+	'emptyText' => $this->renderPartial('noResult',null,true),
 	'pagerCssClass'=>'pagination',
 	'pager'=>array(
 		'class'         =>'myLinkPager',
-		'cssFile'        => false,
+		'cssFile'    	=> false,
 		'header'        => '',
 		'firstPageLabel'=> '&laquo;',
 		'prevPageLabel'	=> '&larr;',

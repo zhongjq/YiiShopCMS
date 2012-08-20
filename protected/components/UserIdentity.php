@@ -23,7 +23,7 @@ class UserIdentity extends CUserIdentity {
 
         // Производим стандартную аутентификацию, описанную в руководстве.
         $user = User::model()->find('LOWER(email)= ?', array(strtolower($this->_email)));
-		
+
 		if( ($user===null) or (md5($this->_password)!==$user->password) ) {
             $this->errorCode = self::ERROR_USERNAME_INVALID;
         } else {
@@ -38,10 +38,9 @@ class UserIdentity extends CUserIdentity {
         }
        return !$this->errorCode;
     }
- 
+
     public function getId()
     {
         return $this->_id;
     }
-
 }

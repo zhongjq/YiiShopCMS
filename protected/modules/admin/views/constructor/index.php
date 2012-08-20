@@ -1,10 +1,7 @@
 <?php
-$this->breadcrumbs=array(
-	'Товары',
-);
+	$this->breadcrumbs=array( Yii::t("products", "Constructor Goods") );
 
-$this->renderPartial('secondMenu');
-
+	$this->renderPartial('secondMenu');
 ?>
 
 <?php
@@ -18,7 +15,7 @@ $this->renderPartial('secondMenu');
             'name',
             array(
                 'type'=>'raw',
-                'value'=>'CHtml::link("поля", Yii::app()->createUrl("/admin/product/fields",array("id"=>$data->id)) )',
+                'value'=>'CHtml::link("поля", Yii::app()->createUrl("/admin/constructor/fields",array("id"=>$data->id)) )',
                  'htmlOptions'=>array('width'=> '40'),
             ),
             array(
@@ -27,7 +24,7 @@ $this->renderPartial('secondMenu');
                 'template'=>'{update}',
                 'buttons'=> array(
                     'update' => array(
-                        'url'=> 'Yii::app()->createUrl("/admin/product/edit",array("id"=>$data->id))',
+                        'url'=> 'Yii::app()->createUrl("/admin/constructor/edit",array("id"=>$data->id))',
                         'imageUrl'=>null,
                         'label'=>'<span class="icon-pencil pointer" title="'.Yii::t('main','Редактировать').'"></span>'
                     )
@@ -39,7 +36,7 @@ $this->renderPartial('secondMenu');
                 'template'=>'{delete}',
                 'buttons'=> array(
                     'delete' => array(
-                        'url'=> 'Yii::app()->createUrl("/admin/product/delete",array("id"=>$data->id))',
+                        'url'=> 'Yii::app()->createUrl("/admin/constructor/delete",array("id"=>$data->id))',
                         'imageUrl'=>null,
                         'label'=>'<span class="close" title="'.Yii::t('main','Удалить').'">&times;</span>'
                     )

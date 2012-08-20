@@ -70,8 +70,8 @@ class ProductField extends CActiveRecord
 	public function relations()
 	{
 		return array(
-            'Product'       => array(self::BELONGS_TO, 'Product', 'product_id'),
-    		
+            'product'       => array(self::BELONGS_TO, 'Product', 'product_id'),
+
 			'IntegerFields' => array(self::HAS_ONE, 'IntegerFields', 'FieldID'),
 			'PriceFields'   => array(self::HAS_ONE, 'PriceFields', 'FieldID'),
 			'StringFields'  => array(self::HAS_ONE, 'StringFields', 'FieldID'),
@@ -87,6 +87,7 @@ class ProductField extends CActiveRecord
 	{
 		return array(
 			'id'            =>  Yii::t("fields",'ID'),
+			'position'     =>  Yii::t("fields",'Приоритет'),
 			'product_id'     =>  Yii::t("fields",'Идентификатор продукта'),
 			'field_type'     =>  Yii::t("fields",'Тип поля'),
 			'name'          =>  Yii::t("fields",'Наименование'),
@@ -95,7 +96,8 @@ class ProductField extends CActiveRecord
 			'is_filter'      =>  Yii::t("fields",'Использовать в фильтрации'),
 			'is_column_table' =>  Yii::t("fields",'Used In Table Header?'),
 			'unitName'      =>  Yii::t("fields",'Used In Table Header?'),
-			'hint'          =>  Yii::t("fields",'Used In Table Header?'),
+			'hint'          =>  Yii::t("fields",'Hint'),
+			'fields'			=>	Yii::t("fields",'Fields'),
 		);
 	}
 
@@ -147,13 +149,13 @@ class ProductField extends CActiveRecord
 					'elements'=>array(
 						'field_type'=>array(
 							'type'  =>  'dropdownlist',
-							'items' =>  TypeFields::getFieldsList(),
+							'items' =>  TypeField::getFieldsList(),
 							'empty'=>  '',
 
 							'ajax' => array(
 								'type'  =>  'POST',
 								'url'   =>  "",
-								'replace'=>  '#FieldForm',
+								'replace'=>  '#fieldForm',
 							)
 
 						),
@@ -193,26 +195,23 @@ class ProductField extends CActiveRecord
 	}
 
 	public static function CreateField($FieldType){
-		if ( !isset(TypeFields::$Fields[$FieldType]['class']) ){
+		if ( !isset(TypeField::$Fields[$FieldType]['class']) ){
 			throw new CException("NOT NUMERIC");
 		}
 
-		return new TypeFields::$Fields[$FieldType]['class']('add');
+		return new TypeField::$Fields[$FieldType]['class']('add');
 	}
-
 
 	public function afterSave(){
 		parent::afterSave();
 
 		if ( $this->moredata ) {
-			$this->moredata->FieldID = $this->ID;
+			$this->moredata->field_id = $this->id;
 			if ( $this->moredata->save() ){
-				$Product = Products::model()->findByPk($this->ProductID);
-
 				if ($this->isNewRecord)
-					Yii::app()->db->createCommand()->addColumn( $Product->Alias,
-						$this->Alias,
-						TypeFields::$Fields[$this->FieldType]['dbType']
+					Yii::app()->db->createCommand()->addColumn( $this->product->alias,
+						$this->alias,
+						TypeField::$Fields[$this->field_type]['dbType']
 					);
 
 				return true;
@@ -222,7 +221,6 @@ class ProductField extends CActiveRecord
 
 	public function afterDelete(){
 		parent::afterDelete();
-		$Product = Products::model()->findByPk($this->ProductID);
-		Yii::app()->db->createCommand()->dropColumn( $Product->Alias, $this->Alias );
+		Yii::app()->db->createCommand()->dropColumn( $this->product->alias, $this->alias );
 	}
 }
