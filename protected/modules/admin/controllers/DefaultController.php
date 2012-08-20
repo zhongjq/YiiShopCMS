@@ -6,7 +6,7 @@ class DefaultController extends Controller
 	public function filters()
 	{
 		return array(
-			'accessControl', // perform access control for CRUD operations
+			'accessControl',
 		);
 	}
 
@@ -24,24 +24,23 @@ class DefaultController extends Controller
 
 	public function actionLogin()
 	{
-
-		$User = new Users('login');
+		$user = new User('login');
 
 		if (!Yii::app()->user->isGuest) {
 			throw new CHttpException(403,'Недостаточно прав!');
 		} else {
-			if (!empty($_POST['Users'])) {
-				$User->attributes = $_POST['Users'];
-				if($User->validate()) {
+			if (!empty($_POST['User'])) {
+				$user->attributes = $_POST['User'];
+				if($user->validate()) {
 					$this->redirect( $this->createUrl('/admin') );
 				}
 			}
 
 		}
 
-		$Form = new CForm( $User->getArrayLoginCForm(), $User );
+		$form = new CForm( $user->getArrayLoginCForm(), $user );
 
-		$this->render('login', array('Form'=>$Form) );
+		$this->render('login', array('form'=>$form) );
 	}
 
 	public function actionLogout()

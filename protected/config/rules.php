@@ -15,16 +15,19 @@ return array(
 				// подтверждение регистрации
 				'/confirmation/<code>' => 'site/confirmation',
 
-
+                
                 /* АДМИНИСТРАТИРОВАНИЕ */
                 "/admin/<action:(login|logout)>" => "admin/default/<action>",
                 // Категории
-                '/admin/category/<action:(add|edit|delete)>/<id>'   =>  'admin/category/<action>',
+                '/admin/categories' => 'admin/category/index',
+                '/admin/category/<action:(add|edit|delete)>/<id>' => 'admin/category/<action>',
+                '/category/<alias>' => '/category/view',
                 // Производители
-                '/admin/manufacturer/<action:(add|edit|delete)>/<ManufacturerID>'   =>  'admin/manufacturers/<action>',
-
+                '/admin/manufacturers' => 'admin/manufacturer/index',
+                '/admin/manufacturer/<action:(add|edit|delete)>/<id>' => 'admin/manufacturer/<action>',
+                '/manufacturer/<alias>' => '/manufacturer/view',
 				// Пользователи
-		        '/admin/user/<action:(edit|view|delete|passwordedit)>/<id>' =>  'admin/users/<action>',
+		        '/admin/user/<action:(edit|view|delete|passwordedit)>/<id>' => 'admin/users/<action>',
                 // Продукты
 		        '/admin/products' => 'admin/product/index',
 
@@ -42,9 +45,6 @@ return array(
                 '/admin/products/list/<ListID:\d+>/items'                   =>  'admin/product/itemslist',
                 '/admin/products/list/<ListID:\d+>/items/add'               =>  'admin/product/additems',
                 '/admin/products/list/<ListID:\d+>/item/<action:(edit|delete)>/<ItemID:\d+>'  =>  'admin/product/<action>item',
-
-                // Категории
-		        '/category/<Alias>' => '/categories/view/',
 
 		         // своё правило для URL вида '/Производитель/Модель'
 		         array(

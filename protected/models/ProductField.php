@@ -14,7 +14,7 @@
  * The followings are the available model relations:
  * @property Products $product
  */
-class ProductsFields extends CActiveRecord
+class ProductField extends CActiveRecord
 {
 	public $moredata;
 	/**
@@ -32,7 +32,7 @@ class ProductsFields extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'ProductsFields';
+		return 'product_field';
 	}
 
 	/**
@@ -43,22 +43,20 @@ class ProductsFields extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('FieldType, Name, Alias', 'required', 'on'=>'add, edit'),
-			array('ProductID, FieldType, IsMandatory, IsFilter', 'numerical', 'integerOnly'=>true),
-			array('Name', 'length', 'max'=>255),
-			array('Alias', 'length', 'max'=>50),
-			array('Name, Alias', 'unique', 'criteria' => array(
-												'condition' => 'ProductID = :ProductID',
-												'params'=>array(':ProductID'=> $this->ProductID )
+			array('field_type, name, alias', 'required', 'on'=>'add, edit'),
+			array('product_id, field_type, is_mandatory, is_filter', 'numerical', 'integerOnly'=>true),
+			array('name', 'length', 'max'=>255),
+			array('alias', 'length', 'max'=>50),
+			array('name, alias', 'unique', 'criteria' => array(
+												'condition' => 'product_id = :product_id',
+												'params'=>array(':product_id'=> $this->ProductID )
 											)),
 
-
-			array('IsColumnTable', 'boolean'),
-			array('Alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u',
-				'message' => Yii::t("AdminModule.products",'Field contains invalid characters.')),
+			array('is_column_table', 'boolean'),
+			array('alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u','message' => Yii::t("products",'Field contains invalid characters.')),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('ID, ProductID, FieldType, Name, IsMandatory, IsFilter', 'safe', 'on'=>'search'),
+			array('id, product_id, field_type, name, is_mandatory, is_filter', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -71,12 +69,11 @@ class ProductsFields extends CActiveRecord
 	 */
 	public function relations()
 	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
 		return array(
+            'Product'       => array(self::BELONGS_TO, 'Product', 'product_id'),
+    		
 			'IntegerFields' => array(self::HAS_ONE, 'IntegerFields', 'FieldID'),
 			'PriceFields'   => array(self::HAS_ONE, 'PriceFields', 'FieldID'),
-			'Product'       => array(self::BELONGS_TO, 'Products', 'ProductID'),
 			'StringFields'  => array(self::HAS_ONE, 'StringFields', 'FieldID'),
 			'TextFields'    => array(self::HAS_ONE, 'TextFields', 'FieldID'),
             'ListFields'    => array(self::HAS_ONE, 'ListFields', 'FieldID'),

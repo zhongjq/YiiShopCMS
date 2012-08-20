@@ -38,12 +38,12 @@
 	    <div class="container-fluid">
 		    <div class="row-fluid">
 			    <div class="span3">
-				    <?php $this->widget('CategoriesWidget', array("ID"=>1) ) ?>
-					<?php $this->widget('ManufacturersWidget', array("title"=>"Производители") ) ?>
+				    <?php $this->widget('Categories', array('title'=>"Категории",'id'=>2) ) ?>
+					<?php $this->widget('Manufacturers', array("title"=>"Производители") ) ?>
 			    </div>
 			    <div class="span9">
 				    <?php echo $content; ?>
-				    <?=CHtml::link('О проекте',$this->createUrl('/products/view/',array('product'=>'bus',"id"=>"asd")))?>
+				    <?=CHtml::link('О проекте',$this->createUrl('/products/view',array('product'=>'bus',"id"=>"asd")))?>
 			    </div>
 		    </div>
 	    </div>

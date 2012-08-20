@@ -30,9 +30,9 @@ class UrlRule extends CBaseUrlRule
 		if (preg_match('%^(\w+)(/(\w+))?$%', $pathInfo, $matches))
 		{
 			// Ищем товар
-			if ( Products::model()->find('Alias=:Alias', array(':Alias'=>$matches[1])) ){
+			if ( Product::model()->find('alias=:alias', array(':alias'=>$matches[1])) ){
 				$_GET['alias'] = $matches[1];
-				return 'products/index';
+				return 'product/index';
 			}
 		}
 		return false;  // не применяем данное правило
