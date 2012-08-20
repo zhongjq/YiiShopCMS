@@ -10,11 +10,11 @@
  * @property string $Name
  * @property string $Desctiprion
  */
-class Manufacturers extends CActiveRecord
+class Manufacturer extends CActiveRecord
 {
-	public $LogoFile;
-	public $OldLogoFile;
-	public $IsDeleteLogoFile;
+	public $logoFile;
+	public $oldLogoFile;
+	public $isDeleteLogoFile;
 
 	public function __construct($scenario = 'add')
 	{
@@ -29,37 +29,30 @@ class Manufacturers extends CActiveRecord
 		return parent::model($className);
 	}
 
-	/**
-	 * @return string the associated database table name
-	 */
 	public function tableName()
 	{
-		return 'Manufacturers';
+		return 'manufacturer';
 	}
 
 	public function rules()
 	{
-		// NOTE: you should only define rules for those attributes that
-		// will receive user inputs.
 		return array(
-			array('Alias, Name', 'required', 'on'=>'add, edit'),
-			array('Status, IsDeleteLogoFile', 'numerical', 'integerOnly'=>true),
-    		array('Alias, Name', 'length', 'max'=>255),
-			array('Alias, Name', 'unique'),
-    		array('Alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u',
+			array('alias, name', 'required', 'on'=>'add, edit'),
+			array('status, isDeleteLogoFile', 'numerical', 'integerOnly'=>true),
+    		array('alias, name', 'length', 'max'=>255),
+			array('alias, name', 'unique'),
+    		array('alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u',
 				    'message' => Yii::t("manufacturers",'Alias contains invalid characters.')),
-			array('Description', 'safe'),
-            array('Logo', 'file', 'types'=>'jpg, gif, png', 'maxSize' => 1048576, 'allowEmpty'=>true ),
+			array('description', 'safe'),
+            array('logo', 'file', 'types'=>'jpg, gif, png', 'maxSize' => 1048576, 'allowEmpty'=>true ),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('ID, Status, Alias, Name, Description', 'safe', 'on'=>'search'),
+			array('id, status, alias, name, description', 'safe', 'on'=>'search'),
 		);
 	}
 
 	public function relations()
 	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
 		return array(
 		);
 	}
@@ -67,13 +60,13 @@ class Manufacturers extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'ID' => 'ID',
-    		'Status'		=>	Yii::t("manufacturers",'Status'),
-			'Alias'			=>	Yii::t("manufacturers",'Alias'),
-			'Name'			=>	Yii::t("manufacturers",'Name'),
-			'Description'	=>	Yii::t("manufacturers",'Description'),
-			'Logo'			=>	Yii::t("manufacturers",'Logo'),
-			'IsDeleteLogoFile' => Yii::t("manufacturers",'Delete an existing logo?'),
+			'id' => 'ID',
+    		'status'		=>	Yii::t("manufacturers",'Status'),
+			'alias'			=>	Yii::t("manufacturers",'Alias'),
+			'name'			=>	Yii::t("manufacturers",'Name'),
+			'description'	=>	Yii::t("manufacturers",'Description'),
+			'logo'			=>	Yii::t("manufacturers",'Logo'),
+			'isDeleteLogoFile' => Yii::t("manufacturers",'Delete an existing logo?'),
 		);
 	}
 
@@ -102,13 +95,13 @@ class Manufacturers extends CActiveRecord
     		'attributes' => array(
 				'enctype' => 'multipart/form-data',
 				'class' => 'well',
-				'id'=>'ManufacturersForm'
+				'id'=>'ManufacturerForm'
 			),
 			'activeForm' => array(
 				'class' => 'CActiveForm',
 				'enableAjaxValidation' => false,
 				'enableClientValidation' => false,
-				'id' => "ManufacturersForm",
+				'id' => "ManufacturerForm",
 				'clientOptions' => array(
 					'validateOnSubmit' => false,
 					'validateOnChange' => false,
@@ -116,23 +109,23 @@ class Manufacturers extends CActiveRecord
 			),
 
     		'elements'=>array(
-        		'Status'=>array(
+        		'status'=>array(
         			'type'=>'checkbox',
     				'layout'=>'{input}{label}{error}{hint}',
     			),
-    			'Name'=>array(
+    			'name'=>array(
     				'type'=>'text',
     				'maxlength'=>255
     			),
-    			'Alias'=>array(
+    			'alias'=>array(
     				'type'=>'text',
     				'maxlength'=>255
     			),
-    			'Description'=>array(
+    			'description'=>array(
     				'type'=>'textarea',
     				'rows'=>5
     			),
-        		'Logo'=>array(
+        		'logo'=>array(
     				'type'=>'file',
 					'class'=>'input-file'
     			),
@@ -148,9 +141,9 @@ class Manufacturers extends CActiveRecord
         );
 
 		// если есть логотип
-		if ( $this->Logo ){
-			$file = Yii::getPathOfAlias('manufacturersurl').'/'.$this->Logo;
-			$form['elements']['IsDeleteLogoFile'] = array(
+		if ( $this->logo ){
+			$file = Yii::getPathOfAlias('manufacturersurl').'/'.$this->logo;
+			$form['elements']['isDeleteLogoFile'] = array(
         		'type'=>'checkbox',
     			'layout'=>'{input}{label}{error}{hint}',
 				'hint'=> CHtml::link('просмотреть',  $file , array("id"=>"fancy-link")),
@@ -164,21 +157,21 @@ class Manufacturers extends CActiveRecord
 	protected function beforeSave()
 	{
 		if (parent::beforeSave() ){
-			$this->Logo = $this->OldLogoFile;
+			$this->logo = $this->oldLogoFile;
 
 			// если стоит галка удалить логотип
-			if ( $this->IsDeleteLogoFile ){
-				if ( $this->deleteLogoFile() ) $this->Logo = null;
+			if ( $this->isDeleteLogoFile ){
+				if ( $this->deleteLogoFile() ) $this->logo = null;
 			}
 
-			if ( $this->LogoFile ){
+			if ( $this->logoFile ){
 				// если загружается новый файл то удаляем старый
 				if ( $this->deleteLogoFile() )
-					$this->Logo = null;
+					$this->logo = null;
 				else
 					throw new CException("Не могу удалить файл");
 				// получаем новый
-				$this->Logo = Controller::translit($this->Name).'.'.$this->LogoFile->getExtensionName();
+				$this->logo = Controller::translit($this->name).'.'.$this->logoFile->getExtensionName();
 			}
 
 			return true;
@@ -192,9 +185,9 @@ class Manufacturers extends CActiveRecord
 	{
 		parent::afterSave();
 
-		if ( $this->LogoFile ){
-			$file = Yii::getPathOfAlias('manufacturersfiles').'/'.$this->Logo;
-			$this->LogoFile->saveAs($file);
+		if ( $this->logoFile ){
+			$file = Yii::getPathOfAlias('manufacturersfiles').'/'.$this->logo;
+			$this->logoFile->saveAs($file);
 			/*
 			Yii::import('ext.wideimage.WideImage');
 			WideImage::load($file)->resize(50, 30)->saveToFile('small.jpg');
@@ -217,21 +210,21 @@ class Manufacturers extends CActiveRecord
 
 	// удаление логотипа
 	public function deleteLogoFile(){
-		if ( $this->Logo ){
-			$NameFileLogo = Yii::getPathOfAlias('manufacturersfiles').DIRECTORY_SEPARATOR.$this->Logo;
+		if ( $this->logo ){
+			$nameFileLogo = Yii::getPathOfAlias('manufacturersfiles').DIRECTORY_SEPARATOR.$this->logo;
 
-			return (is_file($NameFileLogo) && is_writable($NameFileLogo) && unlink($NameFileLogo) ) ? true : false;
+			return (is_file($nameFileLogo) && is_writable($nameFileLogo) && unlink($nameFileLogo) ) ? true : false;
 		}
 		return true;
 	}
 
-	public static function getMenuArray($Manufacturers) {
-
+	public static function getMenuArray($manufacturers) {
 		$return = array();
-		foreach ($Manufacturers as $Manufacturer) {
-            $return[] = array(	'label'     =>  CHtml::encode($Manufacturer->Name),
-								'url'       =>  array('manufacturers/view','alias'=>$Manufacturer->Alias),
-								'active'    =>  CHttpRequest::getParam('alias') == $Manufacturer->Alias,
+        
+		foreach ($manufacturers as $manufacturer) {
+            $return[] = array(	'label'     =>  CHtml::encode($manufacturer->name),
+								'url'       =>  array('manufacturer/view','alias'=>$manufacturer->alias),
+								'active'    =>  CHttpRequest::getParam('alias') == $manufacturer->alias,
 						      );
 		}
 

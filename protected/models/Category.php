@@ -46,7 +46,7 @@ class Category extends CActiveRecord
 			array('lft, rgt, level, status, parentId', 'numerical', 'integerOnly'=>true),
 			array('alias, name', 'length', 'max'=>255),
 			array('alias, name', 'unique'),
-    		array('alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u',
+    		array('alias', 'match', 'pattern' => '/^[A-Za-z0-9-]+$/u',
 				    'message' => Yii::t("categories",'Alias contains invalid characters.')),
 			array('description', 'safe'),
 			// The following rule is used by search().
@@ -125,9 +125,9 @@ class Category extends CActiveRecord
 	public function getListCategories(){
 		$return = array();
 
-		$Categories = Categories::model()->findAll(array('order'=>'lft'));
-		foreach($Categories as $Category){
-			$return[$Category->id] = $Category->name;
+		$categories = Category::model()->findAll(array('order'=>'lft'));
+		foreach($categories as $category){
+			$return[$category->id] = $Category->name;
 		}
 
 		return $return;
@@ -136,25 +136,26 @@ class Category extends CActiveRecord
 	public static function getMenuItems($items, $start = 0) {
 
 		$return = array();
-		$SizeMenu = sizeof($items);
-		for( $i = $start; $i < $SizeMenu; $i++ ){
-            $return[$i] = array(	'label'     =>  CHtml::encode($items[$i]->Name),
-									'url'       =>  array('/categories/view/','Alias'=>$items[$i]->Alias),
-									'active'    =>  CHttpRequest::getParam('Alias') == $items[$i]->Alias,
-						      );
-
-			$cn = $items[$i]->rgt - $items[$i]->lft;
-			if ( $cn != 1 ){
-				$return[$i]['items'] = Category::getMenuItems($items,$i+1);
-				$i = ceil( $cn/2 );
-			}
-		}
+		$sizeMenu = sizeof($items);
+        if ( $sizeMenu > 0 )
+    		for( $i = $start; $i < $sizeMenu; $i++ ){
+                $return[$i] = array(	'label'     =>  CHtml::encode($items[$i]->name),
+    									'url'       =>  array('/category/view','alias'=>$items[$i]->alias),
+    									'active'    =>  CHttpRequest::getParam('alias') == $items[$i]->alias,
+    						      );
+    
+    			$cn = $items[$i]->rgt - $items[$i]->lft;
+    			if ( $cn != 1 ){
+    				$return[$i]['items'] = Category::getMenuItems($items,$i+1);
+    				$i = ceil( $cn/2 );
+    			}
+    		}
 
         return $return;
 	}
 
-	public static function getMenuArray($items) {
-		return Categories::getMenuItems($items);
+	public static function getMenuArray($items) {        
+		return ( is_array($items) && !empty($items) ) ? Category::getMenuItems($items) : null;
 	}
 
     // форма в формате CForm

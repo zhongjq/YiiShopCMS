@@ -2,22 +2,22 @@
 $this->pageTitle	=	Yii::t("manufacturers", "Manufacturers");
 $this->breadcrumbs	=	array(Yii::t("manufacturers", "Manufacturers"));
 
-$this->renderPartial('SecondMenu');
+$this->renderPartial('secondMenu');
 
 $this->widget('zii.widgets.grid.CGridView', array(
-	'dataProvider'	=>	$Manufacturers,
+	'dataProvider'	=>	$manufacturers,
 	'enableSorting'	=>	false,
 	'ajaxUpdate'	=>	false,
 	'columns' => array(
-		array('name'=>'ID','htmlOptions'=>array('width'=>'10')),
-		array('name'=>'Name','value'=>'$data->Name'),
+		array('name'=>'id','htmlOptions'=>array('width'=>'10')),
+		array('name'=>'name','value'=>'$data->name'),
 		array(
 			'htmlOptions'=>array('width'=>'10'),
 			'class'=>'CButtonColumn',
 			'template'=>'{update}',
 			'buttons'=> array(
 				'update' => array(
-					'url'=> 'Yii::app()->createUrl("/admin/manufacturers/edit",array("ManufacturerID"=>$data->ID) )',
+					'url'=> 'Yii::app()->createUrl("/admin/manufacturer/edit",array("id"=>$data->id) )',
 					'imageUrl'=>null,
 					'label'=>'<span class="icon-pencil pointer" title="'.Yii::t('main','Edit').'"></span>'
 				)
@@ -29,7 +29,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 			'template'=>'{delete}',
 			'buttons'=> array(
 				'delete' => array(
-					'url'=> 'Yii::app()->createUrl("/admin/manufacturers/delete",array("ManufacturerID"=>$data->ID) )',
+					'url'=> 'Yii::app()->createUrl("/admin/manufacturer/delete",array("id"=>$data->id) )',
 					'imageUrl'=>null,
 					'label'=>'<span class="close" title="'.Yii::t('main','Delete').'">&times;</span>'
 				)

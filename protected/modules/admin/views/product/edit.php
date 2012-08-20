@@ -1,15 +1,15 @@
 <?php
 $this->breadcrumbs=array(
 	'Товары'    =>  array('index'),
-	'Редактирование товара #'.$Product->ID,
+	'Редактирование товара #'.$product->id,
 );
 
 $this->SecondMenu=array(
 	array(  'label' => 'Поля',
-			'url'   => $this->createUrl('/admin/product/fields',array('ProductID'=>$Product->ID)),
+			'url'   => $this->createUrl('/admin/product/fields',array('productId'=>$product->id)),
 			'active'=> $this->getAction()->getId() == 'fields' ),
 );
 
-echo $Form;
+echo $form;
 
 ?>

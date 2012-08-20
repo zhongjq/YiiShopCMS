@@ -4,15 +4,18 @@
  * This is the model class for table "Products".
  *
  * The followings are the available columns in table 'Products':
- * @property integer $ID
- * @property integer $Status
- * @property string $Name
- * @property string $Alias
+ * @property integer $id
+ * @property integer $status
+ * @property string $name
+ * @property string $alias
+ * @property string $title
+ * @property string $keywords
+ * @property string $description 
  *
  * The followings are the available model relations:
  * @property ProductsFields[] $productsFields
  */
-class Products extends CActiveRecord
+class Product extends CActiveRecord
 {
 	/**
 	 * Returns the static model of the specified AR class.
@@ -29,7 +32,7 @@ class Products extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'Products';
+		return 'product';
 	}
 
 	/**
@@ -40,17 +43,16 @@ class Products extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('Name, Alias', 'required', 'on'=>'create, edit'),
-			array('Status', 'numerical', 'integerOnly'=>true),
-			array('Name', 'length', 'max'=>255),
-			array('Alias', 'length', 'max'=>50),
-			array('Name,Alias', 'unique'),
-			array('Title, Keywords, Description', 'safe'),
-			array('Alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u',
-					'message' => Yii::t("AdminModule.products",'Field contains invalid characters.')),
+			array('name, alias', 'required', 'on'=>'create, edit'),
+			array('status', 'numerical', 'integerOnly'=>true),
+			array('name', 'length', 'max'=>255),
+			array('alias', 'length', 'max'=>50),
+			array('name, alias', 'unique'),
+			array('title, keywords, description', 'safe'),
+			array('alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u', 'message' => Yii::t("products",'Field contains invalid characters.') ),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('ID, Status, Name, Alias', 'safe', 'on'=>'search'),
+			array('id, status, name, alias', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -59,10 +61,8 @@ class Products extends CActiveRecord
 	 */
 	public function relations()
 	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
 		return array(
-			'productsFields' => array(self::HAS_MANY, 'ProductsFields', 'ProductID'),
+			'productsFields' => array(self::HAS_MANY, 'ProductField', 'product_id'),
 		);
 	}
 
@@ -72,13 +72,13 @@ class Products extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'ID'        => 'ID',
-			'Status'    => Yii::t('products','Status'),
-			'Name'      => Yii::t('products','Name'),
-			'Alias'     => Yii::t('products','Alias'),
-			'Title'     => Yii::t('products','Title'),
-			'Keywords'      => Yii::t('products','Keywords'),
-			'Description'   => Yii::t('products','Description'),
+			'id'        => 'ID',
+			'status'    => Yii::t('products','Status'),
+			'name'      => Yii::t('products','Name'),
+			'alias'     => Yii::t('products','Alias'),
+			'title'     => Yii::t('products','Title'),
+			'keywords'      => Yii::t('products','Keywords'),
+			'description'   => Yii::t('products','Description'),
 		);
 	}
 
@@ -178,26 +178,26 @@ class Products extends CActiveRecord
 			),
 
 			'elements'=>array(
-				'Status'=>array(
+				'status'=>array(
 					'type'=>'checkbox',
 					'layout'=>'{input}{label}{error}{hint}',
 				),
-				'Name'=>array(
+				'name'=>array(
 					'type'=>'text',
 					'maxlength'=>255
 				),
-				'Alias'=>array(
+				'alias'=>array(
 					'type'      =>  'text',
 					'maxlength' =>  255,
 					"disabled".$this->isNewRecord  =>  "disabled1",
 				),
-				'Title'=>array(
+				'title'=>array(
 					'type'=>'textarea','class'=>"span5"
 				),
-				'Keywords'=>array(
+				'keywords'=>array(
 					'type'=>'textarea','class'=>"span5"
 				),
-				'Description'=>array(
+				'description'=>array(
 					'type'=>'textarea','class'=>"span5",'rows'=>5
 				),
 			),

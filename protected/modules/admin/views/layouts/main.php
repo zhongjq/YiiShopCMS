@@ -147,7 +147,7 @@
 				<li><?=CHtml::link('О проекте',$this->createUrl('/page/about'))?></li>
 			</ul>
 			<?php
-				if ( !Yii::app()->user->isGuest && YII_DEBUG && Yii::app()->user->Role == "Administrator" ) {
+				if ( !Yii::app()->user->isGuest && YII_DEBUG && Yii::app()->user->role == "Administrator" ) {
 					echo '<br/>Отработало за ' . sprintf('%0.5f', Yii::getLogger()->getExecutionTime()) . ' с. ';
 					echo 'Скушано памяти: ' . round(memory_get_peak_usage() / (1024 * 1024), 2) . ' MB <br>';
 					$sql_stats = YII::app()->db->getStats();

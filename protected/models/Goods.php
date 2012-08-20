@@ -64,7 +64,7 @@ class Goods extends CActiveRecord
 							case TypeFields::CATEGORIES :
 									$this->TableFields[] = array(
 										'name' => $Field->Alias,
-										'value' => '$data->getRecordCategories("'.$Field->Alias.'")'
+										'value' => '$data->getRecordCategory("'.$Field->Alias.'")'
 									);
 							break;
 							default:
@@ -91,12 +91,12 @@ class Goods extends CActiveRecord
        return implode($sSep, $aRes);
     }
 
-    public function getRecordCategories($Name, $sSep = ', ')
+    public function getRecordCategory($name, $sSep = ', ')
 	{
-
        $aRes = array();
-       foreach ($this->{$Name} as $Item) {
-          $aRes[] = $Item->Name;
+       
+       foreach ($this->{$name} as $Item) {
+          $aRes[] = $Item->name;
        }
 
        return implode($sSep, $aRes);
@@ -180,7 +180,7 @@ class Goods extends CActiveRecord
 					break;
 
     				case TypeFields::CATEGORIES :
-						$Form['elements'][$Field->Alias]['items'] = CHtml::listData(Categories::model()->findAll(), 'ID', 'Name');
+						$Form['elements'][$Field->Alias]['items'] = CHtml::listData(Category::model()->findAll(), 'ID', 'Name');
 
 							$selected = array();
 							if ( $this->{$Field->Alias} ) {
@@ -242,7 +242,7 @@ class Goods extends CActiveRecord
 					case TypeFields::CATEGORIES :
 
     						$relations[$Field->Alias] = array(	self::MANY_MANY,
-																		'Categories', 'RecordsCategories(RecordID, CategoryID)',
+																		'Category', 'record_category(record_id, category_id)',
 																		//'on' => 'ProductID = ' .$this->getProductID()
 
 																	);

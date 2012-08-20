@@ -8,28 +8,27 @@
  * @property integer $Status
  * @property integer $RoleID
  * @property string $RegistrationDateTime
- * @property integer $ServiceID
- * @property string $ServiceUserID
  * @property string $Email
  * @property string $Password
  */
-class Users extends CActiveRecord
+class User extends CActiveRecord
 {
-	public $PasswordRepeat;
+    // повтор пароля при регистрации
+	public $passwordRepeat;
 	// капча
-    public	$VerifyCode;
-
-	public $Role;
+    public	$verifyCode;
+    // роль
+	public $role;
 	// Запомнить
-	public $Remember;
+	public $remember;
 	// Язык пользователя
-	public $Language;
+	public $language;
 
 	public function __construct($scenario = 'insert') {
 		parent::__construct($scenario);
 
 		if(isset(Yii::app()->request->cookies['language']))
-			$this->Language = Yii::app()->request->cookies['language']->value;
+			$this->language = Yii::app()->request->cookies['language']->value;
 	}
 
 		/**
@@ -47,7 +46,7 @@ class Users extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'Users';
+		return 'user';
 	}
 
 	/**
@@ -57,30 +56,29 @@ class Users extends CActiveRecord
 	{
 		return array(
 			// Логин и пароль - обязательные поля
-			array('Email, Password', 'required', 'on' => 'login, registration'),
-			array('Password', 'required', 'on' => 'passwordedit'),
-			array('Email', 'required', 'on' => 'edit'),
+			array('email, password', 'required', 'on' => 'login, registration'),
+			array('password', 'required', 'on' => 'passwordedit'),
+			array('email', 'required', 'on' => 'edit'),
+            array('email', 'email', 'on' => 'login, registration, edit'),
 			// Длина логина должна быть в пределах от 5 до 30 символов
-			array('UserName', 'length', 'min'=>3, 'max'=>30),
+			array('username', 'length', 'min'=>3, 'max'=>30),
 			// Статус, роль, и сервис цифры
-			array('Status, RoleID, ServiceID, Remember, Language', 'numerical', 'integerOnly' => true, 'min'=> 0 ),
-			// Идентификатора пользователя если он зарегистрирован через внешний сервис
-			array('ServiceUserID', 'length', 'min'=> 3 ),
-			// Логин должен быть уникальным
-			array('Email', 'unique', 'on'=>'editemail, registration'),
+			array('status, role_id, remember, language', 'numerical', 'integerOnly' => true, 'min'=> 0 ),
+		    // Логин должен быть уникальным
+			array('email', 'unique', 'on'=>'editemail, registration'),
 			// Длина пароля не менее 6 символов
-			array('Password', 'length', 'min'=>6, 'max'=>30, 'on'=>'registration, passwordedit'),
+			array('password', 'length', 'min'=>6, 'max'=>30, 'on'=>'registration, passwordedit'),
 			// проверка пароля нашим методом authenticate
-			array('Password', 'authenticate', 'on' => 'login'),
+			array('password', 'authenticate', 'on' => 'login'),
 			// Повторный пароль обязательны для сценария регистрации
-			array('PasswordRepeat, VerifyCode', 'required', 'on'=>'registration, passwordedit' ),
+			array('passwordRepeat, verifyCode', 'required', 'on'=>'registration, passwordedit' ),
 			// Длина повторного пароля не менее 6 символов
-			array('PasswordRepeat, VerifyCode', 'length', 'min'=>6, 'max'=>30),
+			array('passwordRepeat, verifyCode', 'length', 'min'=>6, 'max'=>30),
 			// Пароль должен совпадать с повторным паролем для сценария регистрации
-			array('Password', 'compare', 'compareAttribute'=>'PasswordRepeat', 'on'=>'registration, passwordedit'),
+			array('password', 'compare', 'compareAttribute'=>'PasswordRepeat', 'on'=>'registration, passwordedit'),
 
-			// Дата время регистрации пользователя
-			array('RegistrationDateTime','default','value'=>new CDbExpression('NOW()'),'on'=>'registration'),
+			// Время регистрации пользователя
+			array('registration_time', 'default','value'=>new CDbExpression('NOW()'),'on'=>'registration'),
 
 			// Капча
 			array(
@@ -110,17 +108,15 @@ class Users extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'ID'					=> 'ID',
-			'Status'				=>	Yii::t('users','Status'),
-			'RoleID'				=>	Yii::t('users','Role'),
-			'RegistrationDateTime'	=>	Yii::t('users','Date/time registration'),
-			'ServiceID'				=> 'Сервис',
-			'ServiceUserID'			=> 'Сервис идентификатор',
-			'Email'					=>	Yii::t('users','E-mail'),
-			'Password'				=>	Yii::t('users','Password'),
-			'UserName'				=>	Yii::t('users','Username'),
-			'Remember'				=>	Yii::t('users','Remember'),
-			'Language'				=>	Yii::t('users','Language'),
+			'id'					=> 'ID',
+			'status'				=>	Yii::t('users','Status'),
+			'roleID'				=>	Yii::t('users','Role'),
+			'registration_time'	    =>	Yii::t('users','Date/time registration'),
+			'email'					=>	Yii::t('users','E-mail'),
+			'password'				=>	Yii::t('users','Password'),
+			'username'				=>	Yii::t('users','Username'),
+			'remember'				=>	Yii::t('users','Remember'),
+			'language'				=>	Yii::t('users','Language'),
 		);
 	}
 
@@ -178,7 +174,7 @@ class Users extends CActiveRecord
 		if( !$this->hasErrors() ) {
 			// Создаем экземпляр класса UserIdentity
 			// и передаем в его конструктор введенный пользователем логин и пароль (с формы)
-			$identity = new UserIdentity($this->Email, $this->Password);
+			$identity = new UserIdentity($this->email, $this->password);
 			// Выполняем метод authenticate (о котором мы с вами говорили пару абзацев назад)
 			// Он у нас проверяет существует ли такой пользовать и возвращает ошибку (если она есть)
 			// в $identity->errorCode
@@ -188,12 +184,12 @@ class Users extends CActiveRecord
 			switch($identity->errorCode)
 			{
 				case UserIdentity::ERROR_NONE:
-					$duration =	$this->Remember ? 3600*24*30 : 0; // 30 days
+					$duration =	$this->remember ? 3600*24*30 : 0; // 30 days
 					Yii::app()->user->login($identity, $duration);
 
 					// присваиваем язык пользователя
-					if ( $this->Language ){
-						$cookie = new CHttpCookie('language', Languages::$Languages[$this->Language]['value']);
+					if ( $this->language ){
+						$cookie = new CHttpCookie('language', Languages::$Languages[$this->language]['value']);
 						$cookie->expire = $duration;
 						Yii::app()->request->cookies['language'] = $cookie;
 					}
@@ -223,13 +219,13 @@ class Users extends CActiveRecord
 			'attributes' => array(
 				'enctype' => 'application/form-data',
 				'class' => 'well',
-				'id'=>'ManufacturersForm',
+				'id'=>'loginForm',
 			),
 			'activeForm' => array(
 				'class' => 'CActiveForm',
 				'enableAjaxValidation' => false,
 				'enableClientValidation' => false,
-				'id' => "ManufacturersForm",
+				'id' => "loginForm",
 				'clientOptions' => array(
 					'validateOnSubmit' => false,
 					'validateOnChange' => false,
@@ -239,25 +235,24 @@ class Users extends CActiveRecord
 			'title' => Yii::t("users",'Login'),
 
     		'elements'=>array(
-    			'Email'=>array(
+    			'email'=>array(
     				'type'=>'text',
     				'maxlength'=>255
     			),
-    			'Password'=>array(
+    			'password'=>array(
     				'type'=>'password',
     				'maxlength'=>255
     			),
-				'Language'=>array(
+				'language'=>array(
 					'type'  =>  'dropdownlist',
 					'items' =>  Languages::getLanguagesList(),
 					'empty'=>  '',
 				),
-				'Remember'=>array(
+				'remember'=>array(
         			'type'=>'checkbox',
     				'layout'=>'{input}{label}{error}{hint}',
     			),
     		),
-			 'ErrorSummary',
     		'buttons'=>array(
 				'<br/>',
 				'submit'=>array(

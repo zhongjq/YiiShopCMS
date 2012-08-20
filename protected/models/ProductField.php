@@ -14,7 +14,7 @@
  * The followings are the available model relations:
  * @property Products $product
  */
-class ProductsFields extends CActiveRecord
+class ProductField extends CActiveRecord
 {
 	public $moredata;
 	/**
@@ -32,7 +32,7 @@ class ProductsFields extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'ProductsFields';
+		return 'product_field';
 	}
 
 	/**
@@ -43,22 +43,20 @@ class ProductsFields extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('FieldType, Name, Alias', 'required', 'on'=>'add, edit'),
-			array('ProductID, FieldType, IsMandatory, IsFilter', 'numerical', 'integerOnly'=>true),
-			array('Name', 'length', 'max'=>255),
-			array('Alias', 'length', 'max'=>50),
-			array('Name, Alias', 'unique', 'criteria' => array(
-												'condition' => 'ProductID = :ProductID',
-												'params'=>array(':ProductID'=> $this->ProductID )
+			array('field_type, name, alias', 'required', 'on'=>'add, edit'),
+			array('product_id, field_type, is_mandatory, is_filter', 'numerical', 'integerOnly'=>true),
+			array('name', 'length', 'max'=>255),
+			array('alias', 'length', 'max'=>50),
+			array('name, alias', 'unique', 'criteria' => array(
+												'condition' => 'product_id = :product_id',
+												'params'=>array(':product_id'=> $this->product_id )
 											)),
 
-
-			array('IsColumnTable', 'boolean'),
-			array('Alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u',
-				'message' => Yii::t("AdminModule.products",'Field contains invalid characters.')),
+			array('is_column_table', 'boolean'),
+			array('alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u','message' => Yii::t("products",'Field contains invalid characters.')),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('ID, ProductID, FieldType, Name, IsMandatory, IsFilter', 'safe', 'on'=>'search'),
+			array('id, product_id, field_type, name, is_mandatory, is_filter', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -71,12 +69,11 @@ class ProductsFields extends CActiveRecord
 	 */
 	public function relations()
 	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
 		return array(
+            'Product'       => array(self::BELONGS_TO, 'Product', 'product_id'),
+    		
 			'IntegerFields' => array(self::HAS_ONE, 'IntegerFields', 'FieldID'),
 			'PriceFields'   => array(self::HAS_ONE, 'PriceFields', 'FieldID'),
-			'Product'       => array(self::BELONGS_TO, 'Products', 'ProductID'),
 			'StringFields'  => array(self::HAS_ONE, 'StringFields', 'FieldID'),
 			'TextFields'    => array(self::HAS_ONE, 'TextFields', 'FieldID'),
             'ListFields'    => array(self::HAS_ONE, 'ListFields', 'FieldID'),
@@ -89,16 +86,16 @@ class ProductsFields extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'ID'            =>  Yii::t("fields",'ID'),
-			'ProductID'     =>  Yii::t("fields",'Идентификатор продукта'),
-			'FieldType'     =>  Yii::t("fields",'Тип поля'),
-			'Name'          =>  Yii::t("fields",'Наименование'),
-			'Alias'         =>  Yii::t("fields",'Псевдоним'),
-			'IsMandatory'   =>  Yii::t("fields",'Обязательно'),
-			'IsFilter'      =>  Yii::t("fields",'Использовать в фильтрации'),
-			'IsColumnTable' =>  Yii::t("fields",'Used In Table Header?'),
-			'UnitName'      =>  Yii::t("fields",'Used In Table Header?'),
-			'Hint'          =>  Yii::t("fields",'Used In Table Header?'),
+			'id'            =>  Yii::t("fields",'ID'),
+			'product_id'     =>  Yii::t("fields",'Идентификатор продукта'),
+			'field_type'     =>  Yii::t("fields",'Тип поля'),
+			'name'          =>  Yii::t("fields",'Наименование'),
+			'alias'         =>  Yii::t("fields",'Псевдоним'),
+			'is_mandatory'   =>  Yii::t("fields",'Обязательно'),
+			'is_filter'      =>  Yii::t("fields",'Использовать в фильтрации'),
+			'is_column_table' =>  Yii::t("fields",'Used In Table Header?'),
+			'unitName'      =>  Yii::t("fields",'Used In Table Header?'),
+			'hint'          =>  Yii::t("fields",'Used In Table Header?'),
 		);
 	}
 
@@ -126,18 +123,18 @@ class ProductsFields extends CActiveRecord
 	}
 
 	// форма в формате CForm
-	public function getMotelCForm(){
-		return new CForm(array(
+	public function getMotelArrayCForm(){
+		return array(
 			'attributes' => array(
 				'enctype' => 'application/form-data',
 				'class' => 'well',
-				'id'=>'FieldForm'
+				'id'=>'fieldForm'
 			),
 			'activeForm' => array(
 				'class' => 'CActiveForm',
 				'enableAjaxValidation' => true,
 				'enableClientValidation' => false,
-				'id' => "FieldForm",
+				'id' => "fieldForm",
 				'clientOptions' => array(
 					'validateOnSubmit' => true,
 					'validateOnChange' => false,
@@ -145,42 +142,43 @@ class ProductsFields extends CActiveRecord
 			),
 
 			'elements'=>array(
-				'FieldType'=>array(
-					'type'  =>  'dropdownlist',
-					'items' =>  TypeFields::getFieldsList(),
-					'empty'=>  '',
-					"disabled".$this->isNewRecord  =>  "disabled1",
-					'ajax' => array(
-						'type'  =>  'POST',
-						'url'   =>  "",
-						'update'=>  '#FieldForm',
+                'productField'=> array(
+    				'type'=>'form',
+					'elements'=>array(
+						'field_type'=>array(
+							'type'  =>  'dropdownlist',
+							'items' =>  TypeFields::getFieldsList(),
+							'empty'=>  '',
+
+							'ajax' => array(
+								'type'  =>  'POST',
+								'url'   =>  "",
+								'replace'=>  '#FieldForm',
+							)
+
+						),
+						'name'=>array(
+							'type'=>'text',
+							'maxlength'=>255
+						),
+						'alias'=>array(
+							'type'      =>  'text',
+							'maxlength' =>  255,
+						),
+						'is_mandatory'=>array(
+							'type'=>'checkbox',
+							'layout'=>'{input}{label}{error}{hint}',
+						),
+						'is_filter'=>array(
+							'type'=>'checkbox',
+							'layout'=>'{input}{label}{error}{hint}',
+						),
+						'is_column_table'=>array(
+							'type'=>'checkbox',
+							'layout'=>'{input}{label}{error}{hint}',
+						),
 					)
-				),
-				'Name'=>array(
-					'type'=>'text',
-					'maxlength'=>255
-				),
-				'Alias'=>array(
-					'type'      =>  'text',
-					'maxlength' =>  255,
-					"disabled".$this->isNewRecord  =>  "disabled1",
-				),
-				'IsMandatory'=>array(
-					'type'=>'checkbox',
-					'layout'=>'{input}{label}{error}{hint}',
-				),
-				'IsFilter'=>array(
-					'type'=>'checkbox',
-					'layout'=>'{input}{label}{error}{hint}',
-				),
-				'IsColumnTable'=>array(
-					'type'=>'checkbox',
-					'layout'=>'{input}{label}{error}{hint}',
-				),
-				'Name'=>array(
-					'type'=>'text',
-					'maxlength'=>255
-				),
+				)
 			),
 
 			'buttons'=>array(
@@ -191,7 +189,7 @@ class ProductsFields extends CActiveRecord
 					'class' =>  "btn"
 				),
 			),
-		), $this);
+		);
 	}
 
 	public static function CreateField($FieldType){

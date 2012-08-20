@@ -8,13 +8,13 @@
 class UserIdentity extends CUserIdentity {
     // Будем хранить id.
     protected $_id;
-    protected $Email;
-    protected $Password;
+    protected $_email;
+    protected $_password;
 
-	public function __construct($Email,$Password)
+	public function __construct($email,$password)
 	{
-		$this->Email = $Email;
-		$this->Password = $Password;
+		$this->_email = $email;
+		$this->_password = $password;
 	}
 
     // Данный метод вызывается один раз при аутентификации пользователя.
@@ -22,17 +22,17 @@ class UserIdentity extends CUserIdentity {
     {
 
         // Производим стандартную аутентификацию, описанную в руководстве.
-        $user = Users::model()->find('LOWER(Email)= ?', array(strtolower($this->Email)));
+        $user = User::model()->find('LOWER(email)= ?', array(strtolower($this->_email)));
 		
-		if( ($user===null) or (md5($this->Password)!==$user->Password) ) {
+		if( ($user===null) or (md5($this->_password)!==$user->password) ) {
             $this->errorCode = self::ERROR_USERNAME_INVALID;
         } else {
-            $this->_id = $user->ID;
+            $this->_id = $user->id;
 
-            $this->username = $user->UserName ? $user->UserName : $user->Email ;
+            $this->username = $user->username ? $user->username : $user->email ;
 
-			$this->setState('RoleID', $user->RoleID );
-			$this->setState('Role', Roles::getRoleString($user->RoleID) );
+			$this->setState('role_id', $user->role_id );
+			$this->setState('role', Roles::getRoleString($user->role_id) );
 
 			$this->errorCode = self::ERROR_NONE;
         }

@@ -1,6 +1,6 @@
 <?php
 
-class ManufacturersController extends Controller
+class ManufacturerController extends Controller
 {
 	/**
 	 * @return array action filters
@@ -47,11 +47,11 @@ class ManufacturersController extends Controller
 	public function actionIndex()
 	{
 		$criteria = new CDbCriteria();
-		$criteria->order = 'Name';
-        $Manufacturers	= new CActiveDataProvider('Manufacturers',array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
+		$criteria->order = 'name';
+        $manufacturers	= new CActiveDataProvider('Manufacturer',array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
 
 		$this->render('index', array(
-			'Manufacturers' => $Manufacturers
+			'manufacturers' => $manufacturers
 		));
 	}
 
@@ -61,21 +61,21 @@ class ManufacturersController extends Controller
 	 */
 	public function actionAdd()
 	{
-		$Manufacturer = new Manufacturers('add');
+		$manufacturer = new Manufacturer('add');
 
-    	$this->performAjaxValidation($Manufacturer);
+    	$this->performAjaxValidation($manufacturer);
 
-		if(isset($_POST['Manufacturers']))
+		if(isset($_POST['Manufacturer']))
 		{
-			$Manufacturer->attributes = $_POST['Manufacturers'];
-			$Manufacturer->LogoFile	= CUploadedFile::getInstance($Manufacturer,'Logo');
-			if($Manufacturer->validate()){
+			$manufacturer->attributes = $_POST['Manufacturer'];
+			$manufacturer->logoFile	= CUploadedFile::getInstance($manufacturer,'logo');
+			if($manufacturer->validate()){
 				$transaction = Yii::app()->db->beginTransaction();
 				try
 				{
-					if ( $Manufacturer->save() ){
+					if ( $manufacturer->save() ){
 						$transaction->commit();
-						$this->redirect(array('/admin/manufacturers'));
+						$this->redirect(array('/admin/manufacturer'));
 					}
 				}
 				catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
@@ -85,10 +85,10 @@ class ManufacturersController extends Controller
 			}
 		}
 
-        $Form = new CForm( $Manufacturer->getArrayCForm(), $Manufacturer );
+        $form = new CForm( $manufacturer->getArrayCForm(), $manufacturer );
 
 		$this->render('add',array(
-			'Form'=>$Form,
+			'form'=>$form,
 		));
 	}
 
@@ -97,25 +97,25 @@ class ManufacturersController extends Controller
 	 * If update is successful, the browser will be redirected to the 'view' page.
 	 * @param integer $id the ID of the model to be updated
 	 */
-	public function actionEdit($ManufacturerID)
+	public function actionEdit($id)
 	{
-		$Manufacturer = $this->loadModel($ManufacturerID);
-        $Manufacturer->setScenario('edit');
+		$manufacturer = $this->loadModel($id);
+        $manufacturer->setScenario('edit');
 
-        $this->performAjaxValidation($Manufacturer);
+        $this->performAjaxValidation($manufacturer);
 
-    	if(isset($_POST['Manufacturers']))
+    	if(isset($_POST['Manufacturer']))
 		{
-			$Manufacturer->OldLogoFile = $Manufacturer->Logo;
-			$Manufacturer->attributes = $_POST['Manufacturers'];
-			$Manufacturer->LogoFile	= CUploadedFile::getInstance($Manufacturer,'Logo');
-			if($Manufacturer->validate()){
+			$manufacturer->oldLogoFile = $manufacturer->logo;
+			$manufacturer->attributes = $_POST['Manufacturer'];
+			$manufacturer->logoFile	= CUploadedFile::getInstance($manufacturer,'logo');
+			if($manufacturer->validate()){
 				$transaction = Yii::app()->db->beginTransaction();
 				try
 				{
-					if ( $Manufacturer->save() ){
+					if ( $manufacturer->save() ){
 						$transaction->commit();
-						$this->redirect(array('/admin/manufacturers'));
+						$this->redirect(array('/admin/manufacturer'));
 					}
 				}
 				catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
@@ -125,10 +125,10 @@ class ManufacturersController extends Controller
 			}
 		}
 
-        $Form = new CForm( $Manufacturer->getArrayCForm(), $Manufacturer );
+        $form = new CForm( $manufacturer->getArrayCForm(), $manufacturer );
 
 		$this->render('edit',array(
-			'Form'=>$Form,
+			'form'=>$form,
 		));
 	}
 
@@ -159,7 +159,7 @@ class ManufacturersController extends Controller
 	 */
 	public function loadModel($id)
 	{
-		$model=Manufacturers::model()->findByPk($id);
+		$model=Manufacturer::model()->findByPk($id);
 		if($model===null)
 			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;
@@ -171,7 +171,7 @@ class ManufacturersController extends Controller
 	 */
 	protected function performAjaxValidation($manufacturer)
 	{
-        if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "manufacturersForm" ){
+        if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "manufacturerForm" ){
     		echo CActiveForm::validate($manufacturer);
 			Yii::app()->end();
 		}
