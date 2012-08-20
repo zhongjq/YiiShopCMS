@@ -4,8 +4,8 @@ $this->breadcrumbs=array(
 	'Создание товара',
 );
 
-$this->renderPartial('SecondMenu');
+$this->renderPartial('secondMenu');
 
-echo $Form;
+echo $form;
 
 ?>

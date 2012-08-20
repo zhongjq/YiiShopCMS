@@ -62,7 +62,7 @@ class Product extends CActiveRecord
 	public function relations()
 	{
 		return array(
-			'productsFields' => array(self::HAS_MANY, 'ProductsFields', 'ProductID'),
+			'productsFields' => array(self::HAS_MANY, 'ProductField', 'product_id'),
 		);
 	}
 
@@ -178,26 +178,26 @@ class Product extends CActiveRecord
 			),
 
 			'elements'=>array(
-				'Status'=>array(
+				'status'=>array(
 					'type'=>'checkbox',
 					'layout'=>'{input}{label}{error}{hint}',
 				),
-				'Name'=>array(
+				'name'=>array(
 					'type'=>'text',
 					'maxlength'=>255
 				),
-				'Alias'=>array(
+				'alias'=>array(
 					'type'      =>  'text',
 					'maxlength' =>  255,
 					"disabled".$this->isNewRecord  =>  "disabled1",
 				),
-				'Title'=>array(
+				'title'=>array(
 					'type'=>'textarea','class'=>"span5"
 				),
-				'Keywords'=>array(
+				'keywords'=>array(
 					'type'=>'textarea','class'=>"span5"
 				),
-				'Description'=>array(
+				'description'=>array(
 					'type'=>'textarea','class'=>"span5",'rows'=>5
 				),
 			),

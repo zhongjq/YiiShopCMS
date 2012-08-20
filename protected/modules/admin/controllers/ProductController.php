@@ -5,22 +5,14 @@ class ProductController extends Controller
 	public $layout='/layouts/main';
 
 	public function actionIndex()
-	{
-		$criteria = new CDbCriteria();
-
-		$count = Products::model()->count($criteria);
-
-		$pages=new CPagination($count);
-		// элементов на страницу
-		$pages->pageSize=10;
-		$pages->applyLimit($criteria);
-
-		$Products = Products::model()->with('productsFields')->findAll($criteria);
+	{    
+    	$criteria = new CDbCriteria();
+		$criteria->with = 'productsFields';
+        $products	= new CActiveDataProvider('Product',array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
 
 		$this->render('index', array(
-			'Products' => $Products,
-			'pages' => $pages
-		));
+			'products' => $products
+		));        
 	}
 
 	public function actionView($ProductID)
@@ -157,25 +149,25 @@ class ProductController extends Controller
 	public function actionCreate()
 	{
 
-		$Product = new Products('create');
+		$product = new Product('create');
 
-		$this->performAjaxValidation($Product);
+		$this->performAjaxValidation($product);
 
-		$Form = $Product->getMotelCForm();
+		$form = $product->getMotelCForm();
 
-		if(isset($_POST['Products']))
+		if(isset($_POST['Product']))
 		{
 			$transaction = Yii::app()->db->beginTransaction();
 			try
 			{
-				$Product->attributes = $_POST['Products'];
-				if( $Product->save() ){
-					Yii::app()->db->createCommand()->createTable($Product->Alias, array(
-						'ID' => 'pk',
-						'Alias' => 'varchar(255)',
-						'Title' => 'text',
-						'Keywords' => 'text',
-						'Description' => 'text',
+				$product->attributes = $_POST['Product'];
+				if( $product->save() ){
+					Yii::app()->db->createCommand()->createTable($product->alias, array(
+						'id' => 'pk',
+						'alias' => 'varchar(255)',
+						'title' => 'text',
+						'keywords' => 'text',
+						'description' => 'text',
 					), 'ENGINE=InnoDB');
 
 					$transaction->commit();
@@ -189,7 +181,7 @@ class ProductController extends Controller
 
 		}
 
-		$this->render('create', array('Form'=>$Form) );
+		$this->render('create', array('form'=>$form) );
 	}
 
 	public function actionDelete($id)
@@ -198,21 +190,21 @@ class ProductController extends Controller
 		$this->redirect(array('/admin/product'));
 	}
 
-	public function actionEdit($ProductID)
+	public function actionEdit($id)
 	{
-		$Product = Products::model()->findByPk($ProductID);
+		$product = Product::model()->findByPk($id);
 
-		$this->performAjaxValidation($Product);
+		$this->performAjaxValidation($product);
 
-		$Form = $Product->getMotelCForm();
+		$form = $product->getMotelCForm();
 
-		if(isset($_POST['Products']))
+		if(isset($_POST['Product']))
 		{
 			$transaction = Yii::app()->db->beginTransaction();
 			try
 			{
-				$Product->attributes = $_POST['Products'];
-				if( $Product->save() ){
+				$product->attributes = $_POST['Product'];
+				if( $product->save() ){
 					$transaction->commit();
 					$this->redirect(array('/admin/product'));
 				}
@@ -224,103 +216,34 @@ class ProductController extends Controller
 
 		}
 
-		$this->render('edit', array('Form'=>$Form,'Product' => $Product) );
+		$this->render('edit', array('form'=>$form,'product' => $product) );
 	}
 
 
-	public function actionFields($ProductID)
+	public function actionFields($productId)
 	{
-		$product = Products::model()->with('productsFields')->findByPk($ProductID);
+		$product = Product::model()->with('productsFields')->findByPk($productId);
 
         $criteria=new CDbCriteria;
-    	$criteria->compare('ProductID',$ProductID);
-        $fields = new CActiveDataProvider('ProductsFields',array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
+    	$criteria->compare('product_id',$productId);
+        $fields = new CActiveDataProvider('ProductField',array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
 
 		$this->render('fields/index', array(
-			'Product'   => $product,
-            'Fields'    => $fields
+			'product'   => $product,
+            'fields'    => $fields
 		));
 	}
 
-	public function actionAddField($ProductID)
+	public function actionAddField($productId)
 	{
-		$Product = Products::model()->findByPk($ProductID);
-		$ProductField = new ProductsFields('add');
-		$ProductField->ProductID = $Product->ID;
+		$product = Product::model()->findByPk($productId);
+		$productField = new ProductField('add');
+		$productField->product_id = $product->id;
 
-		$ArrayForm = array(
-			'attributes' => array(
-				'enctype' => 'application/form-data',
-				'class' => 'well',
-				'id'=>'FieldForm'
-			),
-			'activeForm' => array(
-				'class' => 'CActiveForm',
-				'enableAjaxValidation' => true,
-				'enableClientValidation' => false,
-				'id' => "FieldForm",
-				'clientOptions' => array(
-					'validateOnSubmit' => true,
-					'validateOnChange' => false,
-				),
-			),
-
-			'elements'=>array(
-				'ProductsFields'=> array(
-					'type'=>'form',
-					'elements'=>array(
-						'FieldType'=>array(
-							'type'  =>  'dropdownlist',
-							'items' =>  TypeFields::getFieldsList(),
-							'empty'=>  '',
-
-							'ajax' => array(
-								'type'  =>  'POST',
-								'url'   =>  "",
-								'replace'=>  '#FieldForm',
-							)
-
-						),
-						'Name'=>array(
-							'type'=>'text',
-							'maxlength'=>255
-						),
-						'Alias'=>array(
-							'type'      =>  'text',
-							'maxlength' =>  255,
-						),
-						'IsMandatory'=>array(
-							'type'=>'checkbox',
-							'layout'=>'{input}{label}{error}{hint}',
-						),
-						'IsFilter'=>array(
-							'type'=>'checkbox',
-							'layout'=>'{input}{label}{error}{hint}',
-						),
-						'IsColumnTable'=>array(
-							'type'=>'checkbox',
-							'layout'=>'{input}{label}{error}{hint}',
-						),
-						'Name'=>array(
-							'type'=>'text',
-							'maxlength'=>255
-						),
-					)
-				)
-			),
-
-			'buttons'=>array(
-				'<br/>',
-				'submit'=>array(
-					'type'  =>  'submit',
-					'label' =>  'Создать',
-					'class' =>  "btn"
-				),
-			),
-		);
+		$arProductFieldForm = $productField->getMotelArrayCForm();
 
 		$class = null;
-		$FieldType = null;
+		$fieldType = null;
 		$className = null;
 		if ( isset($_POST['ProductsFields']['FieldType']) )
 			$FieldType = $_POST['ProductsFields']['FieldType'];
@@ -332,11 +255,11 @@ class ProductController extends Controller
 			$ProductField->moredata = $class;
 		}
 
-		$Form = new CForm($ArrayForm);
-		$Form['ProductsFields']->model = $ProductField;
-		if( $FieldType > 0 && $class ) $Form[$className]->model = $class;
+		$form = new CForm($arProductFieldForm);
+		$form['productField']->model = $productField;
+		if( $fieldType > 0 && $class ) $form[$className]->model = $class;
 
-		if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "FieldForm" ){
+		if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "fieldForm" ){
 			$validate = array($ProductField);
 			if ( $class ) $validate[] = $class;
 			echo CActiveForm::validate($validate);
@@ -367,17 +290,17 @@ class ProductController extends Controller
 			}
 		}
 
-		if( Yii::app()->request->isAjaxRequest && $FieldType > 0 ){
-			$Form = $Form->render();
+		if( Yii::app()->request->isAjaxRequest && $fieldType > 0 ){
+			$form = $form->render();
 			$sc = '';
 			Yii::app()->clientScript->render($sc);
-			echo $Form.$sc;
+			echo $form.$sc;
 			Yii::app()->end();
 		}
 
 		$this->render('fields/add', array(
-			'Product' => $Product,
-			'Form' => $Form,
+			'product' => $product,
+			'form' => $form,
 		));
 	}
 

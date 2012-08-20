@@ -49,7 +49,7 @@ class ProductField extends CActiveRecord
 			array('alias', 'length', 'max'=>50),
 			array('name, alias', 'unique', 'criteria' => array(
 												'condition' => 'product_id = :product_id',
-												'params'=>array(':product_id'=> $this->ProductID )
+												'params'=>array(':product_id'=> $this->product_id )
 											)),
 
 			array('is_column_table', 'boolean'),
@@ -86,16 +86,16 @@ class ProductField extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'ID'            =>  Yii::t("fields",'ID'),
-			'ProductID'     =>  Yii::t("fields",'Идентификатор продукта'),
-			'FieldType'     =>  Yii::t("fields",'Тип поля'),
-			'Name'          =>  Yii::t("fields",'Наименование'),
-			'Alias'         =>  Yii::t("fields",'Псевдоним'),
-			'IsMandatory'   =>  Yii::t("fields",'Обязательно'),
-			'IsFilter'      =>  Yii::t("fields",'Использовать в фильтрации'),
-			'IsColumnTable' =>  Yii::t("fields",'Used In Table Header?'),
-			'UnitName'      =>  Yii::t("fields",'Used In Table Header?'),
-			'Hint'          =>  Yii::t("fields",'Used In Table Header?'),
+			'id'            =>  Yii::t("fields",'ID'),
+			'product_id'     =>  Yii::t("fields",'Идентификатор продукта'),
+			'field_type'     =>  Yii::t("fields",'Тип поля'),
+			'name'          =>  Yii::t("fields",'Наименование'),
+			'alias'         =>  Yii::t("fields",'Псевдоним'),
+			'is_mandatory'   =>  Yii::t("fields",'Обязательно'),
+			'is_filter'      =>  Yii::t("fields",'Использовать в фильтрации'),
+			'is_column_table' =>  Yii::t("fields",'Used In Table Header?'),
+			'unitName'      =>  Yii::t("fields",'Used In Table Header?'),
+			'hint'          =>  Yii::t("fields",'Used In Table Header?'),
 		);
 	}
 
@@ -123,18 +123,18 @@ class ProductField extends CActiveRecord
 	}
 
 	// форма в формате CForm
-	public function getMotelCForm(){
-		return new CForm(array(
+	public function getMotelArrayCForm(){
+		return array(
 			'attributes' => array(
 				'enctype' => 'application/form-data',
 				'class' => 'well',
-				'id'=>'FieldForm'
+				'id'=>'fieldForm'
 			),
 			'activeForm' => array(
 				'class' => 'CActiveForm',
 				'enableAjaxValidation' => true,
 				'enableClientValidation' => false,
-				'id' => "FieldForm",
+				'id' => "fieldForm",
 				'clientOptions' => array(
 					'validateOnSubmit' => true,
 					'validateOnChange' => false,
@@ -142,42 +142,43 @@ class ProductField extends CActiveRecord
 			),
 
 			'elements'=>array(
-				'FieldType'=>array(
-					'type'  =>  'dropdownlist',
-					'items' =>  TypeFields::getFieldsList(),
-					'empty'=>  '',
-					"disabled".$this->isNewRecord  =>  "disabled1",
-					'ajax' => array(
-						'type'  =>  'POST',
-						'url'   =>  "",
-						'update'=>  '#FieldForm',
+                'productField'=> array(
+    				'type'=>'form',
+					'elements'=>array(
+						'field_type'=>array(
+							'type'  =>  'dropdownlist',
+							'items' =>  TypeFields::getFieldsList(),
+							'empty'=>  '',
+
+							'ajax' => array(
+								'type'  =>  'POST',
+								'url'   =>  "",
+								'replace'=>  '#FieldForm',
+							)
+
+						),
+						'name'=>array(
+							'type'=>'text',
+							'maxlength'=>255
+						),
+						'alias'=>array(
+							'type'      =>  'text',
+							'maxlength' =>  255,
+						),
+						'is_mandatory'=>array(
+							'type'=>'checkbox',
+							'layout'=>'{input}{label}{error}{hint}',
+						),
+						'is_filter'=>array(
+							'type'=>'checkbox',
+							'layout'=>'{input}{label}{error}{hint}',
+						),
+						'is_column_table'=>array(
+							'type'=>'checkbox',
+							'layout'=>'{input}{label}{error}{hint}',
+						),
 					)
-				),
-				'Name'=>array(
-					'type'=>'text',
-					'maxlength'=>255
-				),
-				'Alias'=>array(
-					'type'      =>  'text',
-					'maxlength' =>  255,
-					"disabled".$this->isNewRecord  =>  "disabled1",
-				),
-				'IsMandatory'=>array(
-					'type'=>'checkbox',
-					'layout'=>'{input}{label}{error}{hint}',
-				),
-				'IsFilter'=>array(
-					'type'=>'checkbox',
-					'layout'=>'{input}{label}{error}{hint}',
-				),
-				'IsColumnTable'=>array(
-					'type'=>'checkbox',
-					'layout'=>'{input}{label}{error}{hint}',
-				),
-				'Name'=>array(
-					'type'=>'text',
-					'maxlength'=>255
-				),
+				)
 			),
 
 			'buttons'=>array(
@@ -188,7 +189,7 @@ class ProductField extends CActiveRecord
 					'class' =>  "btn"
 				),
 			),
-		), $this);
+		);
 	}
 
 	public static function CreateField($FieldType){
