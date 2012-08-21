@@ -70,9 +70,9 @@ class ListItem extends CActiveRecord
 		return array(
 			//'ID' => 'ID',
 			//'list_id' => 'List',
-			'status' => 'status',
-			'priority' => 'priority',
-			'name' => 'name',
+			'status' => Yii::t("lists","Status"),
+			'priority' => Yii::t("lists","Priority"),
+			'name' => Yii::t("lists","Name"),
 		);
 	}
 
@@ -103,13 +103,13 @@ class ListItem extends CActiveRecord
             'attributes' => array(
         		'enctype' => 'application/form-data',
 				'class' => 'well',
-				'id'=>'listsForm'
+				'id'=>'itemForm'
 			),
 			'activeForm' => array(
 				'class' => 'CActiveForm',
 				'enableAjaxValidation' => true,
 				'enableClientValidation' => false,
-				'id' => "listsForm",
+				'id' => "itemForm",
 				'clientOptions' => array(
 					'validateOnSubmit' => true,
 					'validateOnChange' => false,

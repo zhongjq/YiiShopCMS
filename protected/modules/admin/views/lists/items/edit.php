@@ -1,13 +1,12 @@
 <?php
 
 $this->breadcrumbs=array(
-    'Товары'    =>  array('index'),
-    Yii::t('AdminModule.products',"Lists") => array("/admin/products/lists"),
-    Yii::t('AdminModule.products',"Items list").$List->ID => $this->createUrl('/admin/product/itemslist',array('ListID'=>$Item->ListID) ),
-    Yii::t('AdminModule.products',"Edit item #").$Item->ID
+    Yii::t('lists',"Lists") => array("/admin/lists"),
+    Yii::t('lists',"Items list").$item->list_id => $this->createUrl('/admin/lists/items',array('id'=>$item->list_id) ),
+    Yii::t('lists',"Edit item #").$item->id
 );
 
-$this->renderPartial('lists/items/SecondMenu');
+$this->renderPartial('items/secondMenu',array('list'=>$item->list));
 
-echo $Form;
+echo $form;
 ?>

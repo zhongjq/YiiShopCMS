@@ -55,20 +55,20 @@ class ListsController extends Controller
 
     public function actionEditList($ListID){
 
-        $List = Lists::model()->with('ListsItems')->findbyPk($ListID);
-        $List->setScenario('edit');
+        $list = Lists::model()->with('ListsItems')->findbyPk($ListID);
+        $list->setScenario('edit');
         if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "listsForm" ){
-			echo CActiveForm::validate($List);
+			echo CActiveForm::validate($list);
 			Yii::app()->end();
 		}
 
     	if( isset($_POST['Lists']) ) {
-			$List->attributes = $_POST['Lists'];
+			$list->attributes = $_POST['Lists'];
 
 			$transaction = Yii::app()->db->beginTransaction();
 			try
 			{
-				if ( $List->save() ){
+				if ( $list->save() ){
 					$transaction->commit();
 					$this->redirect($this->createUrl('/admin/products/lists'));
 				} else {
@@ -81,7 +81,7 @@ class ListsController extends Controller
 			}
 		}
 
-        $form = new CForm($List->getCFormArray(),$List);
+        $form = new CForm($list->getCFormArray(),$list);
 
 		$this->render('lists/edit', array(
             "Form" => $form
@@ -90,12 +90,12 @@ class ListsController extends Controller
 
     public function actionDeleteList($ListID){
 
-        $List = Lists::model()->findbyPk($ListID);
+        $list = Lists::model()->findbyPk($ListID);
 
 		$transaction = Yii::app()->db->beginTransaction();
 		try
 		{
-			if ( $List->delete() ){
+			if ( $list->delete() ){
 				$transaction->commit();
 				$this->redirect($this->createUrl('/admin/products/lists'));
 			} else {
@@ -122,36 +122,36 @@ class ListsController extends Controller
         ));
 	}
 
-    public function actionAddItems($ListID){
+    public function actionAddItems($id){
 
-        $List = Lists::model()->with('ListsItems')->findbyPk($ListID);
+        $list = Lists::model()->findbyPk($id);
 
-        $ItemsList = new ListsItems('add');
-        $ItemsList->ListID = $ListID;
+        $listItem = new ListItem('add');
+        $listItem->list_id = $id;
 
         if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "additems-form" ){
-    		echo CActiveForm::validate($ItemsList);
+    		echo CActiveForm::validate($listItem);
 			Yii::app()->end();
 		}
 
-         if( isset($_POST['ListsItems'])  ) {
+         if( isset($_POST['ListItem'])  ) {
 
 			$transaction = Yii::app()->db->beginTransaction();
 			try
 			{
-                $Items = explode("\n",$_POST['ListsItems']['Name']);
+                $items = explode("\n",$_POST['ListItem']['name']);
 
-                foreach( $Items as $Item ){
-                    $IL = new ListsItems('add');
-                    $IL->ListID = $ListID;
-                    $IL->Name = $Item;
+                foreach( $items as $item_name ){
+                    $IL = new ListItem('add');
+                    $IL->list_id = $id;
+                    $IL->name = $item_name;
           			if ( !$IL->save() ){
     					throw new CException("Error save");
     				}
                 }
 
 				$transaction->commit();
-				$this->redirect($this->createUrl('/admin/products/lists'));
+				$this->redirect( $this->createUrl('/admin/lists/items',array('id'=>$id)) );
 			}
 			catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
 			{
@@ -159,33 +159,36 @@ class ListsController extends Controller
 			}
 		}
 
-        $this->render('lists/items/add', array(
-            "List" => $List,
-            "ItemsList" => $ItemsList,
+        $this->render('items/add', array(
+            "list" => $list,
+            "listItem" => $listItem,
         ));
 	}
-    public function actionEditItem($ListID, $ItemID){
 
-        $Item = ListsItems::model()->with('List')->find('ListID = :ListID AND t.ID = :ID', array(':ListID'=>$ListID,':ID'=>$ItemID));
-        $Item->setScenario('edit');
+	public function actionEditItem($listId, $itemId){
 
-        if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "additems-form" ){
-        	echo CActiveForm::validate($ItemsList);
+        $item = ListItem::model()->with('list')->find('List_id = :listId AND t.id = :id', array(':listId'=>$listId,':id'=>$itemId));
+        $item->setScenario('edit');
+
+        if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "itemForm" ){
+        	echo CActiveForm::validate($item);
 			Yii::app()->end();
 		}
 
-        if( isset($_POST['ListsItems'])  ) {
+		$form = new CForm($item->getCFormArray(),$item);
+
+        if( isset($_POST['ListItem'])  ) {
 
 			$transaction = Yii::app()->db->beginTransaction();
 			try
 			{
-
-          			if ( $IL->save() ){
-                        $transaction->commit();
-                        $this->redirect($this->createUrl('/admin/products/lists'));
-                    }else{
-    					throw new CException("Error save");
-    				}
+				$item->attributes = $_POST['ListItem'];
+				if ( $form->submitted() && $item->save() ){
+					$transaction->commit();
+					$this->redirect( $this->createUrl('/admin/lists/items',array('id'=>$listId)) );
+				}else{
+					throw new CException("Error save");
+				}
 
 			}
 			catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
@@ -194,24 +197,22 @@ class ListsController extends Controller
 			}
 		}
 
-        $form = new CForm($Item->getCFormArray(),$Item);
-
-        $this->render('lists/items/edit', array(
-            "Form" => $form,
-            "Item" => $Item,
+        $this->render('items/edit', array(
+            "form" => $form,
+            "item" => $item,
         ));
 	}
 
-    public function actionDeleteItem($ListID, $ItemID){
+    public function actionDeleteItem($listId, $itemId){
 
-        $Item = ListsItems::model()->with('List')->find('ListID = :ListID AND t.ID = :ID', array(':ListID'=>$ListID,':ID'=>$ItemID));
+        $item = ListItem::model()->with('list')->find('List_id = :listId AND t.id = :id', array(':listId'=>$listId,':id'=>$itemId));
 
 		$transaction = Yii::app()->db->beginTransaction();
 		try
 		{
-			if( $Item->delete() ){
+			if( $item->delete() ){
 				$transaction->commit();
-				$this->redirect( $this->createUrl('/admin/product/itemslist',array('ListID'=>$ListID)) );
+				$this->redirect( $this->createUrl('/admin/lists/items',array('id'=>$listId)) );
 			}
 		}
 		catch(Exception $e)

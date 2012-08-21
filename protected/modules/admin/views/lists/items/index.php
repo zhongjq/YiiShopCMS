@@ -1,52 +1,47 @@
 <?php
 $this->breadcrumbs=array(
     'Товары'    =>  array('index'),
-    Yii::t('AdminModule.products',"Lists") => array("/admin/products/lists"),
-    "Элементы списка ".$List->ID
+    Yii::t('lists',"Lists") => array("/admin/lists"),
+    "Элементы списка ".$list->id
 );
 
-$this->renderPartial('lists/items/SecondMenu',array('List'=>$List));
-
-?>
-
-<?php if( $List->ListsItems() ) : ?>
+$this->renderPartial('items/secondMenu',array('list'=>$list));
 
 
-<?php 
 
     $this->widget('zii.widgets.grid.CGridView', array(
-        'dataProvider'=>$ListsItems,
+        'dataProvider'=>$items,
         'columns' => array(
             array(
-                'name'=>'ID',
+                'name'=>'id',
                 'htmlOptions'=>array(
-                    'width'=> '10'   
+                    'width'=> '10'
                 ),
             ),
             array(
-                'name'=>'Status',
+                'name'=>'status',
                 'htmlOptions'=>array(
-                    'width'=> '70'   
-                ),                
+                    'width'=> '70'
+                ),
                 'type'  =>  'raw',
-                'value' =>  '$data->Status ? "<span class=\'label label-success\'>Активирован</span>" : "<span class=\'label label-important\'>Неактивирован</span>"' ,
+                'value' =>  '$data->status ? "<span class=\'label label-success\'>Активирован</span>" : "<span class=\'label label-important\'>Неактивирован</span>"' ,
             ),
             array(
-                'name'=>'Priority',
+                'name'=>'priority',
                 'htmlOptions'=>array(
-                    'width'=> '10'   
+                    'width'=> '10'
                 ),
             ),
-            'Name',
+            'name',
             array(
                 'htmlOptions'=>array('width'=>'10'),
                 'class'=>'CButtonColumn',
                 'template'=>'{update}',
                 'buttons'=> array(
                     'update' => array(
-                        'url'=> 'Yii::app()->createUrl("/admin/product/edititem",array("ListID"=>'.$List->ID.',"ItemID"=>$data->ID) )',
+                        'url'=> 'Yii::app()->createUrl("/admin/lists/edititem",array("listId"=>'.$list->id.',"itemId"=>$data->id) )',
                         'imageUrl'=>null,
-                        'label'=>'<span class="icon-pencil pointer" title="'.Yii::t('AdminModule.main','Редактировать').'"></span>'
+                        'label'=>'<span class="icon-pencil pointer" title="'.Yii::t('main','Редактировать').'"></span>'
                     )
                 )
             ),
@@ -56,15 +51,15 @@ $this->renderPartial('lists/items/SecondMenu',array('List'=>$List));
                 'template'=>'{delete}',
                 'buttons'=> array(
                     'delete' => array(
-                        'url'=> 'Yii::app()->createUrl("/admin/product/deleteitem",array("ListID"=>'.$List->ID.',"ItemID"=>$data->ID) )',
+                        'url'=> 'Yii::app()->createUrl("/admin/lists/deleteitem",array("listId"=>'.$list->id.',"itemId"=>$data->id) )',
                         'imageUrl'=>null,
-                        'label'=>'<span class="close" title="'.Yii::t('AdminModule.main','Удалить').'">&times;</span>'
+                        'label'=>'<span class="close" title="'.Yii::t('main','Удалить').'">&times;</span>'
                     )
-                )                
-            ),            
+                )
+            ),
         ),
         'htmlOptions'=>array(
-            'class'=> ''   
+            'class'=> ''
         ),
         'itemsCssClass'=>'table table-bordered table-striped',
         'template'=>'{summary} {items} {pager}',
@@ -77,15 +72,8 @@ $this->renderPartial('lists/items/SecondMenu',array('List'=>$List));
         	'prevPageLabel'	=> '&larr;',
         	'nextPageLabel'	=> '&rarr;',
         	'lastPageLabel' => '&raquo;',
-        	'htmlOptions'	=> array("class"=>false),            
+        	'htmlOptions'	=> array("class"=>false),
         ),
     ));
 
 ?>
-
-<?php else : ?>
-    <h3><?=Yii::t('AdminModule.products',"Not items.")?></h3><br>
-	<?= CHtml::link(Yii::t('AdminModule.products',"Add items"),
-					$this->createUrl('/admin/product/additems',array('ListID'=>$List->ID)),
-					array('class'=>'btn btn-primary btn-large')) ?>
-<?php endif ?>
