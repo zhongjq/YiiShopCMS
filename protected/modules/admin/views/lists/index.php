@@ -28,7 +28,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 			'template'=>'{update}',
 			'buttons'=> array(
 				'update' => array(
-					'url'=> 'Yii::app()->createUrl("/admin/lists/edit",array("id"=>$data->id) )',
+					'url'=> 'Yii::app()->createUrl("/admin/lists/editlist",array("id"=>$data->id) )',
 					'imageUrl'=>null,
 					'label'=>'<span class="icon-pencil pointer" title="'.Yii::t('main','Редактировать').'"></span>'
 				)
@@ -40,7 +40,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 			'template'=>'{delete}',
 			'buttons'=> array(
 				'delete' => array(
-					'url'=> 'Yii::app()->createUrl("/admin/lists/delete",array("id"=>$data->id) )',
+					'url'=> 'Yii::app()->createUrl("/admin/lists/deletelist",array("id"=>$data->id) )',
 					'imageUrl'=>null,
 					'label'=>'<span class="close" title="'.Yii::t('main','Удалить').'">&times;</span>'
 				)

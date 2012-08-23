@@ -2,11 +2,11 @@
 
 $this->breadcrumbs=array(
     'Товары'    =>  array('index'),
-	Yii::t('AdminModule.products',"Lists") => array("/admin/products/lists"),
+	Yii::t('lists',"Lists") => array("/admin/lists"),
     "Добавление списка"
 );
 
-$this->renderPartial('lists/SecondMenu');
+$this->renderPartial('secondMenu');
 
-echo $Form;
+echo $form;
 ?>

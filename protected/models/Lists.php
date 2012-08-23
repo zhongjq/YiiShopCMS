@@ -108,7 +108,7 @@ class Lists extends CActiveRecord
 
     public function afterDelete(){
 		parent::afterDelete();
-		ListsItems::model()->findAll('list_id = :id',array(':id'=>$this->id));
+		ListItem::model()->findAll('list_id = :id',array(':id'=>$this->id));
 	}
 
 }

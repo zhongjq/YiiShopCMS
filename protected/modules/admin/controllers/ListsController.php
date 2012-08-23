@@ -53,9 +53,9 @@ class ListsController extends Controller
         ));
 	}
 
-    public function actionEditList($ListID){
+    public function actionEditList($id){
 
-        $list = Lists::model()->with('ListsItems')->findbyPk($ListID);
+        $list = Lists::model()->findbyPk($id);
         $list->setScenario('edit');
         if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "listsForm" ){
 			echo CActiveForm::validate($list);
@@ -70,7 +70,7 @@ class ListsController extends Controller
 			{
 				if ( $list->save() ){
 					$transaction->commit();
-					$this->redirect($this->createUrl('/admin/products/lists'));
+					$this->redirect($this->createUrl('/admin/lists'));
 				} else {
 					throw new CException("Error save");
 				}
@@ -83,21 +83,21 @@ class ListsController extends Controller
 
         $form = new CForm($list->getCFormArray(),$list);
 
-		$this->render('lists/edit', array(
-            "Form" => $form
+		$this->render('edit', array(
+            "form" => $form
         ));
 	}
 
-    public function actionDeleteList($ListID){
+    public function actionDeleteList($id){
 
-        $list = Lists::model()->findbyPk($ListID);
+        $list = Lists::model()->findbyPk($id);
 
 		$transaction = Yii::app()->db->beginTransaction();
 		try
 		{
 			if ( $list->delete() ){
 				$transaction->commit();
-				$this->redirect($this->createUrl('/admin/products/lists'));
+				$this->redirect($this->createUrl('/admin/lists'));
 			} else {
 				throw new CException("Error save");
 			}

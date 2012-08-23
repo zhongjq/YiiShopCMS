@@ -16,7 +16,7 @@ class ConstructorController extends Controller
 	public function actionIndex()
 	{
     	$criteria = new CDbCriteria();
-		$criteria->with = 'productsFields';
+		$criteria->with = 'productFields';
         $products	= new CActiveDataProvider('Product',array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
 
 		$this->render('index', array(
@@ -99,7 +99,7 @@ class ConstructorController extends Controller
 
 	public function actionFields($id)
 	{
-		$product = Product::model()->with('productsFields')->findByPk($id);
+		$product = Product::model()->with('productFields')->findByPk($id);
 
         $criteria=new CDbCriteria;
     	$criteria->compare('product_id',$id);
@@ -155,7 +155,7 @@ class ConstructorController extends Controller
 			{
 				if ( $form->submitted() && $productField->save() ){
 					$transaction->commit();
-					$this->redirect($this->createUrl('/admin/product/fields',array('id'=>$product->id)));
+					$this->redirect($this->createUrl('/admin/constructor/fields',array('id'=>$product->id)));
 				} else {
 					throw new CException("Error save");
 				}

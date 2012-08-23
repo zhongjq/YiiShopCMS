@@ -62,7 +62,7 @@ class Product extends CActiveRecord
 	public function relations()
 	{
 		return array(
-			'productsFields' => array(self::HAS_MANY, 'ProductField', 'product_id'),
+			'productFields' => array(self::HAS_MANY, 'ProductField', 'product_id'),
 		);
 	}
 
@@ -214,10 +214,28 @@ class Product extends CActiveRecord
 	}
 
 	public function getGoodsObject(){
-		eval("class {$this->Alias} extends Goods{}");
-		$Goods = new $this->Alias();
-		$Goods->setProductID($this->ID);
+		eval("class {$this->alias} extends Record{}");
+		$Goods = new $this->alias();
+		$Goods->setProductID($this->id);
 		//$Goods->setGoodsAttributes();
 		return $Goods;
 	}
+    
+    public static function getElementsMenuProduct(){
+        $produts = Product::model()->findAll();
+       
+        $items = array();
+        if ( $produts ){
+            foreach($produts as $produt){
+               $items[] = array('label'	=> CHtml::encode($produt->name),
+						        'url'	=> Yii::app()->createUrl('/admin/product/view',array('id'=>$produt->id)),
+								'active'=> ( Yii::app()->controller->id =='product' && Yii::app()->request->getParam('id') == $produt->id )
+                                );
+            }
+            $items[] = array('itemOptions'=>array('class'=>"divider"));           
+            
+            
+        }
+        return $items;
+    }
 }

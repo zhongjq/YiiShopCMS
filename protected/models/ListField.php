@@ -8,7 +8,7 @@
  * @property integer $ListID
  * @property integer $IsMultipleSelect
  */
-class ListFields extends CActiveRecord
+class ListField extends CActiveRecord
 {
 	/**
 	 * Returns the static model of the specified AR class.
@@ -25,7 +25,7 @@ class ListFields extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'ListFields';
+		return 'list_field';
 	}
 
 	/**
@@ -34,11 +34,11 @@ class ListFields extends CActiveRecord
 	public function rules()
 	{
 		return array(
-			array('ListID', 'required', 'on'=>'add'),
-			array('FieldID, ListID', 'required', 'on'=>'edit'),
-			array('ListID', 'numerical', 'allowEmpty'=>false, 'message'=> Yii::t('fields','Select list') ),
-			array('ListID, IsMultipleSelect', 'numerical', 'integerOnly'=>true),
-			array('FieldID, ListID, IsMultipleSelect', 'safe', 'on'=>'search'),
+			array('list_id', 'required', 'on'=>'add'),
+			array('field_id, list_id', 'required', 'on'=>'edit'),
+			array('list_id', 'numerical', 'allowEmpty'=>false, 'message'=> Yii::t('fields','Select list') ),
+			array('list_id, is_multiple_select', 'numerical', 'integerOnly'=>true),
+			array('field_id, list_id, is_multiple_select', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -48,6 +48,7 @@ class ListFields extends CActiveRecord
 	public function relations()
 	{
 		return array(
+            'field' => array(self::BELONGS_TO, 'ProductField', 'field_id'),
 		);
 	}
 
@@ -57,30 +58,9 @@ class ListFields extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'FieldID'			=> Yii::t('fields','FieldID'),
-			'ListID'			=> Yii::t('fields','List'),
-			'IsMultipleSelect'	=> Yii::t('fields','Multiple Select'),
+			'list_id'			=> Yii::t('fields','List'),
+			'is_multiple_select'	=> Yii::t('fields','Multiple Select'),
 		);
-	}
-
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// Warning: Please modify the following code to remove attributes that
-		// should not be searched.
-
-		$criteria=new CDbCriteria;
-
-		$criteria->compare('FieldID',$this->FieldID);
-		$criteria->compare('ListID',$this->ListID);
-		$criteria->compare('IsMultipleSelect',$this->IsMultipleSelect);
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
 	}
 
     // форма в формате CForm
@@ -88,12 +68,12 @@ class ListFields extends CActiveRecord
 		return array(
 			'type'=>'form',
 			'elements'=>array(
-				'ListID'=> array(
+				'list_id'=> array(
     		    	'type'  =>  'dropdownlist',
-				    'items' =>  CHtml::listData(Lists::model()->findAll(), 'ID', 'Name'),
+				    'items' =>  CHtml::listData(Lists::model()->findAll(), 'id', 'name'),
 				    'empty'=>  '',
 			    ),
-				'IsMultipleSelect'=>array(
+				'is_multiple_select'=>array(
     				'type'=>'checkbox',
 					'layout'=>'{input}{label}{error}{hint}',
 				),

@@ -8,7 +8,7 @@ $this->breadcrumbs=array(
 $this->renderPartial('records/SecondMenu',array('Product'=>$Product));
 
 
-Yii::app()->getClientScript()->registerScript("select",'$(function(){$("form select").chosen();});');
+Yii::app()->getClientScript()->registerScript("select",'$(function(){$("form select").chosen({allow_single_deselect:true});});');
 
 echo $Form->render(); 
 

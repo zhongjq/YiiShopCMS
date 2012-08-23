@@ -15,33 +15,33 @@ class ProductController extends Controller
 		));
 	}
 
-	public function actionView($ProductID)
+	public function actionView($id)
 	{
-		$product = Product::model()->with('productsFields')->findByPk($ProductID);
+		$product = Product::model()->with('productFields')->findByPk($id);
 		$product->getAttributes();
 
-		$Goods = $product->getGoodsObject();
+		$record = $product->getGoodsObject();
 
-		$IsColumnTable = array();
-		foreach($product->productsFields() as $Field) {
-			if( $Field->IsColumnTable ) $IsColumnTable[] = $Field->Alias;
+		$isColumnTable = array();
+		foreach($product->productFields() as $Field) {
+			if( $Field->is_column_table ) $isColumnTable[] = $Field->alias;
 		}
 
         $criteria = new CDbCriteria;
         //$criteria->select = implode(',', $IsColumnTable);
-        $criteria->with = $Goods->getRelationsNameArray();
-        $GoodsData = new CActiveDataProvider($Goods,array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
+        $criteria->with = $record->getRelationsNameArray();
+        $recordsData = new CActiveDataProvider($Goods,array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
 
 		$this->render('records/view', array(
-			'Product'   => $product,
-			'Goods'     => $Goods,
-            'GoodsData' => $GoodsData
+			'product' => $product,
+			'record' => $records,
+            'recordsData' => $recordsData
 		));
 	}
 
-	public function actionAdd($ProductID)
+	public function actionAdd($id)
 	{
-		$product = Product::model()->with('productsFields')->findByPk($ProductID);
+		$product = Product::model()->with('productFields')->findByPk($id);
 		$Goods = $product->getGoodsObject();
 
 		$extPth = CHtml::asset($this->module->getlayoutPath().'/js/chosen/');
@@ -62,7 +62,7 @@ class ProductController extends Controller
 			{
 				if(isset($_POST['submit']) && $Goods->save()){
 					$transaction->commit();
-					$this->redirect($this->createUrl('/admin/product/view',array('ProductID'=>$product->ID)));
+					$this->redirect($this->createUrl('/admin/product/view',array('id'=>$product->id)));
 				}
 			}
 			catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
@@ -73,7 +73,7 @@ class ProductController extends Controller
 
 		$form = $Goods->getMotelCForm();
 
-		$this->render('records/add',array('Product'=>$product,'Form'=>$form));
+		$this->render('records/add',array('product'=>$product,'form'=>$form));
 	}
 
     public function actionEditRecord($ProductID,$RecordID)

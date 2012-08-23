@@ -1,10 +1,12 @@
 <?php
+$this->pageTitle = $product->name;
+
 $this->breadcrumbs=array(
-	'Товары'    =>  array('index'),
-	'Работа с товаром #'.$Product->ID,
+    Yii::t('products',"Products") => Yii::app()->createUrl("/admin/products"),
+	$product->name,
 );
 
-$this->renderPartial('records/SecondMenu',array('Product'=>$Product));
+$this->renderPartial('records/secondMenu',array('product'=>$product));
 
 ?>
 
@@ -12,10 +14,10 @@ $this->renderPartial('records/SecondMenu',array('Product'=>$Product));
 <?php
 
     $this->widget('zii.widgets.grid.CGridView', array(
-        'dataProvider'=>$GoodsData,
+        'dataProvider'=>$recordData,
         'columns' =>
             array_merge(
-                $Goods->getTableFields()
+                $record->getTableFields()
                 ,
                 array(
                     array(

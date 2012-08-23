@@ -1,74 +1,80 @@
 <?php
 
-class Goods extends CActiveRecord
+class Record extends CActiveRecord
 {
-	private $ProductID = null;
-	private $Product = null;
-	private $ProductsFields = null;
-	private $TableFields = null;
+	private $_productId = null;
+	private $_product = null;
+	private $_productFields = null;
+	private $_tableFields = null;
 
 	public function setProductID($v)
 	{
-		$this->ProductID = $v;
+		$this->_productId = $v;
 	}
 
 	public function getProductID()
 	{
-		return $this->Product->ID;
+		return $this->_product->id;
 	}
 
 	public function getProductFields($update = false)
 	{
-		if ( $this->Product === null ) {
-			$this->Product = Products::model()->find('Alias = :Alias',array(':Alias'=> get_class($this)) );
+		if ( $this->_product === null ) {
+			$this->_product = Product::model()->find('alias = :alias',array(':alias'=> get_class($this)) );
 
-			if ( $this->Product )
-				$this->setProductID($this->Product->ID);
+			if ( $this->_product )
+				$this->setProductID($this->_product->id);
 			else
 				throw new CException("ID NOT ProductID");
 		}
 
-		if ( $this->ProductsFields === null && $update === false )
-			$this->ProductsFields = ProductsFields::model()
-										->with('StringFields','TextFields','IntegerFields','PriceFields','ListFields')
-										->findAll('ProductID=:ProductID',array(':ProductID'=>$this->getProductID()));
+		if ( $this->_productFields === null && $update === false )
+			$this->_productFields = ProductField::model()
+										->with('stringField','textField','integerField','priceField','listField','categoryField')
+										->findAll('product_id=:product_id',array(':product_id'=>$this->getProductID()));
 
 
 
-		return $this->ProductsFields;
+		return $this->_productFields;
 	}
 
 	public function getTableFields($update = false)
 	{
 
-		if ( $this->TableFields === null && $update === false ){
-			$ProductFields = $this->getProductFields();
+		if ( $this->_tableFields === null && $update === false ){
+			$productFields = $this->getProductFields();
 
-			if ( $ProductFields ){
-				foreach( $ProductFields as $Field ){
+			if ( $productFields ){
+				foreach( $productFields as $Field ){
 					if( $Field->IsColumnTable )
 
-						switch( $Field->FieldType ){
-							case TypeFields::LISTS :
-								if ($Field->ListFields->IsMultipleSelect)
+						switch( $Field->field_type ){
+							case TypeField::LISTS :
+								if ($Field->listField->is_multiple_select)
 									$this->TableFields[] = array(
-										'name' => $Field->Alias,
-										'value' => '$data->getRecordItems("'.$Field->Alias.'Items")'
+										'name' => $Field->alias,
+										'value' => '$data->getRecordItems("'.$Field->alias.'Items")'
 									);
 								else
 									$this->TableFields[] = array(
-										'name'	=> $Field->Alias,
-										'value' => 'isset($data->'.$Field->Alias.'Item) ? $data->'.$Field->Alias.'Item->Name : null'
+										'name'	=> $Field->alias,
+										'value' => 'isset($data->'.$Field->alias.'Item) ? $data->'.$Field->alias.'Item->name : null'
 									);
 							break;
-							case TypeFields::CATEGORIES :
+							case TypeField::CATEGORIES :
+                                if ($Field->categoryField->is_multiple_select)
+                                    $this->TableFields[] = array(
+    									'name' => $Field->alias,
+										'value' => '$data->getRecordCategory("'.$Field->alias.'")'
+									);
+                                else
 									$this->TableFields[] = array(
-										'name' => $Field->Alias,
-										'value' => '$data->getRecordCategory("'.$Field->Alias.'")'
+    									'name'	=> $Field->alias,
+										'value' => 'isset($data->'.$Field->alias.'Category) ? $data->'.$Field->alias.'Category->name : null'
 									);
 							break;
 							default:
-								$this->TableFields[] = $Field->Alias;
+								$this->TableFields[] = $Field->alias;
 							break;
 						}
 
@@ -156,44 +162,44 @@ class Goods extends CActiveRecord
 
 		if ( $ProductFields ){
 			foreach( $ProductFields as $Field ){
-                $Form['elements'][$Field->Alias] = TypeFields::$Fields[$Field->FieldType]['form'];
-				switch( $Field->FieldType ){
-					case TypeFields::TEXT :
-						$Form['elements'][$Field->Alias]['rows'] = $Field->TextFields->Rows;
+                $Form['elements'][$Field->alias] = TypeField::$Fields[$Field->field_type]['form'];
+				switch( $Field->field_type ){
+					case TypeField::TEXT :
+						$Form['elements'][$Field->alias]['rows'] = $Field->textField->rows;
 					break;
-    				case TypeFields::LISTS :
-						$Form['elements'][$Field->Alias]['items'] = CHtml::listData(ListsItems::model()->findAll('ListID = :ListID',array(':ListID'=>$Field->ListFields->ListID)), 'ID', 'Name');
-						if ( $Field->ListFields->IsMultipleSelect ){
+    				case TypeField::LISTS :
+						$Form['elements'][$Field->alias]['items'] = CHtml::listData(ListItem::model()->findAll('list_id = :list_id',array(':list_id'=>$Field->listField->list_id)), 'id', 'name');
+						if ( $Field->listField->is_multiple_select ){
 
 							$selected = array();
-							if ( $this->{$Field->Alias."Items"} ) {
-								foreach( $this->{$Field->Alias."Items"} as $Item ){
+							if ( $this->{$Field->alias."Items"} ) {
+								foreach( $this->{$Field->alias."Items"} as $Item ){
 									$selected[] = $Item->ID;
 								}
 							}
 
-                            $this->{$Field->Alias} = $selected;
+                            $this->{$Field->alias} = $selected;
 
-							$Form['elements'][$Field->Alias]['multiple'] = true;
-							$Form['elements'][$Field->Alias]['class'] = 'chzn-select';
+							$Form['elements'][$Field->alias]['multiple'] = true;
+							$Form['elements'][$Field->alias]['class'] = 'chzn-select';
 						}
 					break;
 
-    				case TypeFields::CATEGORIES :
-						$Form['elements'][$Field->Alias]['items'] = CHtml::listData(Category::model()->findAll(), 'ID', 'Name');
-
+    				case TypeField::CATEGORIES :
+						$Form['elements'][$Field->alias]['items'] = CHtml::listData(Category::model()->findAll(), 'id', 'name');
+                        if ( $Field->categoryField->is_multiple_select ){
 							$selected = array();
-							if ( $this->{$Field->Alias} ) {
-								foreach( $this->{$Field->Alias} as $Item ){
+							if ( $this->{$Field->alias} ) {
+								foreach( $this->{$Field->alias} as $Item ){
 									$selected[] = $Item->ID;
 								}
 							}
 
-                            $this->{$Field->Alias} = $selected;
+                            $this->{$Field->alias} = $selected;
 
-							$Form['elements'][$Field->Alias]['multiple'] = true;
-							$Form['elements'][$Field->Alias]['class'] = 'chzn-select';
-
+							$Form['elements'][$Field->alias]['multiple'] = true;
+							$Form['elements'][$Field->alias]['class'] = 'chzn-select';
+                        }
 					break;
 				}
 			}
@@ -228,24 +234,26 @@ class Goods extends CActiveRecord
         $ProductFields = $this->getProductFields();
     	if ( $ProductFields ){
 			foreach( $ProductFields as $Field ){
-				switch( $Field->FieldType ){
-					case TypeFields::LISTS :
-                        if ($Field->ListFields->IsMultipleSelect)
-    						$relations[$Field->Alias.'Items'] = array(	self::MANY_MANY,
-																		'ListsItems', 'RecordsLists(RecordID, ListItemID)',
-																		'on' => 'ProductID = ' .$this->getProductID()
+				switch( $Field->field_type ){
+					case TypeField::LISTS :
+                        if ($Field->listField->is_multiple_select)
+    						$relations[$Field->alias.'Items'] = array(	self::MANY_MANY,
+																		'ListItem', 'RecordsLists(record_id, list_item_id)',
+																		'on' => 'product_id = ' .$this->getProductID()
 
 																	);
 						else
-                            $relations[$Field->Alias.'Item'] = array( self::BELONGS_TO,'ListsItems',$Field->Alias );
+                            $relations[$Field->alias.'Item'] = array( self::BELONGS_TO,'ListItem', $Field->alias );
                     break;
-					case TypeFields::CATEGORIES :
+					case TypeField::CATEGORIES :
+                        if ($Field->categoryField->is_multiple_select)
+    						$relations[$Field->alias] = array(	self::MANY_MANY,
+																'Category', 'record_category(record_id, category_id)',
+																//'on' => 'product_id = ' .$this->getProductID()
 
-    						$relations[$Field->Alias] = array(	self::MANY_MANY,
-																		'Category', 'record_category(record_id, category_id)',
-																		//'on' => 'ProductID = ' .$this->getProductID()
-
-																	);
+															);
+                        else
+                            $relations[$Field->alias.'Category'] = array( self::BELONGS_TO,'Category', $Field->alias );                                            
                     break;
 				}
 			}
@@ -263,11 +271,11 @@ class Goods extends CActiveRecord
         $ProductFields = $this->getProductFields();
     	if ( $ProductFields ){
 			foreach( $ProductFields as $Field ){
-				switch( $Field->FieldType ){
-					case TypeFields::LISTS :
-                        if ($Field->ListFields->IsMultipleSelect){
+				switch( $Field->field_type ){
+					case TypeField::LISTS :
+                        if ($Field->listField->is_multiple_select){
 
-							RecordsLists::model()->deleteAll('ProductID = :ProductID AND RecordID = :RecordID',array(":ProductID"=> $this->getProductID(),':RecordID'=> $this->ID));
+							RecordsLists::model()->deleteAll('product_id = :ProductID AND RecordID = :RecordID',array(":ProductID"=> $this->getProductID(),':RecordID'=> $this->ID));
 
 							if ( isset($PostData[$Field->Alias]) ){
 								foreach ($PostData[$Field->Alias] as $ListItemID) {
@@ -280,7 +288,7 @@ class Goods extends CActiveRecord
 							}
 						}
                     break;
-					case TypeFields::CATEGORIES :
+					case TypeField::CATEGORIES :
 
 						RecordsCategories::model()->deleteAll('ProductID = :ProductID AND RecordID = :RecordID',array(":ProductID"=> $this->getProductID(),':RecordID'=> $this->ID));
 
@@ -306,45 +314,45 @@ class Goods extends CActiveRecord
 		$rules      = array();
 		$required   = array();
 		$numerical  = array();
-		$safe       = array('Title','Keywords','Description');
-		$unique     = array("Alias");
+		$safe       = array('title','keywords','description');
+		$unique     = array("alias");
 
 		$ProductFields = $this->getProductFields();
 
 		if ( $ProductFields ){
 			foreach( $ProductFields as $Field ){
-				if ( $Field->IsMandatory ) $required[] = $Field->Alias;
+				if ( $Field->is_mandatory ) $required[] = $Field->alias;
 
-				switch( $Field->FieldType ){
-					case TypeFields::TEXT :
-						$safe[] = $Field->Alias;
-						$rules[] = array($Field->Alias,'length','min'=> $Field->TextFields->MinLength,'max'=>$Field->TextFields->MaxLength,'allowEmpty'=>true );
+				switch( $Field->field_type ){
+					case TypeField::TEXT :
+						$safe[] = $Field->alias;
+						$rules[] = array($Field->alias,'length','min'=> $Field->textField->min_length,'max'=>$Field->textField->max_length,'allowEmpty'=>true );
 					break;
-					case TypeFields::STRING :
-						$safe[] = $Field->Alias;
-						$rules[] = array($Field->Alias,'length','min'=> $Field->StringFields->MinLength,'max'=>$Field->StringFields->MaxLength,'allowEmpty'=>true );
+					case TypeField::STRING :
+						$safe[] = $Field->alias;
+						$rules[] = array($Field->alias,'length','min'=> $Field->stringField->min_length,'max'=>$Field->stringField->max_length,'allowEmpty'=>true );
 					break;
-					case TypeFields::INTEGER :
-						$rules[] = array($Field->Alias, 'numerical', 'integerOnly'=>true,'min'=> $Field->IntegerFields->MinValue ,'max'=>$Field->IntegerFields->MaxValue ,'allowEmpty'=>true);
+					case TypeField::INTEGER :
+						$rules[] = array($Field->alias, 'numerical', 'integerOnly'=>true,'min'=> $Field->integerField->min_value ,'max'=>$Field->integerField->max_value ,'allowEmpty'=>true);
 					break;
-					case TypeFields::PRICE :
-						$rules[] = array($Field->Alias, 'match', 'pattern'=>'/^\s*[-+]?[0-9]*\.?[0-9]{1,2}?\s*$/',
-											'message' => Yii::t("AdminModule.products",'Price has the wrong format (eg 10.50).')
+					case TypeField::PRICE :
+						$rules[] = array($Field->alias, 'match', 'pattern'=>'/^\s*[-+]?[0-9]*\.?[0-9]{1,2}?\s*$/',
+											'message' => Yii::t("products",'Price has the wrong format (eg 10.50).')
 										);
 
-						$rules[] = array($Field->Alias, 'numerical', 'max'=>$Field->PriceFields->MaxValue ,'allowEmpty'=>true);
+						$rules[] = array($Field->alias, 'numerical', 'max'=>$Field->priceField->max_value ,'allowEmpty'=>true);
 
 					break;
-    				case TypeFields::LISTS :
-						if ($Field->ListFields->IsMultipleSelect)
-							$rules[] = array($Field->Alias, 'ArrayValidator', 'validator'=>'numerical', 'params'=>array(
+    				case TypeField::LISTS :
+						if ($Field->listField->is_multiple_select)
+							$rules[] = array($Field->alias, 'ArrayValidator', 'validator'=>'numerical', 'params'=>array(
 												'integerOnly'=>true, 'allowEmpty'=>false
 											));
 						else
-							$rules[] = array($Field->Alias, 'numerical', 'integerOnly'=>true,'allowEmpty'=>true);
+							$rules[] = array($Field->alias, 'numerical', 'integerOnly'=>true,'allowEmpty'=>true);
 					break;
-    				case TypeFields::CATEGORIES :
-							$rules[] = array($Field->Alias, 'ArrayValidator', 'validator'=>'numerical', 'params'=>array(
+    				case TypeField::CATEGORIES :
+							$rules[] = array($Field->alias, 'ArrayValidator', 'validator'=>'numerical', 'params'=>array(
 												'integerOnly'=>true, 'allowEmpty'=>false
 											));
 					break;
@@ -362,8 +370,8 @@ class Goods extends CActiveRecord
 		if ( !empty($unique) )
 			$rules[] = array(implode(',',$unique), 'unique');
 
-		$rules[] = array('Alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u',
-						'message' => Yii::t("AdminModule.products",'Field contains invalid characters.'));
+		$rules[] = array('alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u',
+						'message' => Yii::t("products",'Field contains invalid characters.'));
 
 		return $rules;
 	}
@@ -376,7 +384,7 @@ class Goods extends CActiveRecord
 
 		if ( $ProductFields ){
 			foreach( $ProductFields as $Field ){
-				$labels[$Field->Alias] = $Field->Name;
+				$labels[$Field->alias] = $Field->name;
 			}
 		}
 

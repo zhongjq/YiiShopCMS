@@ -37,8 +37,9 @@ return array(
 		        '/admin/constructor/<productId:\d+>/field/<action:(edit|delete)>/<fieldId:\d+>' => 'admin/constructor/<action>field',
 
                     // записи
-                '/admin/product/view/<productId:\d+>/add' => 'admin/product/add',
-                '/admin/product/view/<productId:\d+>/record/<action:(edit|delete)>/<fieldId:\d+>' => 'admin/product/<action>record',
+                '/admin/product/<id:\d+>' => 'admin/product/view',
+                '/admin/product/<id:\d+>/add' => 'admin/product/add',
+                '/admin/product/<productId:\d+>/record/<action:(edit|delete)>/<fieldId:\d+>' => 'admin/product/<action>record',
 
 				// Списки
                 '/admin/lists/add' => 'admin/lists/add',

@@ -1,7 +1,7 @@
 <?php
 	$this->SecondMenu=array(
-		array(  'label' => Yii::t('AdminModule.products',"Add list"),
-				'url'   => array('/admin/products/lists/add'),
-				'active'=> $this->getAction()->getId() == 'addlist' ),
+		array(  'label' => Yii::t('lists',"Add list"),
+				'url'   => array('/admin/lists/add'),
+				'active'=> $this->getAction()->getId() == 'add' ),
 
 	);
