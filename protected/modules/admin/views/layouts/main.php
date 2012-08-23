@@ -63,28 +63,34 @@
 								'itemOptions'	=>	array('class'=>'dropdown'),
 								'linkOptions'	=>	array('class'=>'dropdown-toggle','data-toggle'=>'dropdown-toggle'),
 								'encodeLabel'	=>	false,
-								'items'			=>	array(
-									array(	'label'	=>	Yii::t("categories", "Categories"),
-											'url'	=>	array('/admin/category'),
-											'active'=>	$this->getId() =='categories'),
-
-									array(	'label'	=>	Yii::t("manufacturers", "Manufacturers"),
-											'url'	=>	array('/admin/manufacturer'),
-											'active'=>	$this->getId() =='manufacturers'),
-									array(  'label' => Yii::t('lists',"Lists"),
-											'url'   => array('/admin/lists'),
-											'active'=> $this->getAction()->getId() == 'lists' ),
-									array(	'label'	=>	Yii::t("products", "Constructor Goods"),
-											'url'	=>	array('/admin/constructor'),
-											'active'=>	$this->getId() =='product'),
-
-								)
+								'items'			=>
+                                    array_merge(
+                                        Product::getElementsMenuProduct()
+                                        ,
+                                        array(
+        									array(	'label'	=>	Yii::t("categories", "Categories"),
+        											'url'	=>	array('/admin/categories'),
+        											'active'=>	$this->getId() =='category'),
+        
+        									array(	'label'	=>	Yii::t("manufacturers", "Manufacturers"),
+        											'url'	=>	array('/admin/manufacturers'),
+        											'active'=>	$this->getId() =='manufacturer'),
+                                                    
+        									array(  'label' =>  Yii::t('lists',"Lists"),
+        											'url'   =>  array('/admin/lists'),
+        											'active'=>  $this->getId() == 'lists' ),
+                                                    
+        									array(	'label'	=>	Yii::t("products", "Constructor Goods"),
+        											'url'	=>	array('/admin/constructor'),
+        											'active'=>	$this->getId() =='constructor'),
+                                        )
+                                    )								
 							),
 
 
 						//array('label'=> Yii::t("AdminModule.main", "Товары"),	'url'=>array('/admin/products'), 'active'=>$this->getId() =='product'),
-						array('label'=> Yii::t("AdminModule.main", "Заказы"), 'url'=>array('/admin/orders'), 'active'=>$this->getId() =='orders'),
-						array('label'=> Yii::t("AdminModule.main", "Пользователи"), 'url'=>array('/admin/users'), 'active'=>$this->getId() =='users'),
+						array('label'=> Yii::t("main", "Заказы"), 'url'=>array('/admin/orders'), 'active'=>$this->getId() =='orders'),
+						array('label'=> Yii::t("main", "Пользователи"), 'url'=>array('/admin/users'), 'active'=>$this->getId() =='users'),
 					);
 				?>
 				<?php $this->widget('zii.widgets.CMenu',array(

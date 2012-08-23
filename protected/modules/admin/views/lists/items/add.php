@@ -2,7 +2,7 @@
 
 $this->breadcrumbs=array(
     Yii::t('lists',"Lists") => array("/admin/lists"),
-    Yii::t('lists',"Items list").$list->id => $this->createUrl('/admin/lists/items',array('id'=>$list->id) ),
+    Yii::t('lists',"Items list #").$list->id => $this->createUrl('/admin/lists/items',array('id'=>$list->id) ),
     Yii::t('lists',"Add items")
 );
 
@@ -28,7 +28,7 @@ $this->renderPartial('items/secondMenu',array('list'=>$list));
 	</div>
 
 	<div class="buttons">
-		<?php echo CHtml::submitButton($listItem->isNewRecord ? 'Add' : 'Save',array("class"=>"btn")); ?>
+		<?php echo CHtml::submitButton($listItem->isNewRecord ? Yii::t('main',"Add") : Yii::t('main',"Save"), array("class"=>"btn")); ?>
 	</div>
 
 <?php $this->endWidget(); ?>

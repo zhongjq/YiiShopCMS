@@ -71,6 +71,7 @@ class TypeField
     	self::CATEGORIES     => array(
 			'name'      =>  "Категория(и)",
 			'type'      =>  "categories",
+            'class'     =>  "CategoryField",
 			'dbType'    =>  "int(11)",
 			'form'      =>  array(
                 'type'  =>  'dropdownlist',

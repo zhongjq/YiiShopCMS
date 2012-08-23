@@ -72,11 +72,13 @@ class ProductField extends CActiveRecord
 		return array(
             'product'       => array(self::BELONGS_TO, 'Product', 'product_id'),
 
-			'IntegerFields' => array(self::HAS_ONE, 'IntegerFields', 'FieldID'),
-			'PriceFields'   => array(self::HAS_ONE, 'PriceFields', 'FieldID'),
-			'StringFields'  => array(self::HAS_ONE, 'StringFields', 'FieldID'),
-			'TextFields'    => array(self::HAS_ONE, 'TextFields', 'FieldID'),
-            'ListFields'    => array(self::HAS_ONE, 'ListFields', 'FieldID'),
+			'integerField' => array(self::HAS_ONE, 'IntegerField', 'field_id'),
+			'priceField' => array(self::HAS_ONE, 'PriceField', 'field_id'),
+			'stringField' => array(self::HAS_ONE, 'StringField', 'field_id'),
+			'textField' => array(self::HAS_ONE, 'TextField', 'field_id'),
+            'listField' => array(self::HAS_ONE, 'ListField', 'field_id'),
+            'categoryField' => array(self::HAS_ONE, 'CategoryField', 'field_id'),
+            
 		);
 	}
 

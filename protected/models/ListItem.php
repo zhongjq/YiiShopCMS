@@ -68,7 +68,7 @@ class ListItem extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			//'ID' => 'ID',
+			'id' => Yii::t("lists","ID"),
 			//'list_id' => 'List',
 			'status' => Yii::t("lists","Status"),
 			'priority' => Yii::t("lists","Priority"),
