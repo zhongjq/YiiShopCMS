@@ -1,15 +1,15 @@
 <?php
 $this->breadcrumbs=array(
 	'Товары'    =>  array('index'),
-	'Работа с товаром #'.$Product->ID." ({$Product->Name})" => $this->createUrl('/admin/product/view',array('ProductID'=>$Product->ID)),
+	'Работа с товаром #'.$product->id." ({$product->name})" => $this->createUrl('/admin/product/view',array('productId'=>$product->id)),
 	'Редактирование товара',
 );
 
-$this->renderPartial('records/SecondMenu',array('Product'=>$Product));
+$this->renderPartial('records/secondMenu',array('product'=>$product));
 
 
 Yii::app()->getClientScript()->registerScript("select",'$(function(){$("form select").chosen({allow_single_deselect:true});});');
 
-echo $Form->render(); 
+echo $form->render();
 
 ?>

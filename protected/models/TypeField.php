@@ -8,6 +8,7 @@ class TypeField
 	const TEXT = 4;
     const LISTS = 5;
     const CATEGORIES = 6;
+    const MANUFACTURER = 7;
 
 	public static $TypeToIDFields = array(
 		'integer'   => self::INTEGER,
@@ -72,6 +73,16 @@ class TypeField
 			'name'      =>  "Категория(и)",
 			'type'      =>  "categories",
             'class'     =>  "CategoryField",
+			'dbType'    =>  "int(11)",
+			'form'      =>  array(
+                'type'  =>  'dropdownlist',
+				'empty' =>  '',
+            ),
+		),
+    	self::MANUFACTURER     => array(
+			'name'      =>  "Производитель(и)",
+			'type'      =>  "manufacturer",
+            'class'     =>  "ManufacturerField",
 			'dbType'    =>  "int(11)",
 			'form'      =>  array(
                 'type'  =>  'dropdownlist',

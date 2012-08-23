@@ -71,20 +71,20 @@
         									array(	'label'	=>	Yii::t("categories", "Categories"),
         											'url'	=>	array('/admin/categories'),
         											'active'=>	$this->getId() =='category'),
-        
+
         									array(	'label'	=>	Yii::t("manufacturers", "Manufacturers"),
         											'url'	=>	array('/admin/manufacturers'),
         											'active'=>	$this->getId() =='manufacturer'),
-                                                    
+
         									array(  'label' =>  Yii::t('lists',"Lists"),
         											'url'   =>  array('/admin/lists'),
         											'active'=>  $this->getId() == 'lists' ),
-                                                    
+
         									array(	'label'	=>	Yii::t("products", "Constructor Goods"),
         											'url'	=>	array('/admin/constructor'),
         											'active'=>	$this->getId() =='constructor'),
                                         )
-                                    )								
+                                    )
 							),
 
 

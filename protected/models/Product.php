@@ -10,7 +10,7 @@
  * @property string $alias
  * @property string $title
  * @property string $keywords
- * @property string $description 
+ * @property string $description
  *
  * The followings are the available model relations:
  * @property ProductsFields[] $productsFields
@@ -213,29 +213,27 @@ class Product extends CActiveRecord
 		), $this);
 	}
 
-	public function getGoodsObject(){
+	public function getRecordObject(){
 		eval("class {$this->alias} extends Record{}");
 		$Goods = new $this->alias();
 		$Goods->setProductID($this->id);
 		//$Goods->setGoodsAttributes();
 		return $Goods;
 	}
-    
-    public static function getElementsMenuProduct(){
-        $produts = Product::model()->findAll();
-       
-        $items = array();
-        if ( $produts ){
-            foreach($produts as $produt){
-               $items[] = array('label'	=> CHtml::encode($produt->name),
-						        'url'	=> Yii::app()->createUrl('/admin/product/view',array('id'=>$produt->id)),
-								'active'=> ( Yii::app()->controller->id =='product' && Yii::app()->request->getParam('id') == $produt->id )
-                                );
-            }
-            $items[] = array('itemOptions'=>array('class'=>"divider"));           
-            
-            
-        }
-        return $items;
-    }
+
+	public static function getElementsMenuProduct(){
+		$produts = Product::model()->findAll();
+
+		$items = array();
+		if ( $produts ){
+			foreach($produts as $produt){
+				$items[] = array(	'label'	=> CHtml::encode($produt->name),
+									'url'	=> Yii::app()->createUrl('/admin/product/view',array('id'=>$produt->id)),
+									'active'=> ( Yii::app()->controller->id =='product' && Yii::app()->request->getParam('id') == $produt->id )
+				);
+			}
+			$items[] = array('label'=>null,'itemOptions'=>array('class'=>"divider"));
+		}
+		return $items;
+	}
 }

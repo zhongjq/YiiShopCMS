@@ -36,10 +36,10 @@ return array(
 		        '/admin/constructor/<id:\d+>/fields/add' => 'admin/constructor/addfield',
 		        '/admin/constructor/<productId:\d+>/field/<action:(edit|delete)>/<fieldId:\d+>' => 'admin/constructor/<action>field',
 
-                    // записи
+                // записи
                 '/admin/product/<id:\d+>' => 'admin/product/view',
                 '/admin/product/<id:\d+>/add' => 'admin/product/add',
-                '/admin/product/<productId:\d+>/record/<action:(edit|delete)>/<fieldId:\d+>' => 'admin/product/<action>record',
+                '/admin/product/<productId:\d+>/record/<action:(edit|delete)>/<recordId:\d+>' => 'admin/product/<action>record',
 
 				// Списки
                 '/admin/lists/add' => 'admin/lists/add',

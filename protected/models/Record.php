@@ -25,7 +25,7 @@ class Record extends CActiveRecord
 			if ( $this->_product )
 				$this->setProductID($this->_product->id);
 			else
-				throw new CException("ID NOT ProductID");
+				throw new CException("ID NOT product_id");
 		}
 
 		if ( $this->_productFields === null && $update === false )
@@ -46,35 +46,35 @@ class Record extends CActiveRecord
 
 			if ( $productFields ){
 				foreach( $productFields as $Field ){
-					if( $Field->IsColumnTable )
+					if( $Field->is_column_table )
 
 						switch( $Field->field_type ){
 							case TypeField::LISTS :
 								if ($Field->listField->is_multiple_select)
-									$this->TableFields[] = array(
+									$this->_tableFields[] = array(
 										'name' => $Field->alias,
 										'value' => '$data->getRecordItems("'.$Field->alias.'Items")'
 									);
 								else
-									$this->TableFields[] = array(
+									$this->_tableFields[] = array(
 										'name'	=> $Field->alias,
 										'value' => 'isset($data->'.$Field->alias.'Item) ? $data->'.$Field->alias.'Item->name : null'
 									);
 							break;
 							case TypeField::CATEGORIES :
                                 if ($Field->categoryField->is_multiple_select)
-                                    $this->TableFields[] = array(
+                                    $this->_tableFields[] = array(
     									'name' => $Field->alias,
 										'value' => '$data->getRecordCategory("'.$Field->alias.'")'
 									);
                                 else
-									$this->TableFields[] = array(
+									$this->_tableFields[] = array(
     									'name'	=> $Field->alias,
 										'value' => 'isset($data->'.$Field->alias.'Category) ? $data->'.$Field->alias.'Category->name : null'
 									);
 							break;
 							default:
-								$this->TableFields[] = $Field->alias;
+								$this->_tableFields[] = $Field->alias;
 							break;
 						}
 
@@ -83,15 +83,14 @@ class Record extends CActiveRecord
 			}
 		}
 
-		return $this->TableFields;
+		return $this->_tableFields;
 	}
 
-    public function getRecordItems($Name, $sSep = ', ')
+    public function getRecordItems($name, $sSep = ', ')
 	{
-
        $aRes = array();
-       foreach ($this->{$Name} as $Item) {
-          $aRes[] = $Item->Name;
+       foreach ($this->{$name} as $item) {
+          $aRes[] = $item->name;
        }
 
        return implode($sSep, $aRes);
@@ -100,9 +99,9 @@ class Record extends CActiveRecord
     public function getRecordCategory($name, $sSep = ', ')
 	{
        $aRes = array();
-       
-       foreach ($this->{$name} as $Item) {
-          $aRes[] = $Item->name;
+
+       foreach ($this->{$name} as $item) {
+          $aRes[] = $item->name;
        }
 
        return implode($sSep, $aRes);
@@ -110,11 +109,11 @@ class Record extends CActiveRecord
 
 	public function setGoodsAttributes()
 	{
-		$ProductFields = $this->getProductFields();
+		$productFields = $this->getProductFields();
 
-		if ( $ProductFields ){
-			foreach( $ProductFields as $Field ){
-				$this->setAttribute($Field->Alias,$Field->Alias);
+		if ( $productFields ){
+			foreach( $productFields as $Field ){
+				$this->setAttribute($Field->alias,$Field->alias);
 			}
 		}
 	}
@@ -126,13 +125,13 @@ class Record extends CActiveRecord
 			'attributes'    =>  array(
 				'enctype' => 'application/form-data',
 				'class' => 'well',
-				'id' => "GoodsForm",
+				'id' => "recordForm",
 			),
 			'activeForm'    =>  array(
 				'class' => 'CActiveForm',
 				'enableAjaxValidation' => true,
 				'enableClientValidation' => false,
-				'id' => "GoodsForm",
+				'id' => "recordForm",
 				'clientOptions' => array(
 					'validateOnSubmit' => true,
 					'validateOnChange' => false,
@@ -158,10 +157,10 @@ class Record extends CActiveRecord
 			),
 		);
 
-		$ProductFields = $this->getProductFields();
+		$productFields = $this->getProductFields();
 
-		if ( $ProductFields ){
-			foreach( $ProductFields as $Field ){
+		if ( $productFields ){
+			foreach( $productFields as $Field ){
                 $Form['elements'][$Field->alias] = TypeField::$Fields[$Field->field_type]['form'];
 				switch( $Field->field_type ){
 					case TypeField::TEXT :
@@ -210,7 +209,7 @@ class Record extends CActiveRecord
 
 
 		$Form['elements'][]='<div class="tab-pane" id="tab2"><p>';
-		$Form['elements']['Alias'] = array('type'=>'text','class'=>"span5",'maxlength' =>  255);
+		$Form['elements']['alias'] = array('type'=>'text','class'=>"span5",'maxlength' =>  255);
 		$Form['elements']['Title'] = array('type'=>'textarea','class'=>"span5");
 		$Form['elements']['Keywords'] = array('type'=>'textarea','class'=>"span5");
 		$Form['elements']['Description'] = array('type'=>'textarea','class'=>"span5",'rows'=>5);
@@ -231,9 +230,9 @@ class Record extends CActiveRecord
 	{
         $relations = array();
 
-        $ProductFields = $this->getProductFields();
-    	if ( $ProductFields ){
-			foreach( $ProductFields as $Field ){
+        $productFields = $this->getProductFields();
+    	if ( $productFields ){
+			foreach( $productFields as $Field ){
 				switch( $Field->field_type ){
 					case TypeField::LISTS :
                         if ($Field->listField->is_multiple_select)
@@ -253,7 +252,7 @@ class Record extends CActiveRecord
 
 															);
                         else
-                            $relations[$Field->alias.'Category'] = array( self::BELONGS_TO,'Category', $Field->alias );                                            
+                            $relations[$Field->alias.'Category'] = array( self::BELONGS_TO,'Category', $Field->alias );
                     break;
 				}
 			}
@@ -262,42 +261,43 @@ class Record extends CActiveRecord
 		return $relations;
 	}
 
-	public function afterSave()
+	public function afterSave1()
 	{
 		parent::afterSave();
 
-        $PostData = $_POST[$this->Product->Alias];
+        $postData = $_POST[$this->_product->alias];
 
-        $ProductFields = $this->getProductFields();
-    	if ( $ProductFields ){
-			foreach( $ProductFields as $Field ){
+        $productFields = $this->getProductFields();
+    	if ( $productFields ){
+			foreach( $productFields as $Field ){
 				switch( $Field->field_type ){
 					case TypeField::LISTS :
                         if ($Field->listField->is_multiple_select){
 
-							RecordsLists::model()->deleteAll('product_id = :ProductID AND RecordID = :RecordID',array(":ProductID"=> $this->getProductID(),':RecordID'=> $this->ID));
+							RecordList::model()->deleteAll('product_id = :product_id AND record_id = :record_id',array(":product_id"=> $this->getProductID(),':record_id'=> $this->ID));
 
-							if ( isset($PostData[$Field->Alias]) ){
-								foreach ($PostData[$Field->Alias] as $ListItemID) {
+							if ( isset($PostData[$Field->alias]) ){
+								foreach ($PostData[$Field->alias] as $list_item_id) {
 									$RecordsLists = new RecordsLists();
-									$RecordsLists->ProductID = $this->getProductID();
-									$RecordsLists->RecordID = $this->ID;
-									$RecordsLists->ListItemID = $ListItemID;
+									$RecordsLists->product_id = $this->getProductID();
+									$RecordsLists->record_id = $this->ID;
+									$RecordsLists->list_item_id = $list_item_id;
 									if ( !$RecordsLists->save() ) throw new CException("ERROR SEVE LISTS");
 								}
 							}
 						}
                     break;
+
 					case TypeField::CATEGORIES :
 
-						RecordsCategories::model()->deleteAll('ProductID = :ProductID AND RecordID = :RecordID',array(":ProductID"=> $this->getProductID(),':RecordID'=> $this->ID));
+						RecordCategory::model()->deleteAll('product_id = :product_id AND record_id = :record_id',array(":product_id"=> $this->getProductID(),':record_id'=> $this->ID));
 
-						if ( isset($PostData[$Field->Alias]) ){
-							foreach ($PostData[$Field->Alias] as $CategoryID) {
+						if ( isset($PostData[$Field->alias]) ){
+							foreach ($PostData[$Field->alias] as $category_id) {
 								$RecordsCategories = new RecordsCategories();
-								$RecordsCategories->ProductID = $this->getProductID();
-								$RecordsCategories->RecordID = $this->ID;
-								$RecordsCategories->CategoryID = $CategoryID;
+								$RecordsCategories->product_id = $this->getProductID();
+								$RecordsCategories->record_id = $this->ID;
+								$RecordsCategories->category_id = $category_id;
 								if ( !$RecordsCategories->save() ) throw new CException("ERROR SEVE CATEGORIES");
 							}
 						}
@@ -317,10 +317,10 @@ class Record extends CActiveRecord
 		$safe       = array('title','keywords','description');
 		$unique     = array("alias");
 
-		$ProductFields = $this->getProductFields();
+		$productFields = $this->getProductFields();
 
-		if ( $ProductFields ){
-			foreach( $ProductFields as $Field ){
+		if ( $productFields ){
+			foreach( $productFields as $Field ){
 				if ( $Field->is_mandatory ) $required[] = $Field->alias;
 
 				switch( $Field->field_type ){
@@ -335,12 +335,15 @@ class Record extends CActiveRecord
 					case TypeField::INTEGER :
 						$rules[] = array($Field->alias, 'numerical', 'integerOnly'=>true,'min'=> $Field->integerField->min_value ,'max'=>$Field->integerField->max_value ,'allowEmpty'=>true);
 					break;
-					case TypeField::PRICE :
+					case TypeField::PRICE:
+
 						$rules[] = array($Field->alias, 'match', 'pattern'=>'/^\s*[-+]?[0-9]*\.?[0-9]{1,2}?\s*$/',
 											'message' => Yii::t("products",'Price has the wrong format (eg 10.50).')
 										);
+						$price = array($Field->alias, 'numerical', 'allowEmpty'=>$Field->is_mandatory);
 
-						$rules[] = array($Field->alias, 'numerical', 'max'=>$Field->priceField->max_value ,'allowEmpty'=>true);
+						if ( $Field->priceField->max_value ) $price['max'] = $Field->priceField->max_value;
+						$rules[] = $price;
 
 					break;
     				case TypeField::LISTS :
@@ -352,9 +355,12 @@ class Record extends CActiveRecord
 							$rules[] = array($Field->alias, 'numerical', 'integerOnly'=>true,'allowEmpty'=>true);
 					break;
     				case TypeField::CATEGORIES :
+						if ($Field->categoryField->is_multiple_select)
 							$rules[] = array($Field->alias, 'ArrayValidator', 'validator'=>'numerical', 'params'=>array(
-												'integerOnly'=>true, 'allowEmpty'=>false
-											));
+												'integerOnly'=>true, 'allowEmpty'=> $Field->is_mandatory));
+						else
+							$rules[] = array($Field->alias, 'numerical','integerOnly'=>true,'allowEmpty'=> $Field->is_mandatory );
+
 					break;
 				}
 
@@ -380,10 +386,10 @@ class Record extends CActiveRecord
 	{
 		$labels = array();
 
-		$ProductFields = $this->getProductFields();
+		$productFields = $this->getProductFields();
 
-		if ( $ProductFields ){
-			foreach( $ProductFields as $Field ){
+		if ( $productFields ){
+			foreach( $productFields as $Field ){
 				$labels[$Field->alias] = $Field->name;
 			}
 		}

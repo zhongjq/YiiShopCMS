@@ -126,7 +126,7 @@ class ListsController extends Controller
 
         $list = Lists::model()->findbyPk($id);
 
-        $listItem = new ListItem('add');
+        $listItem = new ListItem('addItems');
         $listItem->list_id = $id;
 
         if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "additems-form" ){
@@ -134,24 +134,26 @@ class ListsController extends Controller
 			Yii::app()->end();
 		}
 
-         if( isset($_POST['ListItem'])  ) {
+        if( isset($_POST['ListItem']) ) {
 
 			$transaction = Yii::app()->db->beginTransaction();
 			try
 			{
                 $items = explode("\n",$_POST['ListItem']['name']);
 
-                foreach( $items as $item_name ){
-                    $IL = new ListItem('add');
-                    $IL->list_id = $id;
-                    $IL->name = $item_name;
-          			if ( !$IL->save() ){
-    					throw new CException("Error save");
-    				}
-                }
+				if ( !empty($items) ){
+					foreach( $items as $item_name ){
+						$IL = new ListItem('add');
+						$IL->list_id = $id;
+						$IL->name = $item_name;
+						if ( !$IL->save() ){
+							throw new CException("Error save");
+						}
+					}
 
-				$transaction->commit();
-				$this->redirect( $this->createUrl('/admin/lists/items',array('id'=>$id)) );
+					$transaction->commit();
+					$this->redirect( $this->createUrl('/admin/lists/items',array('id'=>$id)) );
+				}
 			}
 			catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
 			{
