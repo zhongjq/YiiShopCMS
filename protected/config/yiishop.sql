@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 3.5.2.1
+-- version 3.5.2
 -- http://www.phpmyadmin.net
 --
--- Хост: localhost
--- Время создания: Авг 20 2012 г., 22:00
--- Версия сервера: 5.5.24-0ubuntu0.12.04.1
--- Версия PHP: 5.3.10-1ubuntu3.2
+-- Host: mysql0.db.koding.com
+-- Generation Time: Aug 23, 2012 at 05:40 AM
+-- Server version: 5.1.61-log
+-- PHP Version: 5.3.3
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -17,13 +17,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 --
--- База данных: `enchikiben_fbfde`
+-- Database: `enchikiben_fbfde`
 --
 
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `category`
+-- Table structure for table `category`
 --
 
 CREATE TABLE IF NOT EXISTS `category` (
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS `category` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Категории' AUTO_INCREMENT=6 ;
 
 --
--- Дамп данных таблицы `category`
+-- Dumping data for table `category`
 --
 
 INSERT INTO `category` (`id`, `root`, `lft`, `rgt`, `level`, `status`, `alias`, `name`, `description`) VALUES
@@ -53,7 +53,55 @@ INSERT INTO `category` (`id`, `root`, `lft`, `rgt`, `level`, `status`, `alias`, 
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `integer_field`
+-- Table structure for table `category_field`
+--
+
+CREATE TABLE IF NOT EXISTS `category_field` (
+  `field_id` int(11) NOT NULL,
+  `category_id` int(11) NOT NULL,
+  `is_multiple_select` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`field_id`),
+  KEY `category_id` (`category_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `category_field`
+--
+
+INSERT INTO `category_field` (`field_id`, `category_id`, `is_multiple_select`) VALUES
+(7, 2, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `image_field`
+--
+
+CREATE TABLE IF NOT EXISTS `image_field` (
+  `field_id` int(11) NOT NULL,
+  `is_multiple_select` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Множественный выбор картинок',
+  `quantity` int(11) NOT NULL,
+  PRIMARY KEY (`field_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Поля картинок';
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `image_field_parameter`
+--
+
+CREATE TABLE IF NOT EXISTS `image_field_parameter` (
+  `field_id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `width` int(11) NOT NULL,
+  `height` int(11) NOT NULL,
+  KEY `field_id` (`field_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Таблица параметров поля изображения';
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `integer_field`
 --
 
 CREATE TABLE IF NOT EXISTS `integer_field` (
@@ -64,7 +112,7 @@ CREATE TABLE IF NOT EXISTS `integer_field` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Числовое поле';
 
 --
--- Дамп данных таблицы `integer_field`
+-- Dumping data for table `integer_field`
 --
 
 INSERT INTO `integer_field` (`field_id`, `min_value`, `max_value`) VALUES
@@ -73,19 +121,26 @@ INSERT INTO `integer_field` (`field_id`, `min_value`, `max_value`) VALUES
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `list`
+-- Table structure for table `list`
 --
 
 CREATE TABLE IF NOT EXISTS `list` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Списки' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Списки' AUTO_INCREMENT=3 ;
+
+--
+-- Dumping data for table `list`
+--
+
+INSERT INTO `list` (`id`, `name`) VALUES
+(1, 'Диаметр');
 
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `list_field`
+-- Table structure for table `list_field`
 --
 
 CREATE TABLE IF NOT EXISTS `list_field` (
@@ -94,12 +149,19 @@ CREATE TABLE IF NOT EXISTS `list_field` (
   `is_multiple_select` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Множественный выбор списка',
   PRIMARY KEY (`field_id`),
   KEY `list_id` (`list_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6 ;
+
+--
+-- Dumping data for table `list_field`
+--
+
+INSERT INTO `list_field` (`field_id`, `list_id`, `is_multiple_select`) VALUES
+(5, 1, 0);
 
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `list_item`
+-- Table structure for table `list_item`
 --
 
 CREATE TABLE IF NOT EXISTS `list_item` (
@@ -110,12 +172,34 @@ CREATE TABLE IF NOT EXISTS `list_item` (
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `list_id` (`list_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Списки' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Списки' AUTO_INCREMENT=18 ;
+
+--
+-- Dumping data for table `list_item`
+--
+
+INSERT INTO `list_item` (`id`, `list_id`, `status`, `priority`, `name`) VALUES
+(1, 1, 1, 0, '12'),
+(2, 1, 1, 0, '13\r'),
+(3, 1, 1, 0, '14\r'),
+(4, 1, 1, 0, '15\r'),
+(5, 1, 1, 0, '16\r'),
+(6, 1, 1, 0, '16.5\r'),
+(7, 1, 1, 0, '17\r'),
+(8, 1, 1, 0, '18\r'),
+(9, 1, 1, 0, '19\r'),
+(10, 1, 1, 0, '20\r'),
+(11, 1, 1, 0, '21\r'),
+(12, 1, 1, 0, '22\r'),
+(13, 1, 1, 0, '23\r'),
+(14, 1, 1, 0, '24\r'),
+(15, 1, 1, 0, '26\r'),
+(16, 1, 1, 0, '28');
 
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `manufacturer`
+-- Table structure for table `manufacturer`
 --
 
 CREATE TABLE IF NOT EXISTS `manufacturer` (
@@ -129,7 +213,7 @@ CREATE TABLE IF NOT EXISTS `manufacturer` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Производители' AUTO_INCREMENT=10 ;
 
 --
--- Дамп данных таблицы `manufacturer`
+-- Dumping data for table `manufacturer`
 --
 
 INSERT INTO `manufacturer` (`id`, `status`, `alias`, `name`, `description`, `logo`) VALUES
@@ -146,7 +230,7 @@ INSERT INTO `manufacturer` (`id`, `status`, `alias`, `name`, `description`, `log
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `price_field`
+-- Table structure for table `price_field`
 --
 
 CREATE TABLE IF NOT EXISTS `price_field` (
@@ -156,7 +240,7 @@ CREATE TABLE IF NOT EXISTS `price_field` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Ценовые поля';
 
 --
--- Дамп данных таблицы `price_field`
+-- Dumping data for table `price_field`
 --
 
 INSERT INTO `price_field` (`field_id`, `max_value`) VALUES
@@ -165,7 +249,7 @@ INSERT INTO `price_field` (`field_id`, `max_value`) VALUES
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `product`
+-- Table structure for table `product`
 --
 
 CREATE TABLE IF NOT EXISTS `product` (
@@ -180,7 +264,7 @@ CREATE TABLE IF NOT EXISTS `product` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Таблица продуктов магазина' AUTO_INCREMENT=2 ;
 
 --
--- Дамп данных таблицы `product`
+-- Dumping data for table `product`
 --
 
 INSERT INTO `product` (`id`, `status`, `name`, `alias`, `title`, `keywords`, `description`) VALUES
@@ -189,7 +273,7 @@ INSERT INTO `product` (`id`, `status`, `name`, `alias`, `title`, `keywords`, `de
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `product_field`
+-- Table structure for table `product_field`
 --
 
 CREATE TABLE IF NOT EXISTS `product_field` (
@@ -206,22 +290,24 @@ CREATE TABLE IF NOT EXISTS `product_field` (
   `hint` varchar(255) NOT NULL COMMENT 'Подсказка',
   PRIMARY KEY (`id`),
   KEY `ProductID` (`product_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=8 ;
 
 --
--- Дамп данных таблицы `product_field`
+-- Dumping data for table `product_field`
 --
 
 INSERT INTO `product_field` (`id`, `position`, `product_id`, `field_type`, `name`, `alias`, `is_mandatory`, `is_filter`, `is_column_table`, `unit_name`, `hint`) VALUES
 (1, 0, 1, 2, 'Наименование', 'name', 1, 0, 1, '', ''),
 (2, 0, 1, 3, 'Цена', 'price', 1, 1, 1, '', ''),
 (3, 0, 1, 1, 'Количество на складе', 'quantity', 0, 1, 1, '', ''),
-(4, 0, 1, 4, 'Описание', 'description', 0, 0, 0, '', '');
+(4, 0, 1, 4, 'Описание', 'description', 0, 0, 0, '', ''),
+(5, 0, 1, 5, 'Диаметр', 'diameter', 0, 1, 1, '', ''),
+(7, 0, 1, 6, 'Категория', 'category', 0, 0, 1, '', '');
 
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `record_category`
+-- Table structure for table `record_category`
 --
 
 CREATE TABLE IF NOT EXISTS `record_category` (
@@ -235,7 +321,7 @@ CREATE TABLE IF NOT EXISTS `record_category` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `record_list`
+-- Table structure for table `record_list`
 --
 
 CREATE TABLE IF NOT EXISTS `record_list` (
@@ -249,7 +335,7 @@ CREATE TABLE IF NOT EXISTS `record_list` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `string_field`
+-- Table structure for table `string_field`
 --
 
 CREATE TABLE IF NOT EXISTS `string_field` (
@@ -260,7 +346,7 @@ CREATE TABLE IF NOT EXISTS `string_field` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Строковые поля';
 
 --
--- Дамп данных таблицы `string_field`
+-- Dumping data for table `string_field`
 --
 
 INSERT INTO `string_field` (`field_id`, `min_length`, `max_length`) VALUES
@@ -269,7 +355,7 @@ INSERT INTO `string_field` (`field_id`, `min_length`, `max_length`) VALUES
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `text_field`
+-- Table structure for table `text_field`
 --
 
 CREATE TABLE IF NOT EXISTS `text_field` (
@@ -281,7 +367,7 @@ CREATE TABLE IF NOT EXISTS `text_field` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Текстовые поля';
 
 --
--- Дамп данных таблицы `text_field`
+-- Dumping data for table `text_field`
 --
 
 INSERT INTO `text_field` (`field_id`, `min_length`, `max_length`, `rows`) VALUES
@@ -290,7 +376,7 @@ INSERT INTO `text_field` (`field_id`, `min_length`, `max_length`, `rows`) VALUES
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `tires`
+-- Table structure for table `tires`
 --
 
 CREATE TABLE IF NOT EXISTS `tires` (
@@ -302,13 +388,15 @@ CREATE TABLE IF NOT EXISTS `tires` (
   `name` varchar(255) DEFAULT NULL,
   `price` decimal(9,2) DEFAULT NULL,
   `quantity` int(11) DEFAULT NULL,
+  `diameter` int(11) DEFAULT NULL,
+  `category` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `user`
+-- Table structure for table `user`
 --
 
 CREATE TABLE IF NOT EXISTS `user` (
@@ -324,49 +412,67 @@ CREATE TABLE IF NOT EXISTS `user` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Таблица пользователей' AUTO_INCREMENT=2 ;
 
 --
--- Дамп данных таблицы `user`
+-- Dumping data for table `user`
 --
 
 INSERT INTO `user` (`id`, `status`, `role_id`, `registration_time`, `email`, `password`, `username`) VALUES
 (1, 0, 2, '2012-06-30 20:17:00', 'enchikiben@gmail.com', 'a37e9e0ada9d5eef566727a9a8ea36e8', NULL);
 
 --
--- Ограничения внешнего ключа сохраненных таблиц
+-- Constraints for dumped tables
 --
 
 --
--- Ограничения внешнего ключа таблицы `list_field`
+-- Constraints for table `category_field`
+--
+ALTER TABLE `category_field`
+  ADD CONSTRAINT `category_field_ibfk_1` FOREIGN KEY (`field_id`) REFERENCES `product_field` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `image_field`
+--
+ALTER TABLE `image_field`
+  ADD CONSTRAINT `image_field_ibfk_1` FOREIGN KEY (`field_id`) REFERENCES `product_field` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `image_field_parameter`
+--
+ALTER TABLE `image_field_parameter`
+  ADD CONSTRAINT `image_field_parameter_ibfk_1` FOREIGN KEY (`field_id`) REFERENCES `image_field` (`field_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `list_field`
 --
 ALTER TABLE `list_field`
   ADD CONSTRAINT `list_field_ibfk_1` FOREIGN KEY (`list_id`) REFERENCES `list` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Ограничения внешнего ключа таблицы `list_item`
+-- Constraints for table `list_item`
 --
 ALTER TABLE `list_item`
   ADD CONSTRAINT `list_item_ibfk_1` FOREIGN KEY (`list_id`) REFERENCES `list` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Ограничения внешнего ключа таблицы `product_field`
+-- Constraints for table `product_field`
 --
 ALTER TABLE `product_field`
   ADD CONSTRAINT `product_field_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Ограничения внешнего ключа таблицы `record_category`
+-- Constraints for table `record_category`
 --
 ALTER TABLE `record_category`
   ADD CONSTRAINT `record_category_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`),
   ADD CONSTRAINT `record_category_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`);
 
 --
--- Ограничения внешнего ключа таблицы `string_field`
+-- Constraints for table `string_field`
 --
 ALTER TABLE `string_field`
   ADD CONSTRAINT `string_field_ibfk_1` FOREIGN KEY (`field_id`) REFERENCES `product_field` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Ограничения внешнего ключа таблицы `text_field`
+-- Constraints for table `text_field`
 --
 ALTER TABLE `text_field`
   ADD CONSTRAINT `text_field_ibfk_1` FOREIGN KEY (`field_id`) REFERENCES `product_field` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
