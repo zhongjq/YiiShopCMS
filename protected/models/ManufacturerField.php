@@ -40,13 +40,12 @@ class ManufacturerField extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('manufacturer_id', 'required','on'=>'add'),
-			array('field_id, manufacturer_id', 'required','on'=>'edit'),
+			array('field_id', 'required','on'=>'edit'),
 			array('is_multiple_select', 'numerical', 'integerOnly'=>true),
-			array('field_id, manufacturer_id', 'length', 'max'=>11),
+			array('field_id', 'length', 'max'=>11),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('field_id, manufacturer_id, is_multiple_select', 'safe', 'on'=>'search'),
+			array('field_id, is_multiple_select', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -58,7 +57,6 @@ class ManufacturerField extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'manufacturer' => array(self::BELONGS_TO, 'Manufacturer', 'manufacturer_id'),
 			'field' => array(self::BELONGS_TO, 'ProductField', 'field_id'),
 		);
 	}
@@ -69,7 +67,6 @@ class ManufacturerField extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'manufacturer_id' => 'Manufacturer',
 			'is_multiple_select' => 'Is Multiple Select',
 		);
 	}
@@ -77,14 +74,14 @@ class ManufacturerField extends CActiveRecord
 
     // форма в формате CForm
     public function getElementsMotelCForm(){
-		return array(
+    	return array(
 			'type'=>'form',
 			'elements'=>array(
 				'is_multiple_select'=>array(
-    				'type'=>'checkbox',
+				'type'=>'checkbox',
 					'layout'=>'{input}{label}{error}{hint}',
 				),
 			)
 		);
-	}
+    }
 }

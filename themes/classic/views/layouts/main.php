@@ -38,7 +38,7 @@
 	    <div class="container-fluid">
 		    <div class="row-fluid">
 			    <div class="span3">
-				    <?php $this->widget('Categories', array('title'=>"Категории",'id'=>2) ) ?>
+				    <?php $this->widget('Categories', array('title'=>"Категории",'id'=>1) ) ?>
 					<?php $this->widget('Manufacturers', array("title"=>"Производители") ) ?>
 			    </div>
 			    <div class="span9">
@@ -53,12 +53,12 @@
 			    <li><?=CHtml::link('О проекте',$this->createUrl('/page/about'))?></li>
 		    </ul>
 		    <?php
-		    if ( YII_DEBUG  ) {
+		    //if ( YII_DEBUG  ) {
 			    echo '<br/>Отработало за ' . sprintf('%0.5f', Yii::getLogger()->getExecutionTime()) . ' с. ';
 			    echo 'Скушано памяти: ' . round(memory_get_peak_usage() / (1024 * 1024), 2) . ' MB <br>';
 			    $sql_stats = YII::app()->db->getStats();
 			    echo $sql_stats[0] . ' запросов к БД, время выполнения запросов - ' . sprintf('%0.5f', $sql_stats[1]) . ' c.';
-		    }
+		    //}
 		    ?>
 		    <p>&copy; 2011</p>
 	    </footer><!-- #footer -->

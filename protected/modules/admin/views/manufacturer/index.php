@@ -10,7 +10,10 @@ $this->widget('zii.widgets.grid.CGridView', array(
 	'ajaxUpdate'	=>	false,
 	'columns' => array(
 		array('name'=>'id','htmlOptions'=>array('width'=>'10')),
-		array('name'=>'name','value'=>'$data->name'),
+				array(	'name'	=>	'name',
+				'type'	=>	'raw',
+				'value'	=>	'str_repeat("&nbsp;&nbsp;&nbsp;&nbsp;", $data->level <= 1 ? 0 : $data->level-1 ).$data->name'
+		),
 		array(
 			'htmlOptions'=>array('width'=>'10'),
 			'class'=>'CButtonColumn',
@@ -33,11 +36,11 @@ $this->widget('zii.widgets.grid.CGridView', array(
 					'imageUrl'=>null,
 					'label'=>'<span class="close" title="'.Yii::t('main','Delete').'">&times;</span>'
 				)
-			)                
-		),            
+			)
+		),
 	),
 	'htmlOptions'=>array(
-		'class'=> ''   
+		'class'=> ''
 	),
 	'itemsCssClass'=>'table table-bordered table-striped',
 	'template'=>'{summary} {items} {pager}',
@@ -50,7 +53,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 		'prevPageLabel'	=> '&larr;',
 		'nextPageLabel'	=> '&rarr;',
 		'lastPageLabel' => '&raquo;',
-		'htmlOptions'	=> array("class"=>false),            
+		'htmlOptions'	=> array("class"=>false),
 	),
 ));
 

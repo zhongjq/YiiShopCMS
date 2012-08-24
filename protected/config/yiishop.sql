@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Хост: localhost
--- Время создания: Авг 24 2012 г., 00:30
+-- Время создания: Авг 24 2012 г., 21:56
 -- Версия сервера: 5.5.24-0ubuntu0.12.04.1
 -- Версия PHP: 5.3.10-1ubuntu3.2
 
@@ -37,7 +37,16 @@ CREATE TABLE IF NOT EXISTS `category` (
   `name` varchar(255) NOT NULL,
   `description` text,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Категории' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Категории' AUTO_INCREMENT=4 ;
+
+--
+-- Дамп данных таблицы `category`
+--
+
+INSERT INTO `category` (`id`, `root`, `lft`, `rgt`, `level`, `status`, `alias`, `name`, `description`) VALUES
+(1, 1, 1, 6, 1, 1, 'tires', 'Шины', 'Шины'),
+(2, 1, 2, 3, 2, 1, 'leto', 'Лето', ''),
+(3, 1, 4, 5, 2, 1, 'zima', 'Зима', '');
 
 -- --------------------------------------------------------
 
@@ -52,6 +61,13 @@ CREATE TABLE IF NOT EXISTS `category_field` (
   PRIMARY KEY (`field_id`),
   KEY `category_id` (`category_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `category_field`
+--
+
+INSERT INTO `category_field` (`field_id`, `category_id`, `is_multiple_select`) VALUES
+(4, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -236,25 +252,31 @@ INSERT INTO `list_item` (`id`, `list_id`, `status`, `priority`, `name`) VALUES
 
 CREATE TABLE IF NOT EXISTS `manufacturer` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `root` int(10) unsigned NOT NULL,
+  `lft` int(10) unsigned NOT NULL,
+  `rgt` int(10) unsigned NOT NULL,
+  `level` int(10) unsigned NOT NULL,
   `status` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `alias` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `description` text NOT NULL,
   `logo` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Производители' AUTO_INCREMENT=7 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Производители' AUTO_INCREMENT=9 ;
 
 --
 -- Дамп данных таблицы `manufacturer`
 --
 
-INSERT INTO `manufacturer` (`id`, `status`, `alias`, `name`, `description`, `logo`) VALUES
-(1, 1, 'bridgestone', 'Bridgestone', '', ''),
-(2, 1, 'brasa', 'Brasa', '', ''),
-(3, 1, 'continental', 'Continental', '', ''),
-(4, 1, 'cordiant', 'Cordiant', '', ''),
-(5, 1, 'dunlop', 'Dunlop', '', ''),
-(6, 1, 'gislaved', 'Gislaved', '', '');
+INSERT INTO `manufacturer` (`id`, `root`, `lft`, `rgt`, `level`, `status`, `alias`, `name`, `description`, `logo`) VALUES
+(1, 7, 2, 2, 2, 1, 'bridgestone', 'Bridgestone', '', ''),
+(2, 7, 2, 2, 2, 1, 'brasa', 'Brasa', '', ''),
+(3, 7, 2, 2, 2, 1, 'continental', 'Continental', '', ''),
+(4, 7, 2, 2, 2, 1, 'cordiant', 'Cordiant', '', ''),
+(5, 7, 2, 2, 2, 1, 'dunlop', 'Dunlop', '', ''),
+(6, 7, 2, 2, 2, 1, 'gislaved', 'Gislaved', '', ''),
+(7, 7, 1, 3, 1, 1, 'tires', 'Шины', '', ''),
+(8, 8, 1, 2, 1, 1, 'disc', 'Диски', '', '');
 
 -- --------------------------------------------------------
 
@@ -316,7 +338,7 @@ CREATE TABLE IF NOT EXISTS `product` (
 --
 
 INSERT INTO `product` (`id`, `status`, `name`, `alias`, `title`, `keywords`, `description`) VALUES
-(1, 1, 'Шины', 'tires', '', '', '');
+(1, 1, 'Шины', 'tires', 'Шины', '', '');
 
 -- --------------------------------------------------------
 
@@ -338,16 +360,17 @@ CREATE TABLE IF NOT EXISTS `product_field` (
   `hint` varchar(255) NOT NULL COMMENT 'Подсказка',
   PRIMARY KEY (`id`),
   KEY `fk_product_field_product1_idx` (`product_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
 --
 -- Дамп данных таблицы `product_field`
 --
 
 INSERT INTO `product_field` (`id`, `position`, `product_id`, `field_type`, `name`, `alias`, `is_mandatory`, `is_filter`, `is_column_table`, `unit_name`, `hint`) VALUES
-(1, 0, 1, 2, 'Наименование', 'name', 1, 0, 1, '', ''),
-(2, 0, 1, 3, 'Цена', 'price', 1, 1, 1, '', ''),
-(3, 0, 1, 7, 'Производитель', 'manufacturer', 1, 1, 1, '', '');
+(1, 0, 1, 2, 'Наименование', 'name', 1, 0, 1, '', 'Наименование шины'),
+(2, 0, 1, 3, 'Цена', 'price', 1, 1, 1, 'р.', ''),
+(3, 0, 1, 7, 'Производитель', 'manufacturer', 1, 1, 1, '', ''),
+(4, 0, 1, 6, 'Категория', 'category', 1, 0, 1, '', '');
 
 -- --------------------------------------------------------
 
@@ -439,9 +462,18 @@ CREATE TABLE IF NOT EXISTS `tires` (
   `description` text,
   `name` varchar(255) DEFAULT NULL,
   `price` decimal(9,2) DEFAULT NULL,
-  `manufacturer` int(11) NOT NULL,
+  `manufacturer` int(11) DEFAULT NULL,
+  `category` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+
+--
+-- Дамп данных таблицы `tires`
+--
+
+INSERT INTO `tires` (`id`, `alias`, `title`, `keywords`, `description`, `name`, `price`, `manufacturer`, `category`) VALUES
+(1, '', NULL, NULL, NULL, 'Bridgestone Ice Cruiser 7000 235/70 R16 T', 7200.00, 1, 3),
+(2, '', NULL, NULL, NULL, 'Bridgestone IC7000 185/65 R15 88T', 3690.00, 1, 3);
 
 -- --------------------------------------------------------
 
@@ -546,8 +578,8 @@ ALTER TABLE `record_list`
 -- Ограничения внешнего ключа таблицы `record_manufacturer`
 --
 ALTER TABLE `record_manufacturer`
-  ADD CONSTRAINT `fk_record_manufacturer_product1` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_record_manufacturer_manufacturer1` FOREIGN KEY (`manufacturer_id`) REFERENCES `manufacturer` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_record_manufacturer_manufacturer1` FOREIGN KEY (`manufacturer_id`) REFERENCES `manufacturer` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_record_manufacturer_product1` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Ограничения внешнего ключа таблицы `string_field`

@@ -53,6 +53,7 @@ class ProductField extends CActiveRecord
 											)),
 
 			array('is_column_table', 'boolean'),
+            array('unit_name, hint', 'safe'),
 			array('alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u','message' => Yii::t("products",'Field contains invalid characters.')),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
@@ -70,15 +71,17 @@ class ProductField extends CActiveRecord
 	public function relations()
 	{
 		return array(
-            'product'       => array(self::BELONGS_TO, 'Product', 'product_id'),
+            		'product'=>array(self::BELONGS_TO, 'Product', 'product_id'),
 
 			'integerField' => array(self::HAS_ONE, 'IntegerField', 'field_id'),
 			'priceField' => array(self::HAS_ONE, 'PriceField', 'field_id'),
 			'stringField' => array(self::HAS_ONE, 'StringField', 'field_id'),
 			'textField' => array(self::HAS_ONE, 'TextField', 'field_id'),
-            'listField' => array(self::HAS_ONE, 'ListField', 'field_id'),
-            'categoryField' => array(self::HAS_ONE, 'CategoryField', 'field_id'),
+            		'listField' => array(self::HAS_ONE, 'ListField', 'field_id'),
+            		'categoryField' => array(self::HAS_ONE, 'CategoryField', 'field_id'),
+                        'manufacturerField' => array(self::HAS_ONE, 'ManufacturerField', 'field_id'),
             
+
 		);
 	}
 
@@ -88,18 +91,17 @@ class ProductField extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id'            =>  Yii::t("fields",'ID'),
-			'position'     =>  Yii::t("fields",'Приоритет'),
-			'product_id'     =>  Yii::t("fields",'Идентификатор продукта'),
-			'field_type'     =>  Yii::t("fields",'Тип поля'),
-			'name'          =>  Yii::t("fields",'Наименование'),
-			'alias'         =>  Yii::t("fields",'Псевдоним'),
-			'is_mandatory'   =>  Yii::t("fields",'Обязательно'),
-			'is_filter'      =>  Yii::t("fields",'Использовать в фильтрации'),
-			'is_column_table' =>  Yii::t("fields",'Used In Table Header?'),
-			'unitName'      =>  Yii::t("fields",'Used In Table Header?'),
-			'hint'          =>  Yii::t("fields",'Hint'),
-			'fields'			=>	Yii::t("fields",'Fields'),
+			'id' =>  Yii::t("fields",'ID'),
+			'position' => Yii::t("fields",'Приоритет'),
+			'product_id' => Yii::t("fields",'Идентификатор продукта'),
+			'field_type' => Yii::t("fields",'Тип поля'),
+			'name' => Yii::t("fields",'Наименование'),
+			'alias' => Yii::t("fields",'Псевдоним'),
+			'is_mandatory' => Yii::t("fields",'Обязательно'),
+			'is_filter' =>  Yii::t("fields",'Использовать в фильтрации'),
+			'is_column_table' => Yii::t("fields",'Used In Table Header?'),
+			'unit_name' => Yii::t("fields",'Unitname'),
+			'hint' => Yii::t("fields",'Hint'),
 		);
 	}
 
@@ -180,6 +182,14 @@ class ProductField extends CActiveRecord
 						'is_column_table'=>array(
 							'type'=>'checkbox',
 							'layout'=>'{input}{label}{error}{hint}',
+						),
+    					'unit_name'=>array(
+							'type'=>'text',
+							'maxlength'=>255
+						),
+    					'hint'=>array(
+							'type'=>'text',
+							'maxlength'=>255
 						),
 					)
 				)

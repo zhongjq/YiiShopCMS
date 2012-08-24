@@ -45,11 +45,24 @@ class ManufacturerController extends Controller
 	public function actionView($alias)
 	{
 		$manufacturer = Manufacturer::model()->find('alias = :alias', array(':alias'=>$alias));
-		
-		if ( !$manufacturer ) throw new CHttpException(404,'Category not found.');
-		
+
+		if ( !$manufacturer ) throw new CHttpException(404,'Manufacturer not found.');
+
+        // получаем все продукты где есть поле производитель
+        $products = Product::model()->with('productFields')->findAll('productFields.field_type = :field_type',array(':field_type'=>TypeField::MANUFACTURER));
+
+        $arProducts = array();
+
+        if ( $products ){
+            foreach($products as $product){
+                $arProducts[] = $product->searchByManufacturer($manufacturer->id);
+            }
+        }
+
+
 		$this->render('view',array(
-			'manufacturer' => $manufacturer
+			'manufacturer' => $manufacturer,
+            'products'=>$arProducts,
 		));
 	}
 

@@ -79,7 +79,9 @@ return array(
 			'pathViews' => 'application.views.email',
 			'pathLayouts' => 'application.views.email.layouts'
 		),
-
+//		'cache'=>array(
+//			'class'=>'system.caching.CDbCache',
+//		),
 		// База
 		'db'=>array(
 			'connectionString' => 'mysql:host=localhost;dbname=enchikiben_fbfde',
@@ -89,6 +91,7 @@ return array(
 			'password' => '754089db',
 			'charset' => 'utf8',
 			'tablePrefix' => '',
+            'schemaCachingDuration' => 1000,
 			// включаем профайлер
 			'enableProfiling' => true,
 			// показываем значения параметров

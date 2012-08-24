@@ -150,11 +150,7 @@ class Product extends CActiveRecord
 
 	public function beforeDelete(){
 		if( parent::beforeDelete() ) {
-			$Products = $this->findAll();
-			if ( $Products )
-				foreach($Products as $Product){
-					Yii::app()->db->createCommand()->dropTable($Product->Alias);
-				}
+			Yii::app()->db->createCommand()->dropTable($this->alias);
 		}
 		return true;
 	}
@@ -213,9 +209,9 @@ class Product extends CActiveRecord
 		), $this);
 	}
 
-	public function getRecordObject(){
+	public function getRecordObject($action = 'add'){
 		eval("class {$this->alias} extends Record{}");
-		$Goods = new $this->alias();
+		$Goods = new $this->alias($action);
 		$Goods->setProductID($this->id);
 		//$Goods->setGoodsAttributes();
 		return $Goods;
@@ -236,4 +232,28 @@ class Product extends CActiveRecord
 		}
 		return $items;
 	}
+
+
+    public function searchByManufacturer($manufacturer_id){
+
+        $product = $this->getRecordObject('search');
+
+//        $isColumnTable = array();
+//    	foreach($this->productFields() as $field) {
+//        	if( $field->field_type == TypeField::MANUFACTURER )
+//                if ($field->manufacturerField->is_multiple_select)
+//                    $condition = "manufacturerField.manufacturer_id = :manufacturer_id";
+//                else
+//                    $condition = $field->alias." = :manufacturer_id";
+//        }
+
+        //$criteria = new CDbCriteria;
+        //$criteria->select = implode(',', $isColumnTable);
+        //$criteria->with = $product->getRelationsNameArray();
+        //$criteria->condition = $condition;
+        //$criteria->params = array(":manufacturer_id"=>$manufacturer_id);
+        //$product->data = new CActiveDataProvider($product,array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
+
+        return $product;
+    }
 }

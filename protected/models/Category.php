@@ -155,7 +155,7 @@ class Category extends CActiveRecord
 	}
 
 	public static function getMenuArray($items) {        
-		return ( is_array($items) && !empty($items) ) ? Category::getMenuItems($items) : null;
+		return Category::getMenuItems($items);
 	}
 
     // форма в формате CForm

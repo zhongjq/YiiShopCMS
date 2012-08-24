@@ -15,6 +15,7 @@ class Manufacturer extends CActiveRecord
 	public $logoFile;
 	public $oldLogoFile;
 	public $isDeleteLogoFile;
+	public $parentId = 0;
 
 	public function __construct($scenario = 'add')
 	{
@@ -38,11 +39,10 @@ class Manufacturer extends CActiveRecord
 	{
 		return array(
 			array('alias, name', 'required', 'on'=>'add, edit'),
-			array('status, isDeleteLogoFile', 'numerical', 'integerOnly'=>true),
+			array('status, isDeleteLogoFile, lft, rgt, level, parentId', 'numerical', 'integerOnly'=>true),
     		array('alias, name', 'length', 'max'=>255),
 			array('alias, name', 'unique'),
-    		array('alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u',
-				    'message' => Yii::t("manufacturers",'Alias contains invalid characters.')),
+    		array('alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u','message' => Yii::t("manufacturers",'Alias contains invalid characters.')),
 			array('description', 'safe'),
             array('logo', 'file', 'types'=>'jpg, gif, png', 'maxSize' => 1048576, 'allowEmpty'=>true ),
 			// The following rule is used by search().
@@ -60,13 +60,29 @@ class Manufacturer extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id' => 'ID',
+			'id'			=>	Yii::t("AdminModule.main",'ID'),
+			'lft'			=> 'Lft',
+			'rgt'			=> 'Rgt',
+			'level'			=> 'Level',
     		'status'		=>	Yii::t("manufacturers",'Status'),
 			'alias'			=>	Yii::t("manufacturers",'Alias'),
 			'name'			=>	Yii::t("manufacturers",'Name'),
 			'description'	=>	Yii::t("manufacturers",'Description'),
 			'logo'			=>	Yii::t("manufacturers",'Logo'),
 			'isDeleteLogoFile' => Yii::t("manufacturers",'Delete an existing logo?'),
+		);
+	}
+
+	public function behaviors()
+	{
+		return array(
+			'NestedSetBehavior'=>array(
+				'class'				=>	'ext.nestedset.NestedSetBehavior',
+				'leftAttribute'		=>	'lft',
+				'rightAttribute'	=>	'rgt',
+				'levelAttribute'	=>	'level',
+				'hasManyRoots'      =>  true
+			),
 		);
 	}
 
@@ -113,6 +129,17 @@ class Manufacturer extends CActiveRecord
         			'type'=>'checkbox',
     				'layout'=>'{input}{label}{error}{hint}',
     			),
+    			'parentId'=>array(
+					'type'  =>  'dropdownlist',
+					'items' =>  CHtml::listData(Manufacturer::model()->findAll(array(
+																'select'=>"id,name",
+    															'order'=>'lft',
+																'condition'=>'id != :id',
+																'params'=>array(':id' => $this->id ? $this->id : 0 )
+															)
+															), 'id', 'name'),
+					'empty'=>  '',
+				),
     			'name'=>array(
     				'type'=>'text',
     				'maxlength'=>255
@@ -220,7 +247,7 @@ class Manufacturer extends CActiveRecord
 
 	public static function getMenuArray($manufacturers) {
 		$return = array();
-        
+
 		foreach ($manufacturers as $manufacturer) {
             $return[] = array(	'label'     =>  CHtml::encode($manufacturer->name),
 								'url'       =>  array('manufacturer/view','alias'=>$manufacturer->alias),

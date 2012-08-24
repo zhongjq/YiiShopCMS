@@ -11,6 +11,7 @@ $this->renderPartial('records/secondMenu',array('product'=>$product));
 
 $this->widget('zii.widgets.grid.CGridView', array(
 	'dataProvider'=>$recordData,
+	'filter'=>$record,
 	'columns' =>
 		array_merge(
 			$record->getTableFields()

@@ -47,7 +47,7 @@ class ManufacturerController extends Controller
 	public function actionIndex()
 	{
 		$criteria = new CDbCriteria();
-		$criteria->order = 'name';
+		$criteria->order = 'root,lft';
         $manufacturers	= new CActiveDataProvider('Manufacturer',array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
 
 		$this->render('index', array(
@@ -73,9 +73,18 @@ class ManufacturerController extends Controller
 				$transaction = Yii::app()->db->beginTransaction();
 				try
 				{
-					if ( $manufacturer->save() ){
+					if ($manufacturer->parentId == 0){
+						$manufacturer->saveNode();
 						$transaction->commit();
-						$this->redirect(array('/admin/manufacturer'));
+						$this->redirect(array('/admin/manufacturers'));
+					} else {
+						$root = Manufacturer::model()->findByPk($manufacturer->parentId);
+
+						if ( $root ){
+							$manufacturer->appendTo($root);
+							$transaction->commit();
+							$this->redirect(array('/admin/manufacturers'));
+						}
 					}
 				}
 				catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
@@ -101,7 +110,8 @@ class ManufacturerController extends Controller
 	{
 		$manufacturer = $this->loadModel($id);
         $manufacturer->setScenario('edit');
-
+		if ( $manufacturer->parent()->find() )
+			$manufacturer->parentId = $manufacturer->parent()->find()->id;
         $this->performAjaxValidation($manufacturer);
 
     	if(isset($_POST['Manufacturer']))
@@ -113,10 +123,19 @@ class ManufacturerController extends Controller
 				$transaction = Yii::app()->db->beginTransaction();
 				try
 				{
-					if ( $manufacturer->save() ){
-						$transaction->commit();
-						$this->redirect(array('/admin/manufacturer'));
+					if ($manufacturer->parentId == 0 && !$manufacturer->isRoot()){
+						$manufacturer->moveAsRoot();
+
+					} else {
+						$root = Manufacturer::model()->findByPk($manufacturer->parentId);
+
+						if ( $root ){
+							$manufacturer->moveAsFirst($root);
+						}
 					}
+					$manufacturer->saveNode();
+					$transaction->commit();
+					$this->redirect(array('/admin/manufacturers'));
 				}
 				catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
 				{
