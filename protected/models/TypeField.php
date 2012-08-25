@@ -9,6 +9,8 @@ class TypeField
     const LISTS = 5;
     const CATEGORIES = 6;
     const MANUFACTURER = 7;
+    const IMAGE = 8;
+    const FILE = 9;
 
 	public static $TypeToIDFields = array(
 		'integer'   => self::INTEGER,
@@ -17,6 +19,8 @@ class TypeField
 		'text'      => self::TEXT,
         'list'      => self::LISTS,
         'categories'=> self::CATEGORIES,
+        'image'		=> self::IMAGE,
+        'file'		=> self::FILE,
 	);
 
 	public static $Fields = array(
@@ -87,6 +91,24 @@ class TypeField
 			'form'      =>  array(
                 'type'  =>  'dropdownlist',
 				'empty' =>  '',
+            ),
+		),
+    	self::IMAGE     => array(
+			'name'      =>  "Изображения(и)",
+			'type'      =>  "image",
+            'class'     =>  "ImageField",
+			'dbType'    =>  "int(11)",
+			'form'      =>  array(
+                'type'  =>  'file',
+            ),
+		),
+    	self::FILE     => array(
+			'name'      =>  "Файл(ы)",
+			'type'      =>  "file",
+            'class'     =>  "FileField",
+			'dbType'    =>  "int(11)",
+			'form'      =>  array(
+                'type'  =>  'file',
             ),
 		),
 	);

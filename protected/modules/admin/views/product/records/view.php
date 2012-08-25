@@ -1,16 +1,12 @@
 <?php
 $this->pageTitle = $product->name;
 
-$this->breadcrumbs=array(
-    Yii::t('products',"Products") => Yii::app()->createUrl("/admin/products"),
-	$product->name,
-);
+$this->breadcrumbs=array($product->name);
 
 $this->renderPartial('records/secondMenu',array('product'=>$product));
 
-
 $this->widget('zii.widgets.grid.CGridView', array(
-	'dataProvider'=>$recordData,
+	'dataProvider'=>$record->search(),
 	'filter'=>$record,
 	'columns' =>
 		array_merge(

@@ -32,13 +32,18 @@
     <?php
         Yii::app()->clientScript->registerCoreScript('jquery');
 
-        Yii::app()->getClientScript()->registerScriptFile(CHtml::asset($this->module->getlayoutPath().'/js/bootstrap.min.js'));
+        Yii::app()->getClientScript()->registerScriptFile($this->assetsBase.'/bootstrap/js/bootstrap.min.js');
+
+        Yii::app()->getClientScript()->registerCssFile($this->assetsBase.'/bootstrap/css/bootstrap.min.css');
+        Yii::app()->getClientScript()->registerCssFile($this->assetsBase.'/bootstrap/css/bootstrap-responsive.min.css');
+        Yii::app()->getClientScript()->registerCssFile($this->assetsBase.'/style.css');
+
     ?>
 
   </head>
 
   <body>
-	<div class="navbar navbar-fixed-top">
+	<div class="navbar navbar-fixed-top navbar-inverse">
 		<div class="navbar-inner">
 		<div class="container-fluid">
 			<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -140,9 +145,12 @@
 		<?endif;?>
 
 		<?php $this->widget('zii.widgets.CBreadcrumbs', array(
-				'separator' =>	" &rarr; ",
-				'homeLink'	=>	CHtml::link('Главная',$this->createUrl('/admin'),array('title'=>'Главная страница')),
-				'links'		=>	$this->breadcrumbs,
+				'tagName'=>'ul',
+				'activeLinkTemplate'=>'<li><a href="{url}">{label}</a><span class="divider">/</span></li>',
+				'inactiveLinkTemplate'=>'<li><span>{label}</span></li>',
+				'separator'=>null,
+				'homeLink' => CHtml::tag('li',array(),CHtml::link('Главная',$this->createUrl('/admin'),array('title'=>'Главная страница')).CHtml::tag('span',array('class'=>'divider'),'/')  ),
+				'links' =>	$this->breadcrumbs,
 				'htmlOptions'=>array('class'=>'breadcrumb'),
 		)); ?><!-- breadcrumbs -->
 

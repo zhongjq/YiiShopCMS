@@ -13,12 +13,23 @@ class Controller extends CController
 
 	public function beforeRender($view) {
 
-		$extPth = CHtml::asset($this->module->getlayoutPath().'/css/');
-        Yii::app()->getClientScript()->registerCssFile($extPth.'/bootstrap.min.css');
-        Yii::app()->getClientScript()->registerCssFile($extPth.'/bootstrap-responsive.min.css');
-        Yii::app()->getClientScript()->registerCssFile($extPth.'/style.css');
+		$extPth = CHtml::asset($this->module->getBasePath()."/assets/" );
 
 		return parent::beforeRender($view);
+	}
+
+	private $_assetsBase;
+	public function getAssetsBase()
+	{
+		if ($this->_assetsBase === null) {
+				$this->_assetsBase = Yii::app()->assetManager->publish(
+						Yii::getPathOfAlias('application.modules.admin.assets'),
+						false,
+						-1,
+						YII_DEBUG
+				);
+		}
+		return $this->_assetsBase;
 	}
 
 	public $FirstMenu	=	array();

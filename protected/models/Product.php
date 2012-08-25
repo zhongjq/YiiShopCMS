@@ -238,21 +238,10 @@ class Product extends CActiveRecord
 
         $product = $this->getRecordObject('search');
 
-//        $isColumnTable = array();
-//    	foreach($this->productFields() as $field) {
-//        	if( $field->field_type == TypeField::MANUFACTURER )
-//                if ($field->manufacturerField->is_multiple_select)
-//                    $condition = "manufacturerField.manufacturer_id = :manufacturer_id";
-//                else
-//                    $condition = $field->alias." = :manufacturer_id";
-//        }
-
-        //$criteria = new CDbCriteria;
-        //$criteria->select = implode(',', $isColumnTable);
-        //$criteria->with = $product->getRelationsNameArray();
-        //$criteria->condition = $condition;
-        //$criteria->params = array(":manufacturer_id"=>$manufacturer_id);
-        //$product->data = new CActiveDataProvider($product,array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
+    	foreach($this->productFields() as $field) {
+        	if( $field->field_type == TypeField::MANUFACTURER )
+                $product->{$field->alias} = $manufacturer_id;
+        }
 
         return $product;
     }

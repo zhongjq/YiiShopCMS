@@ -40,8 +40,9 @@ class ImageField extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('field_id, quantity', 'required'),
+			array('field_id', 'required', 'on'=>'edit'),
 			array('field_id, is_multiple_select, quantity', 'numerical', 'integerOnly'=>true),
+			array('quantity', 'numerical', 'integerOnly'=>true, 'allowEmpty'=>true),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('field_id, is_multiple_select, quantity', 'safe', 'on'=>'search'),
@@ -67,29 +68,22 @@ class ImageField extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'field_id' => 'Field',
 			'is_multiple_select' => 'Is Multiple Select',
 			'quantity' => 'Quantity',
 		);
 	}
 
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// Warning: Please modify the following code to remove attributes that
-		// should not be searched.
 
-		$criteria=new CDbCriteria;
-
-		$criteria->compare('field_id',$this->field_id);
-		$criteria->compare('is_multiple_select',$this->is_multiple_select);
-		$criteria->compare('quantity',$this->quantity);
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
+	// форма в формате CForm
+	public function getElementsMotelCForm(){
+		return array(
+				'type'=>'form',
+				'elements'=>array(
+					'quantity'=>array(
+						'type'=>'text',
+						'maxlength'=>255
+					),
+				)
+			);
 	}
 }

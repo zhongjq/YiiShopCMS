@@ -4,10 +4,14 @@ class Record extends CActiveRecord
 {
 	private $_productId = null;
 	private $_product = null;
+	private $_with = null;
 	private $_productFields = null;
 	private $_tableFields = null;
     private $_searchFields = null;
     public $data = null;
+
+	private $_manufacturerFilter = null;
+
 
 	public function setProductID($v)
 	{
@@ -21,21 +25,55 @@ class Record extends CActiveRecord
 
 	public function getProductFields($update = false)
 	{
-		if ( $this->_product === null ) {
-			$this->_product = Product::model()->find('alias = :alias',array(':alias'=> get_class($this)) );
+		if ( $this->_productFields === null && $this->_product === null && $update === false ) {
 
-			if ( $this->_product )
+			$this->_product = Product::model()->with('productFields')->find(array(
+				'condition'=>'t.alias = :alias',
+				'params'=>array(':alias'=> get_class($this))
+			));
+
+			if ( $this->_product ){
+				$this->_productFields = $this->_product->productFields();
 				$this->setProductID($this->_product->id);
-			else
+
+				if ( $this->_productFields ){
+					foreach ($this->_productFields as $field) {
+						switch( $field->field_type ){
+							case TypeField::STRING:
+								$this->_with['stringField'] = 'stringField';
+							break;
+							case TypeField::TEXT:
+								$this->_with['textField'] = 'textField';
+							break;
+							case TypeField::INTEGER:
+								$this->_with['integerField'] = 'integerField';
+							break;
+							case TypeField::PRICE:
+								$this->_with['priceField'] = 'priceField';
+							break;
+							case TypeField::LISTS:
+								$this->_with['listField'] = 'listField';
+							break;
+							case TypeField::CATEGORIES:
+								$this->_with['categoryField'] = 'categoryField';
+							break;
+							case TypeField::MANUFACTURER:
+								$this->_with['manufacturerField'] = 'manufacturerField';
+							break;
+						}
+					}
+
+					$this->_productFields = ProductField::model()->with($this->_with)
+												->findAll('product_id=:product_id',array(':product_id'=>$this->getProductID()));
+
+
+				}
+
+			} else
 				throw new CException("ID NOT product_id");
+
+
 		}
-
-		if ( $this->_productFields === null && $update === false )
-			$this->_productFields = ProductField::model()
-										->with('stringField','textField','integerField','priceField','listField','categoryField','manufacturerField')
-										->findAll('product_id=:product_id',array(':product_id'=>$this->getProductID()));
-
-
 
 		return $this->_productFields;
 	}
@@ -48,7 +86,7 @@ class Record extends CActiveRecord
 
 			if ( $productFields ){
 				foreach( $productFields as $field ){
-					if( $field->is_column_table )
+					if( $field->is_column_table ){
 						$f['name'] = $field->alias;
 
 						switch( $field->field_type ){
@@ -65,11 +103,21 @@ class Record extends CActiveRecord
 									$f['value'] = 'isset($data->'.$field->alias.'Category) ? $data->'.$field->alias.'Category->name : null';
 							break;
 							case TypeField::MANUFACTURER:
-								if ($field->manufacturerField->is_multiple_select)
+								if ( $field->manufacturerField->is_multiple_select )
 									$f['value'] = '$data->getRecordManufacturer("'.$field->alias.'")';
 								else
 									$f['value'] = 'isset($data->'.$field->alias.'Manufacturer) ? $data->'.$field->alias.'Manufacturer->name : null';
 
+								if ( $field->is_filter ) {
+//									if( $field->manufacturerField->manufacturer_id ){
+//										$manufacturer = Manufacturer::model()
+//															->findByPk($field->manufacturerField->manufacturer_id)
+//															->descendants()->findAll();
+//									} else {
+//										$manufacturer = Manufacturer::model()->findAll();
+//									}
+									$f['filter'] = CHtml::listData($this->getManufacturerFilter($field) , 'id', 'name');
+								}
 							break;
 						}
 
@@ -77,6 +125,7 @@ class Record extends CActiveRecord
 
 						$this->_tableFields[] = $f;
 						unset($f);
+					}
 				}
 			}
 		}
@@ -84,7 +133,19 @@ class Record extends CActiveRecord
 		return $this->_tableFields;
 	}
 
-    public function getRecordItems($name, $sSep = ', ')
+	private function getManufacturerFilter($field){
+		if ( $this->_manufacturerFilter === null ){
+			if( $field->manufacturerField->manufacturer_id ){
+				$this->_manufacturerFilter = Manufacturer::model()->findByPk($field->manufacturerField->manufacturer_id)
+									->descendants()->findAll();
+			} else {
+				$this->_manufacturerFilter = Manufacturer::model()->findAll();
+			}
+		}
+		return $this->_manufacturerFilter;
+	}
+
+	public function getRecordItems($name, $sSep = ', ')
 	{
        $aRes = array();
        foreach ($this->{$name} as $item) {
@@ -194,7 +255,16 @@ class Record extends CActiveRecord
 					break;
 
     				case TypeField::CATEGORIES :
-						$Form['elements'][$field->alias]['items'] = CHtml::listData(Category::model()->findAll(), 'id', 'name');
+
+						if( $field->categoryField->category_id ){
+							$category = Category::model()
+												->findByPk($field->categoryField->category_id)
+												->descendants()->findAll();
+						} else {
+							$category = Category::model()->findAll();
+						}
+
+						$Form['elements'][$field->alias]['items'] = CHtml::listData($category, 'id', 'name');
                         if ( $field->categoryField->is_multiple_select ){
 							$selected = array();
 							if ( $this->{$field->alias} ) {
@@ -210,7 +280,16 @@ class Record extends CActiveRecord
                         }
 					break;
 				case TypeField::MANUFACTURER :
-						$Form['elements'][$field->alias]['items'] = CHtml::listData(Manufacturer::model()->findAll(), 'id', 'name');
+
+						if( $field->manufacturerField->manufacturer_id ){
+							$manufacturer = Manufacturer::model()
+												->findByPk($field->manufacturerField->manufacturer_id)
+												->descendants()->findAll();
+						} else {
+							$manufacturer = Manufacturer::model()->findAll();
+						}
+
+						$Form['elements'][$field->alias]['items'] = CHtml::listData($manufacturer, 'id', 'name');
                         if ( $field->manufacturerField->is_multiple_select ){
 							$selected = array();
 							if ( $this->{$field->alias} ) {
@@ -286,7 +365,6 @@ class Record extends CActiveRecord
     						$relations[$field->alias] = array(	self::MANY_MANY,
 																'Manufacturer', 'record_manufacturer(record_id, manufacturer_id)',
 																'on' => 'product_id = ' .$this->getProductID()
-
 															);
                         else
                             $relations[$field->alias.'Manufacturer'] = array( self::BELONGS_TO,'Manufacturer', $field->alias );
@@ -436,17 +514,25 @@ class Record extends CActiveRecord
 		return $labels;
 	}
 
-	public function search(){
+	public function search()
+	{
 		$criteria = new CDbCriteria;
+		$criteria->with = $this->getRelationsNameArray();
 
 		foreach ($this->getProductFields() as $field) {
 			if ( $field->is_filter ){
 				switch( $field->field_type ){
 					case TypeField::INTEGER;
-						$criteria->compare($field->alias, $_GET[get_class($this)][$field->alias]);
+						$criteria->compare($field->alias, $this->{$field->alias});
 					break;
 					case TypeField::PRICE;
-						$criteria->compare($field->alias, $_GET[get_class($this)][$field->alias]);
+						$criteria->compare($field->alias, $this->{$field->alias});
+					break;
+					case TypeField::MANUFACTURER;
+						$criteria->compare($field->alias, $this->{$field->alias});
+					break;
+					case TypeField::CATEGORIES;
+						$criteria->compare($field->alias, $this->{$field->alias});
 					break;
 				}
 			}

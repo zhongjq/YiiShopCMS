@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Хост: localhost
--- Время создания: Авг 24 2012 г., 21:56
+-- Время создания: Авг 25 2012 г., 00:30
 -- Версия сервера: 5.5.24-0ubuntu0.12.04.1
 -- Версия PHP: 5.3.10-1ubuntu3.2
 
@@ -286,16 +286,18 @@ INSERT INTO `manufacturer` (`id`, `root`, `lft`, `rgt`, `level`, `status`, `alia
 
 CREATE TABLE IF NOT EXISTS `manufacturer_field` (
   `field_id` int(11) unsigned NOT NULL,
+  `manufacturer_id` int(10) unsigned DEFAULT NULL,
   `is_multiple_select` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`field_id`)
+  PRIMARY KEY (`field_id`),
+  KEY `manufacturer_id` (`manufacturer_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `manufacturer_field`
 --
 
-INSERT INTO `manufacturer_field` (`field_id`, `is_multiple_select`) VALUES
-(3, 0);
+INSERT INTO `manufacturer_field` (`field_id`, `manufacturer_id`, `is_multiple_select`) VALUES
+(3, 7, 0);
 
 -- --------------------------------------------------------
 
@@ -370,7 +372,7 @@ INSERT INTO `product_field` (`id`, `position`, `product_id`, `field_type`, `name
 (1, 0, 1, 2, 'Наименование', 'name', 1, 0, 1, '', 'Наименование шины'),
 (2, 0, 1, 3, 'Цена', 'price', 1, 1, 1, 'р.', ''),
 (3, 0, 1, 7, 'Производитель', 'manufacturer', 1, 1, 1, '', ''),
-(4, 0, 1, 6, 'Категория', 'category', 1, 0, 1, '', '');
+(4, 0, 1, 6, 'Категория', 'category', 1, 0, 0, '', '');
 
 -- --------------------------------------------------------
 
@@ -465,7 +467,7 @@ CREATE TABLE IF NOT EXISTS `tires` (
   `manufacturer` int(11) DEFAULT NULL,
   `category` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=24 ;
 
 --
 -- Дамп данных таблицы `tires`
@@ -473,7 +475,28 @@ CREATE TABLE IF NOT EXISTS `tires` (
 
 INSERT INTO `tires` (`id`, `alias`, `title`, `keywords`, `description`, `name`, `price`, `manufacturer`, `category`) VALUES
 (1, '', NULL, NULL, NULL, 'Bridgestone Ice Cruiser 7000 235/70 R16 T', 7200.00, 1, 3),
-(2, '', NULL, NULL, NULL, 'Bridgestone IC7000 185/65 R15 88T', 3690.00, 1, 3);
+(2, '', NULL, NULL, NULL, 'Bridgestone IC7000 185/65 R15 88T', 3690.00, 1, 3),
+(3, '', NULL, NULL, NULL, 'Nokian Hakkapeliitta R SUV', 324.00, 2, 2),
+(4, '', NULL, NULL, NULL, 'шина 2', 4345.00, 3, 2),
+(5, '', NULL, NULL, NULL, 'шина 4', 345.00, 2, 2),
+(6, '', NULL, NULL, NULL, 'шина 45', 345354.00, 3, 2),
+(7, '', NULL, NULL, NULL, 'шина 433', 324.00, 2, 2),
+(8, '', NULL, NULL, NULL, 'шина 4', 324.00, 2, 2),
+(9, '', NULL, NULL, NULL, '213', 345.00, 2, 2),
+(10, '', NULL, NULL, NULL, 'шина 4343', 3434.00, 2, 2),
+(11, '', NULL, NULL, NULL, '3234', 234234.00, 2, 2),
+(12, '', NULL, NULL, NULL, 'dsfsdf', 434.00, 3, 2),
+(13, '', NULL, NULL, NULL, '234234', 234234.00, 5, 3),
+(14, '', NULL, NULL, NULL, 'шина 4324234', 234234.00, 4, 2),
+(15, '', NULL, NULL, NULL, 'шина 4', 234234.00, 2, 2),
+(16, '', NULL, NULL, NULL, 'шина 4', 234234.00, 3, 2),
+(17, '', NULL, NULL, NULL, 'шина 445', 9655.00, 3, 2),
+(18, '', NULL, NULL, NULL, 'шина 4555', 555.00, 3, 2),
+(19, '', NULL, NULL, NULL, 'шина 4324234', 234234.00, 4, 2),
+(20, '', NULL, NULL, NULL, 'шина 4', 234234.00, 2, 2),
+(21, '', NULL, NULL, NULL, 'шина 4', 234234.00, 3, 2),
+(22, '', NULL, NULL, NULL, 'шина 445', 9655.00, 3, 2),
+(23, '', NULL, NULL, NULL, 'шина 4555', 555.00, 3, 2);
 
 -- --------------------------------------------------------
 
@@ -546,6 +569,7 @@ ALTER TABLE `list_item`
 -- Ограничения внешнего ключа таблицы `manufacturer_field`
 --
 ALTER TABLE `manufacturer_field`
+  ADD CONSTRAINT `manufacturer_field_ibfk_1` FOREIGN KEY (`manufacturer_id`) REFERENCES `manufacturer` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_manufacturer_field_product_field` FOREIGN KEY (`field_id`) REFERENCES `product_field` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --

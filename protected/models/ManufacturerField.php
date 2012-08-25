@@ -41,7 +41,7 @@ class ManufacturerField extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('field_id', 'required','on'=>'edit'),
-			array('is_multiple_select', 'numerical', 'integerOnly'=>true),
+			array('is_multiple_select,manufacturer_id', 'numerical', 'integerOnly'=>true),
 			array('field_id', 'length', 'max'=>11),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
@@ -67,6 +67,7 @@ class ManufacturerField extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
+			'manufacturer_id'=>Yii::t('manufacturer',"manufacturer"),
 			'is_multiple_select' => 'Is Multiple Select',
 		);
 	}
@@ -77,6 +78,11 @@ class ManufacturerField extends CActiveRecord
     	return array(
 			'type'=>'form',
 			'elements'=>array(
+				'manufacturer_id'=> array(
+    		    	'type'  =>  'dropdownlist',
+				    'items' =>  CHtml::listData(Manufacturer::model()->findAll(), 'id', 'name'),
+				    'empty'=>  '',
+			    ),
 				'is_multiple_select'=>array(
 				'type'=>'checkbox',
 					'layout'=>'{input}{label}{error}{hint}',

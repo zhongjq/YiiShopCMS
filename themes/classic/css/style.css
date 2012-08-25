@@ -152,5 +152,8 @@ form .row {
 
 div.summary{
     margin-bottom: 5px;
-}    
-    
+}
+
+tr.filters input, tr.filters select {
+	margin: 0px;
+}

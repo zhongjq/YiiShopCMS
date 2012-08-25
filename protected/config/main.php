@@ -8,8 +8,8 @@ return array(
 	'theme'             =>  'classic',
 
 	'params'=>array(
-		'keywords'		=>	array('компания, товары, услуги, бизнес, продажа, сделки, покупка, тендеры, заявки, каталог, справочник, информация о компаниях, прайс-листы, цены, материалы, технологии, b2b, Россия',),
-		'description'	=>	'Каталог производителей, поставщиков, промышленных и торговых предприятий, заводов, предприятий сферы услуг России. Бесплатная регистрация компаний на сайте. Размещение прайс-листов, информации о товарах и услугах. Поиск товаров и услуг, тендеров и заявок, бесплатное создание сайта компании.',
+		'keywords'		=>	array(),
+		'description'	=>	'',
 		'smtp'			=>	array(
 								"host"		=> "smtp.yandex.ru", 			//smtp сервер
 								"debug"		=> 0,                   		//отображение информации дебаггера (0 - нет вообще)
@@ -80,7 +80,7 @@ return array(
 			'pathLayouts' => 'application.views.email.layouts'
 		),
 //		'cache'=>array(
-//			'class'=>'system.caching.CDbCache',
+//			'class'=>'system.caching.CApcCache',
 //		),
 		// База
 		'db'=>array(
@@ -156,6 +156,13 @@ return array(
 					'class'=>'CWebLogRoute',
 					'levels'=>'error, warning, trace, profile, info',
 				),
+
+				array(
+					'class' => 'CWebLogRoute',
+					'categories' => 'application',
+					'showInFireBug' => true
+				),
+
 			),
 		),
 

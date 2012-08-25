@@ -48,8 +48,14 @@ class ManufacturerController extends Controller
 
 		if ( !$manufacturer ) throw new CHttpException(404,'Manufacturer not found.');
 
+		$parent = $manufacturer->parent()->find();
+		if ( $parent ) $parent = $parent->id; else $parent = null;
         // получаем все продукты где есть поле производитель
-        $products = Product::model()->with('productFields')->findAll('productFields.field_type = :field_type',array(':field_type'=>TypeField::MANUFACTURER));
+        $products = Product::model()->with(array('productFields','productFields.manufacturerField'))
+						->findAll(	'productFields.field_type = :field_type AND manufacturerField.manufacturer_id = :manufacturer_id',
+									array(':field_type'=>TypeField::MANUFACTURER,
+											':manufacturer_id'=>$parent,
+										));
 
         $arProducts = array();
 

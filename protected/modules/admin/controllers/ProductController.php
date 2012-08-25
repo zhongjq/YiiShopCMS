@@ -20,22 +20,15 @@ class ProductController extends Controller
 		$product = Product::model()->with('productFields')->findByPk($id);
 		$product->getAttributes();
 
-		$record = $product->getRecordObject();
+		$record = $product->getRecordObject('search');
 
-		$isColumnTable = array();
-		foreach($product->productFields() as $Field) {
-			if( $Field->is_column_table ) $isColumnTable[] = $Field->alias;
+		if ( isset($_GET[get_class($record)]) ){
+			$record->attributes = $_GET[get_class($record)];
 		}
-
-        $criteria = new CDbCriteria;
-        $criteria->select = implode(',', $isColumnTable);
-        $criteria->with = $record->getRelationsNameArray();
-        $recordData = new CActiveDataProvider($record,array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
 
 		$this->render('records/view', array(
 			'product' => $product,
-			'record' => $record,
-            'recordData' => $recordData
+			'record' => $record
 		));
 	}
 
@@ -52,10 +45,6 @@ class ProductController extends Controller
 	{
 		$product = Product::model()->with('productFields')->findByPk($id);
 		$record = $product->getRecordObject();
-
-		$extPth = CHtml::asset($this->module->getlayoutPath().'/js/chosen/');
-        Yii::app()->getClientScript()->registerCssFile($extPth.'/chosen.css');
-        Yii::app()->getClientScript()->registerScriptFile($extPth.'/chosen.jquery.js');
 
 		$this->performAjaxRecordValidation($record);
 
@@ -84,11 +73,6 @@ class ProductController extends Controller
 
     public function actionEditRecord($productId,$recordId)
 	{
-
-		$extPth = CHtml::asset($this->module->getlayoutPath().'/js/chosen/');
-        Yii::app()->getClientScript()->registerCssFile($extPth.'/chosen.css');
-        Yii::app()->getClientScript()->registerScriptFile($extPth.'/chosen.jquery.js');
-
 		$product = Product::model()->with('productFields')->findByPk($productId);
 		$record = $product->getRecordObject()->findByPk($recordId);
         $record->setProductID($productId);

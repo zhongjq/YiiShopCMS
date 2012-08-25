@@ -5,11 +5,6 @@ $this->breadcrumbs=array(
 	'Добавление товара',
 );
 
-$this->renderPartial('records/secondMenu',array('product'=>$product));
-
-Yii::app()->getClientScript()->registerScript("select",'$(function(){$("form select").chosen({allow_single_deselect:true});});');
-
-
-echo $form->render(); 
+$this->renderPartial('records/body',array('product'=>$product,'form'=>$form));
 
 ?>

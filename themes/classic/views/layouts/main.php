@@ -8,7 +8,7 @@
 
     <!-- styles -->
     <link href="<?= Yii::app()->theme->baseUrl ?>/css/bootstrap.min.css" rel="stylesheet">
-    <link href="<?= Yii::app()->theme->baseUrl ?>/css/bootstrap.min.responsive.css" rel="stylesheet">
+    <link href="<?= Yii::app()->theme->baseUrl ?>/css/bootstrap-responsive.min.css" rel="stylesheet">
 
 	<link href="<?= Yii::app()->theme->baseUrl ?>/css/style.css" rel="stylesheet">
 	<style type="text/css">
