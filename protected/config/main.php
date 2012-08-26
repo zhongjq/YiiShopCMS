@@ -48,15 +48,15 @@ return array(
 		'admin' => array(
 			'layout'=>'application.modules.admin.views.layouts.main',
 		),
-        'gii'=>array(
-            'class'         =>  'system.gii.GiiModule',
-            'password'      =>  '1',
-            'ipFilters'     =>  array("192.168.56.1","127.0.0.1",),
-            'newFileMode'   =>  0666,
-            'newDirMode'    =>  0777,
-        )
+//        'gii'=>array(
+//            'class'         =>  'system.gii.GiiModule',
+//            'password'      =>  '1',
+//            'ipFilters'     =>  array("192.168.56.1","127.0.0.1",),
+//            'newFileMode'   =>  0666,
+//            'newDirMode'    =>  0777,
+//        )
     ),
-
+	//'preload'=>array('log'),
 	// Компоненты
 	'components'=>array(
 
@@ -91,7 +91,7 @@ return array(
 			'password' => '754089db',
 			'charset' => 'utf8',
 			'tablePrefix' => '',
-            'schemaCachingDuration' => 1000,
+            'schemaCachingDuration'=>3600,
 			// включаем профайлер
 			'enableProfiling' => true,
 			// показываем значения параметров

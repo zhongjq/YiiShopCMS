@@ -245,4 +245,16 @@ class Product extends CActiveRecord
 
         return $product;
     }
+
+    public function searchByCategory($category_id){
+
+        $product = $this->getRecordObject('search');
+
+    	foreach($this->productFields() as $field) {
+        	if( $field->field_type == TypeField::CATEGORIES )
+                $product->{$field->alias} = $category_id;
+        }
+
+        return $product;
+    }
 }

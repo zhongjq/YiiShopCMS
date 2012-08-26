@@ -43,6 +43,7 @@ class ProductController extends Controller
 
 	public function actionAdd($id)
 	{
+
 		$product = Product::model()->with('productFields')->findByPk($id);
 		$record = $product->getRecordObject();
 
@@ -181,6 +182,7 @@ class ProductController extends Controller
 
 	public function actionEdit($id)
 	{
+
 		$product = Product::model()->findByPk($id);
 
 		$this->performAjaxValidation($product);

@@ -68,7 +68,7 @@ class ManufacturerController extends Controller
 
 		$this->render('view',array(
 			'manufacturer' => $manufacturer,
-            'products'=>$arProducts,
+			'products'=>$arProducts,
 		));
 	}
 

@@ -44,7 +44,7 @@ class ProductField extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('field_type, name, alias', 'required', 'on'=>'add, edit'),
-			array('product_id, field_type, is_mandatory, is_filter', 'numerical', 'integerOnly'=>true),
+			array('product_id, field_type, is_mandatory, is_filter,position', 'numerical', 'integerOnly'=>true),
 			array('name', 'length', 'max'=>255),
 			array('alias', 'length', 'max'=>50),
 			array('name, alias', 'unique', 'criteria' => array(
@@ -71,16 +71,18 @@ class ProductField extends CActiveRecord
 	public function relations()
 	{
 		return array(
-            		'product'=>array(self::BELONGS_TO, 'Product', 'product_id'),
+			'product'=>array(self::BELONGS_TO, 'Product', 'product_id'),
 
 			'integerField' => array(self::HAS_ONE, 'IntegerField', 'field_id'),
 			'priceField' => array(self::HAS_ONE, 'PriceField', 'field_id'),
 			'stringField' => array(self::HAS_ONE, 'StringField', 'field_id'),
 			'textField' => array(self::HAS_ONE, 'TextField', 'field_id'),
-            		'listField' => array(self::HAS_ONE, 'ListField', 'field_id'),
-            		'categoryField' => array(self::HAS_ONE, 'CategoryField', 'field_id'),
-                        'manufacturerField' => array(self::HAS_ONE, 'ManufacturerField', 'field_id'),
-            
+			'listField' => array(self::HAS_ONE, 'ListField', 'field_id'),
+			'categoryField' => array(self::HAS_ONE, 'CategoryField', 'field_id'),
+			'manufacturerField' => array(self::HAS_ONE, 'ManufacturerField', 'field_id'),
+			'imageField' => array(self::HAS_ONE, 'ImageField', 'field_id'),
+			'fileField' => array(self::HAS_ONE, 'FileField', 'field_id'),
+
 
 		);
 	}
@@ -217,14 +219,30 @@ class ProductField extends CActiveRecord
 	public function afterSave(){
 		parent::afterSave();
 
+		${$this->product->alias} = $this->product->getRecordObject();
+
 		if ( $this->moredata ) {
 			$this->moredata->field_id = $this->id;
 			if ( $this->moredata->save() ){
-				if ($this->isNewRecord)
+
+				if( isset($this->moredata->is_multiple_select) ){
+					if ($this->isNewRecord && $this->moredata->is_multiple_select == 0){
+						Yii::app()->db->createCommand()->addColumn( $this->product->alias,
+							$this->alias,
+							TypeField::$Fields[$this->field_type]['dbType']
+						);
+					} elseif ( $this->moredata->is_multiple_select && isset(${$this->product->alias}->tableSchema->columns[$this->alias]) ){
+						Yii::app()->db->createCommand()->dropColumn( $this->product->alias, $this->alias );
+					} elseif ( !$this->moredata->is_multiple_select && !isset(${$this->product->alias}->tableSchema->columns[$this->alias]) ){
+						Yii::app()->db->createCommand()->addColumn( $this->product->alias,$this->alias,TypeField::$Fields[$this->field_type]['dbType']);
+					}
+
+				} else {
 					Yii::app()->db->createCommand()->addColumn( $this->product->alias,
 						$this->alias,
 						TypeField::$Fields[$this->field_type]['dbType']
 					);
+				}
 
 				return true;
 			}

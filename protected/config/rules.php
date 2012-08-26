@@ -33,6 +33,7 @@ return array(
                 '/admin/constructor/<action:(edit|view|delete)>/<id:\d+>'=>  'admin/constructor/<action>',
 					// поля
                 '/admin/constructor/<id:\d+>/fields' => 'admin/constructor/fields',
+                '/admin/constructor/<id:\d+>/sorting' => 'admin/constructor/sorting',
 		        '/admin/constructor/<id:\d+>/fields/add' => 'admin/constructor/addfield',
 		        '/admin/constructor/<productId:\d+>/field/<action:(edit|delete)>/<fieldId:\d+>' => 'admin/constructor/<action>field',
 

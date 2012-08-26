@@ -258,4 +258,5 @@ class Manufacturer extends CActiveRecord
         return $return;
 	}
 
+
 }

@@ -73,23 +73,4 @@ class RecordManufacturer extends CActiveRecord
 		);
 	}
 
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// Warning: Please modify the following code to remove attributes that
-		// should not be searched.
-
-		$criteria=new CDbCriteria;
-
-		$criteria->compare('product_id',$this->product_id,true);
-		$criteria->compare('record_id',$this->record_id,true);
-		$criteria->compare('manufacturer_id',$this->manufacturer_id,true);
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
-	}
 }

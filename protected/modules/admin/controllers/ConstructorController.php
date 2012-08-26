@@ -17,7 +17,7 @@ class ConstructorController extends Controller
 	{
     	$criteria = new CDbCriteria();
 		$criteria->with = 'productFields';
-        $products	= new CActiveDataProvider('Product',array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
+        $products = new CActiveDataProvider('Product',array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
 
 		$this->render('index', array(
 			'products' => $products
@@ -103,6 +103,7 @@ class ConstructorController extends Controller
 
         $criteria=new CDbCriteria;
     	$criteria->compare('product_id',$id);
+		$criteria->order = 'position';
         $fields = new CActiveDataProvider('ProductField',array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
 
 		$this->render('fields/index', array(
@@ -163,6 +164,7 @@ class ConstructorController extends Controller
 			}
 			catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
 			{
+				Yii::app()->user->setFlash('success',$e->getMessage());
 				$transaction->rollBack();
 			}
 		}
@@ -262,5 +264,13 @@ class ConstructorController extends Controller
 		}
 	}
 
-
+	public function actionSorting()
+	{
+		if (isset($_POST['fields']) && is_array($_POST['fields'])) {
+			$i = 0;
+			foreach ($_POST['fields'] as $field_id) {
+				Yii::app()->db->createCommand()->update('product_field', array('position'=>$i++), 'id=:id', array(':id'=>$field_id));
+			}
+		}
+	}
 }

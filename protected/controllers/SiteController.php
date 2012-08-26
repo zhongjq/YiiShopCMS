@@ -5,14 +5,15 @@
  */
 class SiteController extends Controller
 {
-	
+
 	public function actions(){
         return array(
             'captcha'=>array(
                 'class'=>'CCaptchaAction',
             ),
         );
-    }	
+    }
+
 
 	/**
 	 * Index action is the default action in a controller.
@@ -22,12 +23,12 @@ class SiteController extends Controller
 		$this->render('index');
 	}
 
-	
+
 	public function actionError(){
 		if($error=Yii::app()->errorHandler->error)
 			$this->render('error', $error);
-	}	
-	
+	}
+
 	/**
 	 * Displays the login page
 	 */
@@ -108,7 +109,7 @@ class SiteController extends Controller
 
             $this->redirect(array('login'));
         }
-		
+
 
         $model = new Users('login');
 
@@ -120,10 +121,10 @@ class SiteController extends Controller
 				if($model->validate()) {
 					$this->redirect(  Yii::app()->user->returnUrl );
 				}
-			} 
-			
-		}		
-				
+			}
+
+		}
+
 		$this->render('login', array('model'=>$model) );
 	}
 
@@ -135,12 +136,12 @@ class SiteController extends Controller
 		Yii::app()->user->logout();
 		//$this->redirect(Yii::app()->user->returnUrl);
 		$this->redirect(Yii::app()->homeUrl);
-	}		
-	
+	}
+
     public function actionSignup()
     {
         $user = new Users('signup');
-		
+
 		$user->UserName = Yii::app()->session['UserName'];
 		$user->Email	= Yii::app()->session['Email'];
 
@@ -167,7 +168,7 @@ class SiteController extends Controller
         }
 
         $this->render('signup', array('form'=>$user));
-    }	
+    }
 
 	// регистрация
     public function actionRegistration()
@@ -196,10 +197,10 @@ class SiteController extends Controller
         }
 
 		$this->render('registration', array('model'=>$model) );
-    }	
-	
+    }
+
 	public function actionConfirmation($code) {
-		
+
 		if ( !$code )
 			throw new CHttpException(404,'Ошибка!');
 
@@ -207,9 +208,9 @@ class SiteController extends Controller
 					'select'	=> 'id',
 					'condition'	=> 'Status = :Status AND Password = :Code',
 					'params'	=> array(':Status'=> Statuses::CONFIRM_EMAIL, ':Code' => $code),
-				));		
-		
-		
+				));
+
+
 		if ( $User ) {
 			$User->Status = 1;
 
@@ -220,8 +221,8 @@ class SiteController extends Controller
 				throw new CHttpException(404,'Ошибка!');
 			}
 
-		} else 
+		} else
 			throw new CHttpException(404,'Страница не найдена!');
-		
-	}	
+
+	}
 }

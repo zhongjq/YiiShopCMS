@@ -11,6 +11,8 @@ class TypeField
     const MANUFACTURER = 7;
     const IMAGE = 8;
     const FILE = 9;
+    const DOUBLE = 10;
+    const BOOLEAN = 11;
 
 	public static $TypeToIDFields = array(
 		'integer'   => self::INTEGER,
@@ -21,6 +23,8 @@ class TypeField
         'categories'=> self::CATEGORIES,
         'image'		=> self::IMAGE,
         'file'		=> self::FILE,
+        'double'	=> self::DOUBLE,
+        'boolean'	=> self::BOOLEAN,
 	);
 
 	public static $Fields = array(
@@ -44,6 +48,16 @@ class TypeField
 				'maxlength' =>  11,
 			),
 		),
+		self::DOUBLE   =>  array(
+			'name'      =>  "Дробное число",
+			'type'      =>  'double',
+			'class'     =>  "DoubleField",
+			'dbType'    =>  "float",
+			'form'      =>  array(
+				'type'      =>  'text',
+				'maxlength' =>  11,
+			),
+		),
 		self::TEXT   =>  array(
 			'name'      =>  "Текст",
 			'type'      =>  "text",
@@ -61,6 +75,16 @@ class TypeField
 			'form'      =>  array(
 				'type'      =>  'text',
 				'maxlength' =>  12,
+			),
+		),
+		self::BOOLEAN     => array(
+			'name'      =>  "Логический переключатель",
+			'type'      =>  "boolean",
+			'class'     =>  "BooleanField",
+			'dbType'    =>  "tinyint(1)",
+			'form'      =>  array(
+				'type'=>'checkbox',
+				'layout'=>'{input}{label}{error}{hint}',
 			),
 		),
     	self::LISTS     => array(

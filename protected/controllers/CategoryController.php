@@ -45,11 +45,29 @@ class CategoryController extends Controller
 	public function actionView($alias)
 	{
 		$category = Category::model()->find('alias = :alias', array(':alias'=>$alias));
-		
+
 		if ( !$category ) throw new CHttpException(404,'Category not found.');
-		
+
+		$parent = $category->parent()->find();
+		if ( $parent ) $parent = $parent->id; else $parent = null;
+        // получаем все продукты где есть поле производитель
+        $products = Product::model()->with(array('productFields','productFields.categoryField'))
+						->findAll(	'productFields.field_type = :field_type AND categoryField.category_id = :category_id',
+									array(':field_type'=>TypeField::CATEGORIES,
+											':category_id'=>$parent,
+										));
+
+        $arProducts = array();
+
+        if ( $products ){
+            foreach($products as $product){
+                $arProducts[] = $product->searchByCategory($category->id);
+            }
+        }
+
 		$this->render('view',array(
-			'category' => $category
+			'category' => $category,
+			'products'=>$arProducts,
 		));
 	}
 

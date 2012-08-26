@@ -1,23 +1,21 @@
 <?php
 
 /**
- * This is the model class for table "manufacturer_field".
+ * This is the model class for table "boolean_field".
  *
- * The followings are the available columns in table 'manufacturer_field':
+ * The followings are the available columns in table 'boolean_field':
  * @property string $field_id
- * @property string $manufacturer_id
- * @property integer $is_multiple_select
+ * @property integer $default
  *
  * The followings are the available model relations:
- * @property Manufacturer $manufacturer
  * @property ProductField $field
  */
-class ManufacturerField extends CActiveRecord
+class BooleanField extends CActiveRecord
 {
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
-	 * @return ManufacturerField the static model class
+	 * @return BooleanField the static model class
 	 */
 	public static function model($className=__CLASS__)
 	{
@@ -29,7 +27,7 @@ class ManufacturerField extends CActiveRecord
 	 */
 	public function tableName()
 	{
-		return 'manufacturer_field';
+		return 'boolean_field';
 	}
 
 	/**
@@ -41,11 +39,11 @@ class ManufacturerField extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('field_id', 'required','on'=>'edit'),
-			array('is_multiple_select,manufacturer_id', 'numerical', 'integerOnly'=>true),
+			array('field_id, default', 'numerical', 'integerOnly'=>true),
 			array('field_id', 'length', 'max'=>11),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('field_id, is_multiple_select', 'safe', 'on'=>'search'),
+			array('field_id, default', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -67,27 +65,20 @@ class ManufacturerField extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'manufacturer_id'=>Yii::t('manufacturer',"manufacturer"),
-			'is_multiple_select' => 'Is Multiple Select',
+			'default' => Yii::t('field','Default'),
 		);
 	}
 
-
-    // форма в формате CForm
-    public function getElementsMotelCForm(){
-    	return array(
+	// форма в формате CForm
+	public function getElementsMotelCForm(){
+		return array(
 			'type'=>'form',
 			'elements'=>array(
-				'manufacturer_id'=> array(
-    		    	'type'  =>  'dropdownlist',
-				    'items' =>  CHtml::listData(Manufacturer::model()->findAll(), 'id', 'name'),
-				    'empty'=>  '',
-			    ),
-				'is_multiple_select'=>array(
-					'type'=>'checkbox',
-					'layout'=>'{input}{label}{error}{hint}',
+				'default'=>array(
+					'type'=>'text',
+					'maxlength'=>11
 				),
 			)
 		);
-    }
+	}
 }

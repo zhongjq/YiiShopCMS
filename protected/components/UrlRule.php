@@ -7,14 +7,16 @@ class UrlRule extends CBaseUrlRule
 	public function createUrl($manager,$route,$params,$ampersand)
 	{
 		switch($route){
-			case "products/index":
-				return $params['Alias'].$manager->urlSuffix;
+			case "product/index":
+				return $params['alias'].$manager->urlSuffix;
 			break;
-			case "products/view":
+			case "product/view":
+
 				if (isset($params['product'], $params['id']))
 					return $params['product'] . '/' . $params['id'].$manager->urlSuffix;
 				else if (isset($params['product'], $params['alias']))
 					return $params['product'] . '/' . $params['alias'].$manager->urlSuffix;
+
 			break;
 
 			case "manufacturers/view":
@@ -27,12 +29,23 @@ class UrlRule extends CBaseUrlRule
 
 	public function parseUrl($manager,$request,$pathInfo,$rawPathInfo)
 	{
+		if (preg_match('%^(\w+)(/(\d+))?$%', $pathInfo, $matches))
+		{
+			// Ищем товар
+			if ( isset($matches[1],$matches[3]) ){
+				$_GET['product'] = $matches[1];
+				$_GET['id'] = $matches[3];
+				return 'product/viewId';
+			}
+		}
+
 		if (preg_match('%^(\w+)(/(\w+))?$%', $pathInfo, $matches))
 		{
 			// Ищем товар
-			if ( Product::model()->find('alias=:alias', array(':alias'=>$matches[1])) ){
-				$_GET['alias'] = $matches[1];
-				return 'product/index';
+			if ( isset($matches[1],$matches[3]) ){
+				$_GET['product'] = $matches[1];
+				$_GET['alias'] = $matches[3];
+				return 'product/viewAlias';
 			}
 		}
 		return false;  // не применяем данное правило
