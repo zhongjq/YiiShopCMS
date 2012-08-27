@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 3.5.2.1
+-- version 3.5.2.2
 -- http://www.phpmyadmin.net
 --
--- Хост: localhost
--- Время создания: Авг 26 2012 г., 22:57
--- Версия сервера: 5.5.24-0ubuntu0.12.04.1
--- Версия PHP: 5.3.10-1ubuntu3.2
+-- Хост: mysql0.db.koding.com
+-- Время создания: Авг 27 2012 г., 06:05
+-- Версия сервера: 5.1.61-log
+-- Версия PHP: 5.3.3
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -96,6 +96,27 @@ INSERT INTO `category_field` (`field_id`, `category_id`, `is_multiple_select`) V
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `datetime_field`
+--
+
+CREATE TABLE IF NOT EXISTS `datetime_field` (
+  `field_id` int(11) unsigned NOT NULL,
+  `type` int(11) unsigned DEFAULT NULL COMMENT 'Тип: дата/время, время, дата',
+  `format` varchar(255) DEFAULT NULL COMMENT 'Да',
+  `is_multiple_select` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`field_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Дата время поле';
+
+--
+-- Дамп данных таблицы `datetime_field`
+--
+
+INSERT INTO `datetime_field` (`field_id`, `type`, `format`, `is_multiple_select`) VALUES
+(22, 0, '', 0);
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `disk`
 --
 
@@ -108,6 +129,7 @@ CREATE TABLE IF NOT EXISTS `disk` (
   `name` varchar(255) DEFAULT NULL,
   `price` decimal(9,2) DEFAULT NULL,
   `spikes` tinyint(1) DEFAULT NULL,
+  `date` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
@@ -115,11 +137,11 @@ CREATE TABLE IF NOT EXISTS `disk` (
 -- Дамп данных таблицы `disk`
 --
 
-INSERT INTO `disk` (`id`, `alias`, `title`, `keywords`, `description`, `name`, `price`, `spikes`) VALUES
-(1, '', '', '', '', 'Диск 1', 1111.00, 1),
-(2, '', '', '', '', 'Диск 2', 222.00, NULL),
-(3, '', '', '', '', 'Диск 3', 123123.00, NULL),
-(4, '', '', '', '', 'Диск 4', 123123.00, NULL);
+INSERT INTO `disk` (`id`, `alias`, `title`, `keywords`, `description`, `name`, `price`, `spikes`, `date`) VALUES
+(1, '', '', '', '', 'Диск 1', '1111.00', 1, NULL),
+(2, '', '', '', '', 'Диск 2', '222.00', 0, '0000-00-00 00:00:00'),
+(3, '', '', '', '', 'Диск 3', '123123.00', NULL, NULL),
+(4, '', '', '', '', 'Диск 4', '123123.00', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -439,7 +461,7 @@ CREATE TABLE IF NOT EXISTS `product_field` (
   `hint` varchar(255) NOT NULL COMMENT 'Подсказка',
   PRIMARY KEY (`id`),
   KEY `fk_product_field_product1_idx` (`product_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=22 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=23 ;
 
 --
 -- Дамп данных таблицы `product_field`
@@ -449,13 +471,14 @@ INSERT INTO `product_field` (`id`, `position`, `product_id`, `field_type`, `name
 (1, 0, 1, 2, 'Наименование', 'name', 1, 0, 1, '', 'Наименование шины'),
 (2, 1, 1, 3, 'Цена', 'price', 1, 1, 1, 'р.', ''),
 (3, 2, 1, 7, 'Производитель', 'manufacturer', 1, 1, 1, '', ''),
-(4, 4, 1, 6, 'Категория', 'category', 1, 1, 1, '', ''),
+(4, 3, 1, 6, 'Категория', 'category', 1, 1, 1, '', ''),
 (5, 0, 2, 2, 'Наименование', 'name', 1, 1, 1, '', ''),
 (6, 0, 2, 3, 'Цена', 'price', 1, 1, 1, '', ''),
 (7, 0, 2, 6, 'Категория', 'category', 0, 0, 1, '', ''),
 (8, 0, 2, 7, 'Производитель', 'manufacturer', 1, 1, 1, '', ''),
-(9, 3, 1, 8, 'Изображения', 'image', 0, 0, 0, '', ''),
-(21, 0, 2, 11, 'Шипы', 'spikes', 0, 1, 1, '', '');
+(9, 4, 1, 8, 'Изображения', 'image', 0, 0, 0, '', ''),
+(21, 0, 2, 11, 'Шипы', 'spikes', 0, 1, 1, '', ''),
+(22, 0, 2, 12, 'date', 'date', 0, 1, 1, '', '');
 
 -- --------------------------------------------------------
 
@@ -476,12 +499,25 @@ CREATE TABLE IF NOT EXISTS `record_category` (
 --
 
 INSERT INTO `record_category` (`product_id`, `record_id`, `category_id`) VALUES
-(2, 2, 5),
-(2, 2, 6),
-(2, 2, 7),
 (2, 4, 7),
 (2, 3, 6),
-(2, 1, 6);
+(2, 1, 6),
+(2, 2, 5),
+(2, 2, 6),
+(2, 2, 7);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `record_datetime`
+--
+
+CREATE TABLE IF NOT EXISTS `record_datetime` (
+  `product_id` int(11) unsigned NOT NULL,
+  `record_id` int(11) unsigned NOT NULL,
+  `datetime` datetime DEFAULT NULL,
+  KEY `fk_record_manufacturer_product1_idx` (`product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Связь товаров со множественными списками';
 
 -- --------------------------------------------------------
 
@@ -516,13 +552,13 @@ CREATE TABLE IF NOT EXISTS `record_manufacturer` (
 --
 
 INSERT INTO `record_manufacturer` (`product_id`, `record_id`, `manufacturer_id`) VALUES
-(2, 2, 10),
 (2, 4, 10),
 (2, 3, 10),
 (2, 3, 11),
 (2, 1, 9),
 (2, 1, 10),
-(2, 1, 11);
+(2, 1, 11),
+(2, 2, 10);
 
 -- --------------------------------------------------------
 
@@ -584,29 +620,29 @@ CREATE TABLE IF NOT EXISTS `tires` (
 --
 
 INSERT INTO `tires` (`id`, `alias`, `title`, `keywords`, `description`, `name`, `price`, `manufacturer`, `category`, `image`) VALUES
-(1, 'asdasd', '', '', '', 'Bridgestone Ice Cruiser 7000 235/70 R16 T', 7200.00, 2, 3, NULL),
-(2, '', NULL, NULL, NULL, 'Bridgestone IC7000 185/65 R15 88T', 3690.00, 1, 3, NULL),
-(3, '', NULL, NULL, NULL, 'Nokian Hakkapeliitta R SUV', 324.00, 2, 2, NULL),
-(4, '', NULL, NULL, NULL, 'шина 2', 4345.00, 3, 2, NULL),
-(5, '', NULL, NULL, NULL, 'шина 4', 345.00, 2, 2, NULL),
-(6, '', NULL, NULL, NULL, 'шина 45', 345354.00, 3, 2, NULL),
-(7, '', NULL, NULL, NULL, 'шина 433', 324.00, 2, 2, NULL),
-(8, '', NULL, NULL, NULL, 'шина 4', 324.00, 2, 2, NULL),
-(9, '', NULL, NULL, NULL, '213', 345.00, 2, 2, NULL),
-(10, '', NULL, NULL, NULL, 'шина 4343', 3434.00, 2, 2, NULL),
-(11, '', NULL, NULL, NULL, '3234', 234234.00, 2, 2, NULL),
-(12, '', NULL, NULL, NULL, 'dsfsdf', 434.00, 3, 2, NULL),
-(13, '', NULL, NULL, NULL, '234234', 234234.00, 5, 3, NULL),
-(14, '', NULL, NULL, NULL, 'шина 4324234', 234234.00, 4, 2, NULL),
-(15, '', NULL, NULL, NULL, 'шина 4', 234234.00, 2, 2, NULL),
-(16, '', NULL, NULL, NULL, 'шина 4', 234234.00, 3, 2, NULL),
-(17, '', NULL, NULL, NULL, 'шина 445', 9655.00, 3, 2, NULL),
-(18, '', NULL, NULL, NULL, 'шина 4555', 555.00, 3, 2, NULL),
-(19, '', NULL, NULL, NULL, 'шина 4324234', 234234.00, 4, 2, NULL),
-(20, '', NULL, NULL, NULL, 'шина 4', 234234.00, 2, 2, NULL),
-(21, '', NULL, NULL, NULL, 'шина 4', 234234.00, 3, 2, NULL),
-(22, '', NULL, NULL, NULL, 'шина 445', 9655.00, 3, 2, NULL),
-(23, '', NULL, NULL, NULL, 'шина 4555', 555.00, 3, 2, NULL);
+(1, 'asdasd', '', '', '', 'Bridgestone Ice Cruiser 7000 235/70 R16 T', '7200.00', 2, 3, NULL),
+(2, '', NULL, NULL, NULL, 'Bridgestone IC7000 185/65 R15 88T', '3690.00', 1, 3, NULL),
+(3, '', NULL, NULL, NULL, 'Nokian Hakkapeliitta R SUV', '324.00', 2, 2, NULL),
+(4, '', NULL, NULL, NULL, 'шина 2', '4345.00', 3, 2, NULL),
+(5, '', NULL, NULL, NULL, 'шина 4', '345.00', 2, 2, NULL),
+(6, '', NULL, NULL, NULL, 'шина 45', '345354.00', 3, 2, NULL),
+(7, '', NULL, NULL, NULL, 'шина 433', '324.00', 2, 2, NULL),
+(8, '', NULL, NULL, NULL, 'шина 4', '324.00', 2, 2, NULL),
+(9, '', NULL, NULL, NULL, '213', '345.00', 2, 2, NULL),
+(10, '', NULL, NULL, NULL, 'шина 4343', '3434.00', 2, 2, NULL),
+(11, '', NULL, NULL, NULL, '3234', '234234.00', 2, 2, NULL),
+(12, '', NULL, NULL, NULL, 'dsfsdf', '434.00', 3, 2, NULL),
+(13, '', NULL, NULL, NULL, '234234', '234234.00', 5, 3, NULL),
+(14, '', NULL, NULL, NULL, 'шина 4324234', '234234.00', 4, 2, NULL),
+(15, '', NULL, NULL, NULL, 'шина 4', '234234.00', 2, 2, NULL),
+(16, '', NULL, NULL, NULL, 'шина 4', '234234.00', 3, 2, NULL),
+(17, '', NULL, NULL, NULL, 'шина 445', '9655.00', 3, 2, NULL),
+(18, '', NULL, NULL, NULL, 'шина 4555', '555.00', 3, 2, NULL),
+(19, '', NULL, NULL, NULL, 'шина 4324234', '234234.00', 4, 2, NULL),
+(20, '', NULL, NULL, NULL, 'шина 4', '234234.00', 2, 2, NULL),
+(21, '', NULL, NULL, NULL, 'шина 4', '234234.00', 3, 2, NULL),
+(22, '', NULL, NULL, NULL, 'шина 445', '9655.00', 3, 2, NULL),
+(23, '', NULL, NULL, NULL, 'шина 4555', '555.00', 3, 2, NULL);
 
 -- --------------------------------------------------------
 
@@ -649,6 +685,12 @@ ALTER TABLE `boolean_field`
 ALTER TABLE `category_field`
   ADD CONSTRAINT `fk_category_field_category1` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_category_field_product_field1` FOREIGN KEY (`field_id`) REFERENCES `product_field` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Ограничения внешнего ключа таблицы `datetime_field`
+--
+ALTER TABLE `datetime_field`
+  ADD CONSTRAINT `datetime_field_ibfk_1` FOREIGN KEY (`field_id`) REFERENCES `product_field` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Ограничения внешнего ключа таблицы `double_field`
@@ -712,6 +754,12 @@ ALTER TABLE `product_field`
 ALTER TABLE `record_category`
   ADD CONSTRAINT `fk_record_category_category1` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_record_category_product1` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Ограничения внешнего ключа таблицы `record_datetime`
+--
+ALTER TABLE `record_datetime`
+  ADD CONSTRAINT `record_datetime_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Ограничения внешнего ключа таблицы `record_list`
