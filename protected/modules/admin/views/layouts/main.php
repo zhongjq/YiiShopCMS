@@ -155,7 +155,14 @@
 		)); ?><!-- breadcrumbs -->
 
 
-		<?php echo $content; ?>
+        <?php if(Yii::app()->user->hasFlash('error')):?>
+            <div class="alert alert-erro">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <?=Yii::app()->user->getFlash('error'); ?>
+            </div>
+        <?php endif; ?>
+
+        <?=$content; ?>
 
 		<hr>
 		<footer id="footer">
