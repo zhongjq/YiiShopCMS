@@ -164,7 +164,7 @@ class ConstructorController extends Controller
 			}
 			catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
 			{
-				Yii::app()->user->setFlash('success',$e->getMessage());
+				Yii::app()->user->setFlash('error',$e->getFile()."<br/>". $e->getLine().": ". $e->getMessage());
 				$transaction->rollBack();
 			}
 		}

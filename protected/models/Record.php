@@ -64,6 +64,9 @@ class Record extends CActiveRecord
 							case TypeField::IMAGE:
 								$this->_with['imageField'] = 'imageField';
 							break;
+    						case TypeField::DATETIME:
+								$this->_with['dateTimeField'] = 'dateTimeField';
+							break;                            
 						}
 					}
 
@@ -407,6 +410,11 @@ class Record extends CActiveRecord
                             $relations[$field->alias.'Manufacturer'] = array( self::BELONGS_TO,'Manufacturer', $field->alias );
                     break;
 
+    				case TypeField::DATETIME :
+                        if ($field->dateTimeField->is_multiple_select)
+    						$relations[$field->alias] = array(	self::HAS_MANY,'RecordDatetime','on'=>'`product_id` = '.$this->getProductID(), 'together'=>true);
+                        
+                    break;
 
 				}
 			}
@@ -471,6 +479,22 @@ class Record extends CActiveRecord
 							}
 						}
                     break;
+
+    				case TypeField::DATETIME :
+						if ($field->datetimeField->is_multiple_select){
+							RecordManufacturer::model()->deleteAll('product_id = :product_id AND record_id = :record_id',array(":product_id"=> $this->getProductID(),':record_id'=> $this->id));
+
+							if ( isset($this->{$field->alias}) && !empty($this->{$field->alias}) ){
+								foreach ($this->{$field->alias} as $manufacturer_id) {
+									$RecordManufacturer = new RecordManufacturer();
+									$RecordManufacturer->product_id = $this->getProductID();
+									$RecordManufacturer->record_id = $this->id;
+									$RecordManufacturer->manufacturer_id = $manufacturer_id;
+									if ( !$RecordManufacturer->save() ) throw new CException("ERROR SEVE MANUFACTURES");
+								}
+							}
+						}
+                    break;                    
 				}
 			}
 		}
@@ -536,6 +560,9 @@ class Record extends CActiveRecord
     				case TypeField::BOOLEAN :
 						$rules[] = array($field->alias, 'numerical','integerOnly'=>true,'allowEmpty'=> $field->is_mandatory );
 					break;
+        			case TypeField::DATETIME :
+						$rules[] = array($field->alias, 'date', 'format'=> DateTimeField::$formats[$field->dateTimeField->format] );
+					break;                    
 				}
 
 			}

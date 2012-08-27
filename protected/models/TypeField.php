@@ -13,7 +13,8 @@ class TypeField
     const FILE = 9;
     const DOUBLE = 10;
     const BOOLEAN = 11;
-
+    const DATETIME = 12;
+    
 	public static $TypeToIDFields = array(
 		'integer'   => self::INTEGER,
 		'string'    => self::STRING,
@@ -25,6 +26,7 @@ class TypeField
         'file'		=> self::FILE,
         'double'	=> self::DOUBLE,
         'boolean'	=> self::BOOLEAN,
+        'datatime'  => self::DATETIME
 	);
 
 	public static $Fields = array(
@@ -126,7 +128,7 @@ class TypeField
                 'type'  =>  'file',
             ),
 		),
-    	self::FILE     => array(
+    	self::FILE      => array(
 			'name'      =>  "Файл(ы)",
 			'type'      =>  "file",
             'class'     =>  "FileField",
@@ -135,6 +137,17 @@ class TypeField
                 'type'  =>  'file',
             ),
 		),
+        self::DATETIME  => array(
+			'name'      =>  "Дата/время",
+			'type'      =>  "datetime",
+            'class'     =>  "DatetimeField",
+			'dbType'    =>  "datetime",
+			'form'      =>  array(
+                'type'  =>  'text',
+                'class'=>'span2',
+                'layout'=>  '{label}<div class="input-prepend"><span class="add-on"><i class="icon-calendar"></i></span>{input}</div>{error}{hint}',
+            ),
+		),        
 	);
 
 	public static function getFieldsList(){

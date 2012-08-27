@@ -9,8 +9,5 @@ $this->breadcrumbs=array(
 
 $this->renderPartial('fields/secondMenu',array('product'=>$product));
 
-if(Yii::app()->user->hasFlash('success'))
-        echo Yii::app()->user->getFlash('success');
-
 echo $form->render();
 ?>

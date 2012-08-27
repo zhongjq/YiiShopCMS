@@ -82,7 +82,7 @@ class ProductField extends CActiveRecord
 			'manufacturerField' => array(self::HAS_ONE, 'ManufacturerField', 'field_id'),
 			'imageField' => array(self::HAS_ONE, 'ImageField', 'field_id'),
 			'fileField' => array(self::HAS_ONE, 'FileField', 'field_id'),
-
+            'dateTimeField' => array(self::HAS_ONE, 'DateTimeField', 'field_id'),
 
 		);
 	}
