@@ -66,7 +66,7 @@ class Record extends CActiveRecord
 							break;
     						case TypeField::DATETIME:
 								$this->_with['dateTimeField'] = 'dateTimeField';
-							break;                            
+							break;
 						}
 					}
 
@@ -137,6 +137,32 @@ class Record extends CActiveRecord
 
 								if ( $field->is_filter ) {
 									$f['filter'] = CHtml::listData($this->getManufacturerFilter($field) , 'id', 'name');
+								}
+							break;
+							case TypeField::DATETIME:
+								if ( $field->dateTimeField->is_multiple_select )
+									$f['value'] = '$data->getRecordManufacturer("'.$field->alias.'")';
+								else {
+									switch ($field->dateTimeField->type) {
+										case DateTimeField::DATETIME:
+											$f['value'] = 'Yii::app()->dateFormatter->formatDateTime($data->'.$field->alias.',"medium","short");';
+										break;
+										case DateTimeField::DATE:
+											$f['value'] = 'Yii::app()->dateFormatter->formatDateTime($data->'.$field->alias.',"medium",null);';
+										break;
+										case DateTimeField::TIME:
+											$f['value'] = 'Yii::app()->dateFormatter->formatDateTime($data->'.$field->alias.',null,"short");';
+										break;
+
+									}
+								}
+
+
+								if ( $field->is_filter ) {
+									$f['filter'] = Yii::app()->controller->widget(	'zii.widgets.jui.CJuiDatePicker', array(
+																					'model'=>$this,'attribute'=>$field->alias,
+																					'language'=>Yii::app()->getLanguage(),
+																					'htmlOptions'=>array('onclick'=>'$(this).datepicker( $.datepicker.regional["'.Yii::app()->getLanguage().'"]);$(this).datepicker().focus();')),true);
 								}
 							break;
 						}
@@ -266,7 +292,7 @@ class Record extends CActiveRecord
 
 		if ( $productFields ){
 			foreach( $productFields as $field ){
-                $Form['elements'][$field->alias] = TypeField::$Fields[$field->field_type]['form'];
+               $Form['elements'][$field->alias] = TypeField::getFieldFormData($field->field_type);
 				switch( $field->field_type ){
 					case TypeField::TEXT :
 						$Form['elements'][$field->alias]['rows'] = $field->textField->rows;
@@ -413,7 +439,7 @@ class Record extends CActiveRecord
     				case TypeField::DATETIME :
                         if ($field->dateTimeField->is_multiple_select)
     						$relations[$field->alias] = array(	self::HAS_MANY,'RecordDatetime','on'=>'`product_id` = '.$this->getProductID(), 'together'=>true);
-                        
+
                     break;
 
 				}
@@ -421,6 +447,73 @@ class Record extends CActiveRecord
 		}
 
 		return $relations;
+	}
+
+	public function beforeSave() {
+		parent::beforeSave();
+
+        $productFields = $this->getProductFields();
+    	if ( $productFields ){
+			foreach( $productFields as $field ){
+				switch( $field->field_type ){
+		        	case TypeField::DATETIME :
+						$date = new DateTime($this->{$field->alias});
+
+						switch ($field->dateTimeField->type) {
+							case DateTimeField::DATETIME:
+								$this->{$field->alias} = $date->format('Y-m-d H:m:00');
+							break;
+							case DateTimeField::DATE:
+								$this->{$field->alias} = $date->format('Y-m-d 00:00:00');
+							break;
+							case DateTimeField::TIME:
+								$this->{$field->alias} = $date->format('00-00-00 H:m:00');
+							break;
+						}
+					break;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	public function afterFind() {
+		parent::afterFind();
+
+        $productFields = $this->getProductFields();
+    	if ( $productFields ){
+			foreach( $productFields as $field ){
+				switch( $field->field_type ){
+		        	case TypeField::DATETIME :
+						$date = new DateTime($this->{$field->alias});
+
+						if ( $field->dateTimeField->is_multiple_select ) {
+							echo 123;
+						} else {
+
+							switch ($field->dateTimeField->type) {
+								case DateTimeField::DATETIME:
+									$this->{$field->alias} = Yii::app()->dateFormatter->formatDateTime($this->{$field->alias},"medium","short");
+								break;
+								case DateTimeField::DATE:
+									$this->{$field->alias} = Yii::app()->dateFormatter->formatDateTime($this->{$field->alias},"medium",null);
+								break;
+								case DateTimeField::TIME:
+									$this->{$field->alias} = Yii::app()->dateFormatter->formatDateTime($this->{$field->alias},null,"short");
+								break;
+
+							}
+
+						}
+
+
+					break;
+				}
+			}
+		}
+
+		return true;
 	}
 
 	public function afterSave()
@@ -481,7 +574,7 @@ class Record extends CActiveRecord
                     break;
 
     				case TypeField::DATETIME :
-						if ($field->datetimeField->is_multiple_select){
+						if ($field->dateTimeField->is_multiple_select){
 							RecordManufacturer::model()->deleteAll('product_id = :product_id AND record_id = :record_id',array(":product_id"=> $this->getProductID(),':record_id'=> $this->id));
 
 							if ( isset($this->{$field->alias}) && !empty($this->{$field->alias}) ){
@@ -494,7 +587,7 @@ class Record extends CActiveRecord
 								}
 							}
 						}
-                    break;                    
+                    break;
 				}
 			}
 		}
@@ -561,8 +654,8 @@ class Record extends CActiveRecord
 						$rules[] = array($field->alias, 'numerical','integerOnly'=>true,'allowEmpty'=> $field->is_mandatory );
 					break;
         			case TypeField::DATETIME :
-						$rules[] = array($field->alias, 'date', 'format'=> DateTimeField::$formats[$field->dateTimeField->format] );
-					break;                    
+						$rules[] = array($field->alias, 'date', 'format'=> DateTimeField::getFormatLocale($field->dateTimeField->type),'allowEmpty'=> $field->is_mandatory );
+					break;
 				}
 
 			}
@@ -625,6 +718,14 @@ class Record extends CActiveRecord
 							$criteria->compare($field->alias.'.id', $this->{$field->alias});
 						} else {
 							$criteria->compare($field->alias, $this->{$field->alias});
+						}
+					break;
+					case TypeField::DATETIME && $this->{$field->alias};
+						$date = new DateTime($this->{$field->alias});
+						if( $field->dateTimeField->is_multiple_select ){
+							$criteria->compare($field->alias.'.id', $this->{$field->alias});
+						} else {
+							$criteria->compare($field->alias,$date->format('Y-m-d 00:00:00'));
 						}
 					break;
 				}

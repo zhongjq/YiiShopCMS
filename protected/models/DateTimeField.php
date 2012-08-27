@@ -16,12 +16,21 @@ class DateTimeField extends CActiveRecord
     const DATETIME = 0;
     const DATE = 1;
     const TIME = 2;
-    public static $formats = array(
-        self::DATETIME => 'dd/MM/YYYY H:i',
-        self::DATE => 'dd/MM/YYYY',
-        self::TIME => 'H:i',
-    );
-    
+
+	public static function getFormatLocale($id){
+		$datetime = new DateTimeField();
+		$formats = $datetime->getFormats();
+		return $formats[$id];
+	}
+
+	private function getFormats(){
+		return array(
+			self::DATETIME => Yii::app()->getLocale(Yii::app()->getLanguage())->getDateFormat().', '.Yii::app()->getLocale(Yii::app()->getLanguage())->getTimeFormat('short'),
+			self::DATE => Yii::app()->getLocale(Yii::app()->getLanguage())->getDateFormat(),
+			self::TIME => Yii::app()->getLocale(Yii::app()->getLanguage())->getTimeFormat('short'),
+		);
+	}
+
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
@@ -75,15 +84,15 @@ class DateTimeField extends CActiveRecord
 			'format' => Yii::t('fields','Format'),
 		);
 	}
-    
+
     public static function getTypeDateTime(){
         return array(
             self::DATETIME=>"Дата/время",
+			self::DATE=>"Дата",
             self::TIME=>"Время",
-            self::DATE=>"Дата"            
         );
     }
-    
+
 	// форма в формате CForm
 	public function getElementsMotelCForm(){
 		return array(
@@ -95,7 +104,7 @@ class DateTimeField extends CActiveRecord
 			    ),
 				'format'=>array(
 					'type'=>'text',
-					'maxlength'=>255
+					'maxlength'=>255,
 				),
     			'is_multiple_select'=>array(
     				'type'=>'checkbox',

@@ -229,13 +229,14 @@ class ConstructorController extends Controller
 			{
 				if ( $form->submitted() && $productField->save() ){
 					$transaction->commit();
-					$this->redirect($this->createUrl('/admin/product/fields',array('id'=>$product->id)));
+					$this->redirect($this->createUrl('/admin/constructor/fields',array('id'=>$product->id)));
 				} else {
 					throw new CException("Error save");
 				}
 			}
 			catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
 			{
+				Yii::app()->user->setFlash('error',$e->getFile()."<br/>". $e->getLine().": ". $e->getMessage());
 				$transaction->rollBack();
 			}
 		}

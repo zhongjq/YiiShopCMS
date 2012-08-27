@@ -174,4 +174,5 @@ div.summary{
 
 tr.filters input, tr.filters select {
 	margin: 0px;
+	width: auto;
 }

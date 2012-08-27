@@ -14,7 +14,7 @@ class TypeField
     const DOUBLE = 10;
     const BOOLEAN = 11;
     const DATETIME = 12;
-    
+
 	public static $TypeToIDFields = array(
 		'integer'   => self::INTEGER,
 		'string'    => self::STRING,
@@ -125,7 +125,7 @@ class TypeField
             'class'     =>  "ImageField",
 			'dbType'    =>  "int(11)",
 			'form'      =>  array(
-                'type'  =>  'file',
+                'type'  =>  'CMultiFileUpload',
             ),
 		),
     	self::FILE      => array(
@@ -140,15 +140,28 @@ class TypeField
         self::DATETIME  => array(
 			'name'      =>  "Дата/время",
 			'type'      =>  "datetime",
-            'class'     =>  "DatetimeField",
+            'class'     =>  "DateTimeField",
 			'dbType'    =>  "datetime",
 			'form'      =>  array(
-                'type'  =>  'text',
-                'class'=>'span2',
-                'layout'=>  '{label}<div class="input-prepend"><span class="add-on"><i class="icon-calendar"></i></span>{input}</div>{error}{hint}',
-            ),
-		),        
+				'type'		=> 'zii.widgets.jui.CJuiDatePicker',
+				'language'	=> '',
+             ),
+		),
 	);
+
+
+
+	public function __construct(){
+		$this->fields = self::$Fields;
+		$this->fields[self::DATETIME]['form']['language'] = Yii::app()->getLanguage();
+	}
+
+
+	public static function getFieldFormData($fieldId){
+		$field = new TypeField();
+
+		return $field->fields[$fieldId]['form'];
+	}
 
 	public static function getFieldsList(){
 		$return = array();
