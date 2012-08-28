@@ -141,8 +141,10 @@ class Record extends CActiveRecord
 							break;
 							case TypeField::DATETIME:
 								if ( $field->dateTimeField->is_multiple_select )
-									$f['value'] = '1';
+									$f['value'] = '$data->getRecordDateTime("'.$field->alias.'");';
+									//$f['value'] = 'isset($data->'.$field->alias.'->datetime) ? $data->'.$field->alias.'->datetime : null ;';
 								else {
+
 									switch ($field->dateTimeField->type) {
 										case DateTimeField::DATETIME:
 											$f['value'] = 'Yii::app()->dateFormatter->formatDateTime($data->'.$field->alias.',"medium","short");';
@@ -227,6 +229,18 @@ class Record extends CActiveRecord
        return implode($sSep, $aRes);
     }
 
+    public function getRecordDateTime($name, $sSep = ', ')
+	{
+       $aRes = array();
+
+	   if ( !empty($this->{$name}) )
+		foreach ($this->{$name} as $item) {
+		   $aRes[] = $item->datetime;
+		}
+
+       return implode($sSep, $aRes);
+    }
+
     public function getRecordManufacturer($name, $sSep = ', ')
     {
        $aRes = array();
@@ -296,7 +310,7 @@ class Record extends CActiveRecord
 				switch( $field->field_type ){
     				case TypeField::DATETIME :
 						$Form['elements'][$field->alias] = $field->dateTimeField->getElementCForm();
-					break;                    
+					break;
 					case TypeField::TEXT :
 						$Form['elements'][$field->alias]['rows'] = $field->textField->rows;
 					break;
@@ -441,7 +455,7 @@ class Record extends CActiveRecord
 
     				case TypeField::DATETIME :
                         if ($field->dateTimeField->is_multiple_select)
-    						$relations[$field->alias] = array( self::HAS_ONE,'RecordDatetime','record_id');
+    						$relations[$field->alias] = array( self::HAS_MANY,'RecordDatetime','record_id');
 
                     break;
 
@@ -489,15 +503,17 @@ class Record extends CActiveRecord
 			foreach( $productFields as $field ){
 				switch( $field->field_type ){
 		        	case TypeField::DATETIME:
-                        
                         if ( !empty($this->{$field->alias}) ){
-    						$date = new DateTime($this->{$field->alias});
-    
     						if ( $field->dateTimeField->is_multiple_select ) {
-    							echo 123;
+
+								if ( !empty($this->{$field->alias}) )
+									foreach ($this->{$field->alias} as $datetime) {
+										$datetime->datetime = $field->dateTimeField->formatedDateTime($datetime->datetime);
+									}
+
     						} else {
                                 $this->{$field->alias} = $field->dateTimeField->formatedDateTime($this->{$field->alias});
-    
+
     						}
 				        }
 

@@ -50,9 +50,9 @@ return array(
                 '/admin/list/<listId:\d+>/item/<action:(edit|delete)>/<itemId:\d+>' => 'admin/lists/<action>item',
 
 		         // своё правило для URL вида '/Производитель/Модель'
-		         array(
-			         //'class' => 'application.components.UrlRule',
-			         //'connectionID' => 'db',
-		         ),
+//		         array(
+//			         'class' => 'application.components.UrlRule',
+//			         'connectionID' => 'db',
+//		         ),
 
 	        );

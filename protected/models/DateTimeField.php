@@ -92,10 +92,14 @@ class DateTimeField extends CActiveRecord
 			self::TIME => Yii::app()->getLocale(Yii::app()->getLanguage())->getTimeFormat('short'),
 		);
 	}
-    
+
     public function getElementCForm(){
         return array(
-    		'type' => 'application.extensions.CJuiDateTimePicker.CJuiDateTimePicker',
+    		//'type' => 'application.extensions.CJuiDateTimePicker.CJuiDateTimePicker',
+    		'type' => 'application.extensions.datePicker.datePicker',
+			'value'=>'',
+			'name'=>'',
+			'htmlOptions'=>array('value'=>'',),
 			'language' => Yii::app()->getLanguage(),
             'options' => array('format'=> $this->getFormatLocale($this->type)),
             'hint' => $this->getFormatLocale($this->type)
@@ -112,7 +116,7 @@ class DateTimeField extends CActiveRecord
     		break;
     		case DateTimeField::TIME:
     			$dateTime = Yii::app()->dateFormatter->formatDateTime($dateTime,null,"short");
-    		break;    
+    		break;
     	}
         return $dateTime;
     }
