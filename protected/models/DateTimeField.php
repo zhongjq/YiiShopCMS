@@ -17,20 +17,6 @@ class DateTimeField extends CActiveRecord
     const DATE = 1;
     const TIME = 2;
 
-	public static function getFormatLocale($id){
-		$datetime = new DateTimeField();
-		$formats = $datetime->getFormats();
-		return $formats[$id];
-	}
-
-	private function getFormats(){
-		return array(
-			self::DATETIME => Yii::app()->getLocale(Yii::app()->getLanguage())->getDateFormat().', '.Yii::app()->getLocale(Yii::app()->getLanguage())->getTimeFormat('short'),
-			self::DATE => Yii::app()->getLocale(Yii::app()->getLanguage())->getDateFormat(),
-			self::TIME => Yii::app()->getLocale(Yii::app()->getLanguage())->getTimeFormat('short'),
-		);
-	}
-
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
@@ -93,6 +79,44 @@ class DateTimeField extends CActiveRecord
         );
     }
 
+    public static function getFormatLocale($id){
+		$datetime = new DateTimeField();
+		$formats = $datetime->getFormats();
+		return $formats[$id];
+	}
+
+	private function getFormats(){
+		return array(
+			self::DATETIME => Yii::app()->getLocale(Yii::app()->getLanguage())->getDateFormat().' '.Yii::app()->getLocale(Yii::app()->getLanguage())->getTimeFormat('short'),
+			self::DATE => Yii::app()->getLocale(Yii::app()->getLanguage())->getDateFormat(),
+			self::TIME => Yii::app()->getLocale(Yii::app()->getLanguage())->getTimeFormat('short'),
+		);
+	}
+    
+    public function getElementCForm(){
+        return array(
+    		'type' => 'application.extensions.CJuiDateTimePicker.CJuiDateTimePicker',
+			'language' => Yii::app()->getLanguage(),
+            'options' => array('format'=> $this->getFormatLocale($this->type)),
+            'hint' => $this->getFormatLocale($this->type)
+        );
+    }
+
+    public function formatedDateTime($dateTime){
+        switch ($this->type) {
+            case DateTimeField::DATETIME:
+    	    	$dateTime = Yii::app()->dateFormatter->formatDateTime($dateTime,"medium",null).' '.Yii::app()->dateFormatter->formatDateTime($dateTime,null,"short");
+    		break;
+    		case DateTimeField::DATE:
+    			$dateTime = Yii::app()->dateFormatter->formatDateTime($dateTime,"medium",null);
+    		break;
+    		case DateTimeField::TIME:
+    			$dateTime = Yii::app()->dateFormatter->formatDateTime($dateTime,null,"short");
+    		break;    
+    	}
+        return $dateTime;
+    }
+
 	// форма в формате CForm
 	public function getElementsMotelCForm(){
 		return array(
@@ -102,10 +126,12 @@ class DateTimeField extends CActiveRecord
         	    	'type'  =>  'dropdownlist',
 				    'items' =>  DateTimeField::getTypeDateTime(),
 			    ),
+                /*
 				'format'=>array(
 					'type'=>'text',
 					'maxlength'=>255,
 				),
+                */
     			'is_multiple_select'=>array(
     				'type'=>'checkbox',
 					'layout'=>'{input}{label}{error}{hint}',

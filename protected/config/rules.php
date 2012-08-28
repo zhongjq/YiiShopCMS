@@ -51,8 +51,8 @@ return array(
 
 		         // своё правило для URL вида '/Производитель/Модель'
 		         array(
-			         'class' => 'application.components.UrlRule',
-			         'connectionID' => 'db',
+			         //'class' => 'application.components.UrlRule',
+			         //'connectionID' => 'db',
 		         ),
 
 	        );

@@ -31,12 +31,6 @@ return array(
 		'application.models.*',
 		'application.components.*',
 		'application.widgets.*',
-
-        'ext.eoauth.*',
-        'ext.eoauth.lib.*',
-        'ext.lightopenid.*',
-        'ext.eauth.*',
-        'ext.eauth.services.*',
 	),
 
 	// Сжатие
@@ -45,16 +39,17 @@ return array(
 
 	// Модули
 	'modules'=>array(
-		'admin' => array(
+
+        'gii'=>array(
+            'class'         =>  'system.gii.GiiModule',
+            'password'      =>  '1',
+            'ipFilters'     =>  array("192.168.56.1","127.0.0.1",),
+            'newFileMode'   =>  0666,
+           'newDirMode'    =>  0777,
+        ),
+    	'admin' => array(
 			'layout'=>'application.modules.admin.views.layouts.main',
 		),
-//        'gii'=>array(
-//            'class'         =>  'system.gii.GiiModule',
-//            'password'      =>  '1',
-//            'ipFilters'     =>  array("192.168.56.1","127.0.0.1",),
-//            'newFileMode'   =>  0666,
-//            'newDirMode'    =>  0777,
-//        )
     ),
 	//'preload'=>array('log'),
 	// Компоненты
@@ -84,8 +79,8 @@ return array(
 //		),
 		// База
 		'db'=>array(
-			'connectionString' => 'mysql:host=localhost;dbname=enchikiben_fbfde',
-            //'connectionString' => 'mysql:host=mysql0.db.koding.com;dbname=enchikiben_fbfde',
+			//'connectionString' => 'mysql:host=localhost;dbname=enchikiben_fbfde',
+            'connectionString' => 'mysql:host=mysql0.db.koding.com;dbname=enchikiben_fbfde',
 			'emulatePrepare' => true,
 			'username' => 'enchikiben_fbfde',
 			'password' => '754089db',

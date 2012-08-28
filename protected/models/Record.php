@@ -141,7 +141,7 @@ class Record extends CActiveRecord
 							break;
 							case TypeField::DATETIME:
 								if ( $field->dateTimeField->is_multiple_select )
-									$f['value'] = '$data->getRecordManufacturer("'.$field->alias.'")';
+									$f['value'] = '1';
 								else {
 									switch ($field->dateTimeField->type) {
 										case DateTimeField::DATETIME:
@@ -158,7 +158,7 @@ class Record extends CActiveRecord
 								}
 
 
-								if ( $field->is_filter ) {
+								if ( $field->is_filter && !$field->dateTimeField->is_multiple_select) {
 									$f['filter'] = Yii::app()->controller->widget(	'zii.widgets.jui.CJuiDatePicker', array(
 																					'model'=>$this,'attribute'=>$field->alias,
 																					'language'=>Yii::app()->getLanguage(),
@@ -294,6 +294,9 @@ class Record extends CActiveRecord
 			foreach( $productFields as $field ){
                $Form['elements'][$field->alias] = TypeField::getFieldFormData($field->field_type);
 				switch( $field->field_type ){
+    				case TypeField::DATETIME :
+						$Form['elements'][$field->alias] = $field->dateTimeField->getElementCForm();
+					break;                    
 					case TypeField::TEXT :
 						$Form['elements'][$field->alias]['rows'] = $field->textField->rows;
 					break;
@@ -438,7 +441,7 @@ class Record extends CActiveRecord
 
     				case TypeField::DATETIME :
                         if ($field->dateTimeField->is_multiple_select)
-    						$relations[$field->alias] = array(	self::HAS_MANY,'RecordDatetime','on'=>'`product_id` = '.$this->getProductID(), 'together'=>true);
+    						$relations[$field->alias] = array( self::HAS_ONE,'RecordDatetime','record_id');
 
                     break;
 
@@ -485,28 +488,18 @@ class Record extends CActiveRecord
     	if ( $productFields ){
 			foreach( $productFields as $field ){
 				switch( $field->field_type ){
-		        	case TypeField::DATETIME :
-						$date = new DateTime($this->{$field->alias});
-
-						if ( $field->dateTimeField->is_multiple_select ) {
-							echo 123;
-						} else {
-
-							switch ($field->dateTimeField->type) {
-								case DateTimeField::DATETIME:
-									$this->{$field->alias} = Yii::app()->dateFormatter->formatDateTime($this->{$field->alias},"medium","short");
-								break;
-								case DateTimeField::DATE:
-									$this->{$field->alias} = Yii::app()->dateFormatter->formatDateTime($this->{$field->alias},"medium",null);
-								break;
-								case DateTimeField::TIME:
-									$this->{$field->alias} = Yii::app()->dateFormatter->formatDateTime($this->{$field->alias},null,"short");
-								break;
-
-							}
-
-						}
-
+		        	case TypeField::DATETIME:
+                        
+                        if ( !empty($this->{$field->alias}) ){
+    						$date = new DateTime($this->{$field->alias});
+    
+    						if ( $field->dateTimeField->is_multiple_select ) {
+    							echo 123;
+    						} else {
+                                $this->{$field->alias} = $field->dateTimeField->formatedDateTime($this->{$field->alias});
+    
+    						}
+				        }
 
 					break;
 				}
