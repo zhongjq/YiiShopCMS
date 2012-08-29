@@ -17,6 +17,12 @@ class DateTimeField extends CActiveRecord
     const DATE = 1;
     const TIME = 2;
 
+	public static $mode = array(
+		self::DATETIME => 'datetime',
+		self::TIME => 'time',
+		self::DATE => 'date',
+	);
+
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
@@ -93,13 +99,14 @@ class DateTimeField extends CActiveRecord
 		);
 	}
 
-    public function getElementCForm(){
+	public function getElementCForm(){
+		//var_dump($this);
+		//die();
         return array(
-    		//'type' => 'application.extensions.CJuiDateTimePicker.CJuiDateTimePicker',
-    		'type' => 'application.extensions.datePicker.datePicker',
-			'value'=>'',
-			'name'=>'',
-			'htmlOptions'=>array('value'=>'',),
+    		'type' => 'application.extensions.CJuiDateTimePicker.CJuiDateTimePicker',
+			'mode'=> DateTimeField::$mode[$this->type] ,
+			'multiselect'=> true ,
+    		//'htmlOptions'=>array('value'=>'111'),
 			'language' => Yii::app()->getLanguage(),
             'options' => array('format'=> $this->getFormatLocale($this->type)),
             'hint' => $this->getFormatLocale($this->type)
@@ -121,7 +128,24 @@ class DateTimeField extends CActiveRecord
         return $dateTime;
     }
 
-	// форма в формате CForm
+	public function formatedDateTimeSave($dateTime){
+		$date = new DateTime($dateTime);
+
+		switch ($this->type) {
+			case DateTimeField::DATETIME:
+				$dateTime = $date->format('Y-m-d H:m:00');
+			break;
+			case DateTimeField::DATE:
+				$dateTime = $date->format('Y-m-d 00:00:00');
+			break;
+			case DateTimeField::TIME:
+				$dateTime = $date->format('00-00-00 H:m:00');
+			break;
+		}
+		return $dateTime;
+	}
+
+		// форма в формате CForm
 	public function getElementsMotelCForm(){
 		return array(
 			'type'=>'form',

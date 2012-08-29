@@ -1,17 +1,17 @@
 <?php
 
 /**
- * This is the model class for table "RecordsCategories".
+ * This is the model class for table "RecordDatetime".
  *
  * The followings are the available columns in table 'RecordsCategories':
  * @property integer $product_id
  * @property integer $record_id
- * @property string $category_id
+ * @property datetime $datetime
  *
  * The followings are the available model relations:
  * @property Categories $category
  */
-class RecordDatetime extends CActiveRecord
+class RecordDateTime extends CActiveRecord
 {
 
 	public static function model($className=__CLASS__)
@@ -27,22 +27,16 @@ class RecordDatetime extends CActiveRecord
 	public function rules()
 	{
 		return array(
-			array('product_id, record_id', 'required'),
+			array('product_id, record_id, datetime', 'required'),
 			array('product_id, record_id', 'numerical', 'integerOnly'=>true),
-            array('date', 'date'),
 		);
 	}
-    
-    /**
-	 * @return array relational rules.
-	 */
+
 	public function relations()
 	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
 		return array(
 			'product' => array(self::BELONGS_TO, 'Products', 'product_id'),
 		);
-	}    
-    
+	}
+
 }

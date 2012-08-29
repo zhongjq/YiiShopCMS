@@ -64,7 +64,7 @@ class ProductController extends Controller
 			}
 			catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
 			{
-				echo $e->getMessage();
+				Yii::app()->user->setFlash('error',$e->getFile()."<br/>". $e->getLine().": ". $e->getMessage());
 				$transaction->rollBack();
 			}
 		}
@@ -95,7 +95,7 @@ class ProductController extends Controller
 			}
 			catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
 			{
-				echo $e->getMessage();
+				Yii::app()->user->setFlash('error',$e->getFile()."<br/>". $e->getLine().": ". $e->getMessage());
 				$transaction->rollBack();
 			}
 		}

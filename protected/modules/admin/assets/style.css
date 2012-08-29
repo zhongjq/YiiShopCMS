@@ -176,3 +176,13 @@ tr.filters input, tr.filters select {
 	margin: 0px;
 	width: auto;
 }
+
+
+.ui-datepicker-trigger {
+	margin-bottom: 5px;
+}
+.ui-state-select a.ui-state-default {
+	/*color:red; */
+	font-weight: bold;
+}
+​

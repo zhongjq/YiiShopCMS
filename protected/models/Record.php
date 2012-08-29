@@ -455,7 +455,7 @@ class Record extends CActiveRecord
 
     				case TypeField::DATETIME :
                         if ($field->dateTimeField->is_multiple_select)
-    						$relations[$field->alias] = array( self::HAS_MANY,'RecordDatetime','record_id');
+    						$relations[$field->alias] = array( self::HAS_MANY,'RecordDateTime','record_id');
 
                     break;
 
@@ -466,7 +466,8 @@ class Record extends CActiveRecord
 		return $relations;
 	}
 
-	public function beforeSave() {
+	public function beforeSave()
+	{
 		parent::beforeSave();
 
         $productFields = $this->getProductFields();
@@ -474,18 +475,18 @@ class Record extends CActiveRecord
 			foreach( $productFields as $field ){
 				switch( $field->field_type ){
 		        	case TypeField::DATETIME :
-						$date = new DateTime($this->{$field->alias});
 
-						switch ($field->dateTimeField->type) {
-							case DateTimeField::DATETIME:
-								$this->{$field->alias} = $date->format('Y-m-d H:m:00');
-							break;
-							case DateTimeField::DATE:
-								$this->{$field->alias} = $date->format('Y-m-d 00:00:00');
-							break;
-							case DateTimeField::TIME:
-								$this->{$field->alias} = $date->format('00-00-00 H:m:00');
-							break;
+						if ($field->dateTimeField->is_multiple_select){
+							$dates = explode(',', $this->{$field->alias});
+							$new = array();
+							if (!empty($dates)){
+								foreach ($dates as $date) {
+									$new[] = $field->dateTimeField->formatedDateTimeSave($date);
+								}
+							}
+							$this->{$field->alias} = $new;
+						} else {
+							$this->{$field->alias} = $field->dateTimeField->formatedDateTimeSave($this->{$field->alias});
 						}
 					break;
 				}
@@ -495,7 +496,8 @@ class Record extends CActiveRecord
 		return true;
 	}
 
-	public function afterFind() {
+	public function afterFind()
+	{
 		parent::afterFind();
 
         $productFields = $this->getProductFields();
@@ -583,16 +585,17 @@ class Record extends CActiveRecord
                     break;
 
     				case TypeField::DATETIME :
+
 						if ($field->dateTimeField->is_multiple_select){
-							RecordManufacturer::model()->deleteAll('product_id = :product_id AND record_id = :record_id',array(":product_id"=> $this->getProductID(),':record_id'=> $this->id));
+							RecordDateTime::model()->deleteAll('product_id = :product_id AND record_id = :record_id',array(":product_id"=> $this->getProductID(),':record_id'=> $this->id));
 
 							if ( isset($this->{$field->alias}) && !empty($this->{$field->alias}) ){
-								foreach ($this->{$field->alias} as $manufacturer_id) {
-									$RecordManufacturer = new RecordManufacturer();
-									$RecordManufacturer->product_id = $this->getProductID();
-									$RecordManufacturer->record_id = $this->id;
-									$RecordManufacturer->manufacturer_id = $manufacturer_id;
-									if ( !$RecordManufacturer->save() ) throw new CException("ERROR SEVE MANUFACTURES");
+								foreach ($this->{$field->alias} as $datetime) {
+									$RecordDateTime = new RecordDateTime();
+									$RecordDateTime->product_id = $this->getProductID();
+									$RecordDateTime->record_id = $this->id;
+									$RecordDateTime->datetime = $datetime;
+									if ( !$RecordDateTime->save() ) throw new CException("ERROR SAVE DATETIME");
 								}
 							}
 						}
@@ -663,7 +666,10 @@ class Record extends CActiveRecord
 						$rules[] = array($field->alias, 'numerical','integerOnly'=>true,'allowEmpty'=> $field->is_mandatory );
 					break;
         			case TypeField::DATETIME :
-						$rules[] = array($field->alias, 'date', 'format'=> DateTimeField::getFormatLocale($field->dateTimeField->type),'allowEmpty'=> $field->is_mandatory );
+						if ( $field->dateTimeField->is_multiple_select )
+							$rules[] = array($field->alias, 'type', 'type' => 'string');
+						else
+							$rules[] = array($field->alias, 'date', 'format'=> DateTimeField::getFormatLocale($field->dateTimeField->type),'allowEmpty'=> $field->is_mandatory );
 					break;
 				}
 
@@ -744,7 +750,8 @@ class Record extends CActiveRecord
 		return new CActiveDataProvider($this,array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));;
 	}
 
-	public function beforeValidate() {
+	public function beforeValidate()
+	{
 		parent::beforeValidate();
 		foreach ($this->getProductFields() as $field) {
 
