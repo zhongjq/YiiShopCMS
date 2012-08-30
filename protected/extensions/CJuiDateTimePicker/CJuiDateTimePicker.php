@@ -8,7 +8,7 @@
 Yii::import('zii.widgets.jui.CJuiDatePicker');
 class CJuiDateTimePicker extends CJuiDatePicker
 {
-	const ASSETS_NAME='/jquery-ui-timepicker-addon';
+    const ASSETS_NAME='/jquery-ui-timepicker-addon';
 
 	public $mode='datetime';
 	public $multiselect=false;

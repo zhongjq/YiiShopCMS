@@ -12,6 +12,13 @@ class Record extends CActiveRecord
 
 	private $_manufacturerFilter = null;
 
+    public function __construct($scenario = 'add')
+	{
+		parent::__construct($scenario);
+
+		Yii::setPathOfAlias('files', Yii::getPathOfAlias('webroot')."/data/".get_class($this)."/");
+		Yii::setPathOfAlias('url', Yii::app()->baseUrl."/data/".get_class($this)."/");
+	}
 
 	public function setProductID($v)
 	{
@@ -308,6 +315,9 @@ class Record extends CActiveRecord
 			foreach( $productFields as $field ){
                $Form['elements'][$field->alias] = TypeField::getFieldFormData($field->field_type);
 				switch( $field->field_type ){
+        			case TypeField::IMAGE :
+						$Form['elements'][$field->alias] = $field->imageField->getElementCForm();
+					break;                    
     				case TypeField::DATETIME :
 						$Form['elements'][$field->alias] = $field->dateTimeField->getElementCForm();
 					break;
@@ -515,7 +525,6 @@ class Record extends CActiveRecord
 
     						} else {
                                 $this->{$field->alias} = $field->dateTimeField->formatedDateTime($this->{$field->alias});
-
     						}
 				        }
 
@@ -529,8 +538,6 @@ class Record extends CActiveRecord
 
 	public function afterSave()
 	{
-		parent::afterSave();
-
         $productFields = $this->getProductFields();
     	if ( $productFields ){
 			foreach( $productFields as $field ){
@@ -600,6 +607,18 @@ class Record extends CActiveRecord
 							}
 						}
                     break;
+
+        			case TypeField::IMAGE :
+						
+						if ( is_array($this->{$field->alias}) && !empty($this->{$field->alias}) ){
+    					    foreach($this->{$field->alias} as $file){
+                                $folder = Yii::getPathOfAlias('files').'/'.$this->id."/";
+                                if(!is_dir($folder)) mkdir($folder,0777,true);
+			                    $file->saveAs($folder.$file->getName());    		                    
+    					    }
+						}
+                        
+                    break;                    
 				}
 			}
 		}
@@ -660,7 +679,12 @@ class Record extends CActiveRecord
 
 					break;
     				case TypeField::IMAGE :
-						$rules[] = array($field->alias, 'file', 'types'=>'jpg, gif, png', 'maxSize' => 1048576, 'allowEmpty'=>true );
+                        if ( $field->imageField->is_multiple_select )
+						    $rules[] = array($field->alias, 'ArrayValidator', 'validator'=>'file', 'params'=>array(
+												'types'=>'jpg, gif, png', 'maxSize' => 1048576, 'allowEmpty'=>false
+											));
+						else
+						    $rules[] = array($field->alias, 'file', 'types'=>'jpg, gif, png', 'maxSize' => 1048576, 'allowEmpty'=>true );
 					break;
     				case TypeField::BOOLEAN :
 						$rules[] = array($field->alias, 'numerical','integerOnly'=>true,'allowEmpty'=> $field->is_mandatory );
@@ -752,17 +776,13 @@ class Record extends CActiveRecord
 
 	public function beforeValidate()
 	{
-		parent::beforeValidate();
 		foreach ($this->getProductFields() as $field) {
-
 			switch( $field->field_type ){
-				case TypeField::IMAGE;
-					$this->{$field->alias} = CUploadedFile::getInstance($this,$field->alias);
+				case TypeField::IMAGE;                    
+					$this->{$field->alias} = CUploadedFile::getInstances($this,$field->alias);
 				break;
 			}
-
 		}
-
 		return true;
 	}
 }

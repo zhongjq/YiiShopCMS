@@ -100,13 +100,10 @@ class DateTimeField extends CActiveRecord
 	}
 
 	public function getElementCForm(){
-		//var_dump($this);
-		//die();
-        return array(
+	    return array(
     		'type' => 'application.extensions.CJuiDateTimePicker.CJuiDateTimePicker',
 			'mode'=> DateTimeField::$mode[$this->type] ,
 			'multiselect'=> true ,
-    		//'htmlOptions'=>array('value'=>'111'),
 			'language' => Yii::app()->getLanguage(),
             'options' => array('format'=> $this->getFormatLocale($this->type)),
             'hint' => $this->getFormatLocale($this->type)
