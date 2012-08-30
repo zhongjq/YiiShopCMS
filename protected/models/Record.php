@@ -11,6 +11,7 @@ class Record extends CActiveRecord
     public $data = null;
 
 	private $_manufacturerFilter = null;
+	private $_categoryFilter = null;
 
     public function __construct($scenario = 'add')
 	{
@@ -18,6 +19,27 @@ class Record extends CActiveRecord
 
 		Yii::setPathOfAlias('files', Yii::getPathOfAlias('webroot')."/data/".get_class($this)."/");
 		Yii::setPathOfAlias('url', Yii::app()->baseUrl."/data/".get_class($this)."/");
+	}
+
+	private $_attributes=array();
+	public function __get($name)
+	{
+		try {
+			return parent::__get($name);
+		} catch (Exception $exc) {
+			return $this->_attributes[strtolower($name)];
+		}
+
+	}
+
+	public function __set($name,$value)
+	{
+		try {
+			parent::__set($name,$value);
+		} catch (Exception $exc) {
+			$name=strtolower($name);
+			return $this->_attributes[$name] = $value;
+		}
 	}
 
 	public function setProductID($v)
@@ -201,7 +223,6 @@ class Record extends CActiveRecord
 		return $this->_manufacturerFilter;
 	}
 
-	private $_categoryFilter = null;
 	private function getCategoryFilter($field)
 	{
 		if ( $this->_categoryFilter === null ){
@@ -317,7 +338,7 @@ class Record extends CActiveRecord
 				switch( $field->field_type ){
         			case TypeField::IMAGE :
 						$Form['elements'][$field->alias] = $field->imageField->getElementCForm();
-					break;                    
+					break;
     				case TypeField::DATETIME :
 						$Form['elements'][$field->alias] = $field->dateTimeField->getElementCForm();
 					break;
@@ -529,11 +550,24 @@ class Record extends CActiveRecord
 				        }
 
 					break;
+
+		        	case TypeField::IMAGE:
+
+						$this->{$field->alias} = LoaderFiles::Load($this->getRecordFolder());
+						//echo "<pre>";
+						//var_dump($this->{$field->alias});
+						//die();
+					break;
 				}
 			}
 		}
 
 		return true;
+	}
+
+	protected function getRecordFolder()
+	{
+		return Yii::getPathOfAlias('files').DIRECTORY_SEPARATOR.$this->id.DIRECTORY_SEPARATOR;
 	}
 
 	public function afterSave()
@@ -609,16 +643,23 @@ class Record extends CActiveRecord
                     break;
 
         			case TypeField::IMAGE :
-						
+
+						// новые файлы
 						if ( is_array($this->{$field->alias}) && !empty($this->{$field->alias}) ){
     					    foreach($this->{$field->alias} as $file){
-                                $folder = Yii::getPathOfAlias('files').'/'.$this->id."/";
+                                $folder = $this->getRecordFolder();
                                 if(!is_dir($folder)) mkdir($folder,0777,true);
-			                    $file->saveAs($folder.$file->getName());    		                    
+			                    $file->saveAs($folder.$file->getName());
     					    }
 						}
-                        
-                    break;                    
+
+						// удлаение старых файлов
+						if ( is_array($this->imageFiles) && !empty($this->imageFiles) ){
+    					    print_r($this->imageFiles);
+							die();
+						}
+
+                    break;
 				}
 			}
 		}
@@ -679,12 +720,11 @@ class Record extends CActiveRecord
 
 					break;
     				case TypeField::IMAGE :
-                        if ( $field->imageField->is_multiple_select )
-						    $rules[] = array($field->alias, 'ArrayValidator', 'validator'=>'file', 'params'=>array(
-												'types'=>'jpg, gif, png', 'maxSize' => 1048576, 'allowEmpty'=>false
-											));
-						else
-						    $rules[] = array($field->alias, 'file', 'types'=>'jpg, gif, png', 'maxSize' => 1048576, 'allowEmpty'=>true );
+                        $name = 'newFile'.$field->alias;
+						$rules[] = array($field->{$name}, 'ArrayValidator', 'validator'=>'file', 'params'=>array(
+											'types'=>'jpg, gif, png', 'maxSize' => 1048576, 'allowEmpty'=>false
+										));
+
 					break;
     				case TypeField::BOOLEAN :
 						$rules[] = array($field->alias, 'numerical','integerOnly'=>true,'allowEmpty'=> $field->is_mandatory );
@@ -778,8 +818,13 @@ class Record extends CActiveRecord
 	{
 		foreach ($this->getProductFields() as $field) {
 			switch( $field->field_type ){
-				case TypeField::IMAGE;                    
-					$this->{$field->alias} = CUploadedFile::getInstances($this,$field->alias);
+				case TypeField::IMAGE;
+
+					$name = 'newFile'.$field->alias;
+
+					$this->{$name} = CUploadedFile::getInstances($this,$field->alias);
+
+
 				break;
 			}
 		}

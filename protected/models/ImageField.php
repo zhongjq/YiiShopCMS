@@ -72,10 +72,10 @@ class ImageField extends CActiveRecord
 			'quantity' => 'Quantity',
 		);
 	}
-    
+
     public function getElementCForm(){
 	    return array(
-    		'type' => 'CMultiFileUpload',
+    		'type' => 'ext.files.files',
             'accept'=>'jpg|gif|png',
         );
     }
