@@ -10,20 +10,6 @@ return array(
 	'params'=>array(
 		'keywords'		=>	array(),
 		'description'	=>	'',
-		'smtp'			=>	array(
-								"host"		=> "smtp.yandex.ru", 			//smtp сервер
-								"debug"		=> 0,                   		//отображение информации дебаггера (0 - нет вообще)
-								"auth"		=> true,                 		//сервер требует авторизации
-								"port"		=> 25,                    		//порт (по-умолчанию - 25)
-								"username"	=> "",			//имя пользователя на сервере
-								"password"	=> "",					//пароль
-								"addreply"	=> "",	//ваш е-mail
-								"replyto"	=> "",   //e-mail ответа
-								"fromname"	=> "",				//имя
-								"from"		=> "",	//от кого
-								"charset"	=> "utf-8",      				//от кого
-							),
-		'separator'		=>	' | '
 	 ),
 
 	// подгружаем модели к классы
@@ -39,48 +25,41 @@ return array(
 
 	// Модули
 	'modules'=>array(
-
         'gii'=>array(
             'class'         =>  'system.gii.GiiModule',
             'password'      =>  '1',
             'ipFilters'     =>  array("192.168.56.1","127.0.0.1",),
             'newFileMode'   =>  0666,
-           'newDirMode'    =>  0777,
+            'newDirMode'    =>  0777,
         ),
     	'admin' => array(
 			'layout'=>'application.modules.admin.views.layouts.main',
 		),
     ),
-	//'preload'=>array('log'),
+	'preload'=>array('log'),
 	// Компоненты
 	'components'=>array(
 
 		'clientScript'=>array(
             'scriptMap'=>array(
-                'jquery.js'				=> 'https://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js',
-                //'jquery-ui.js'			=> 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js',
+                'jquery.js' => 'https://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js',
+                //'jquery-ui.js' => 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js',
 				//'jquery.ajaxqueue.js'	=> false,
-				//'jquery.metadata.js'	=> false,
-				//'jquery.yiilistview.js'	=> false,
-				//'jquery.ba-bbq.js'		=> false,
-				'styles.css'			=> false,
+				//'jquery.metadata.js' => false,
+				//'jquery.yiilistview.js' => false,
+				//'jquery.ba-bbq.js' => false,
+				'styles.css' => false,
             ),
             //'enableJavaScript'=>false,    // Эта опция отключает любую генерацию javascript'а фреймворком
         ),
-
-		// Почта
-		'mailer' => array(
-			'class' => 'application.extensions.mailer.EMailer',
-			'pathViews' => 'application.views.email',
-			'pathLayouts' => 'application.views.email.layouts'
-		),
-//		'cache'=>array(
-//			'class'=>'system.caching.CApcCache',
-//		),
+        
+		//'cache'=>array(
+		//	'class'=>'system.caching.CDbCache',
+		//),
 		// База
 		'db'=>array(
-			'connectionString' => 'mysql:host=localhost;dbname=enchikiben_fbfde',
-            //'connectionString' => 'mysql:host=mysql0.db.koding.com;dbname=enchikiben_fbfde',
+			//'connectionString' => 'mysql:host=localhost;dbname=enchikiben_fbfde',
+            'connectionString' => 'mysql:host=mysql0.db.koding.com;dbname=enchikiben_fbfde',
 			'emulatePrepare' => true,
 			'username' => 'enchikiben_fbfde',
 			'password' => '754089db',
@@ -110,21 +89,6 @@ return array(
  		'authManager'=>array(
 			'class' => 'PhpAuthManager',
 			'defaultRoles' => array('guest'),
-        ),
-		'loid' => array(
-            'class' => 'ext.lightopenid.loid',
-        ),
-        'eauth' => array(
-            'class' => 'ext.eauth.EAuth',
-            'popup' => false,       // Использовать всплывающее окно вместо перенаправления на сайт провайдера
-            'services' => array(    // Вы можете настроить список провайдеров и переопределить их классы
-                'google' => array(
-                    'class' => 'GoogleOpenIDService',
-                ),
-                'yandex' => array(
-                    'class' => 'YandexOpenIDService',
-                )
-            ),
         ),
 
 		// адресация

@@ -12,14 +12,15 @@ class Files extends CMultiFileUpload
 	{
 		parent::run();
 
-
-		if ( is_array($this->model->{$this->attribute}) && !empty($this->model->{$this->attribute})){
+        $name = md5($this->attribute);        
+		if ( is_array($this->model->{$name}) && empty($this->model->{$name}) == true ){
 			$files = array();
-			foreach ($this->model->{$this->attribute} as $file) {
+			foreach ($this->model->{$name} as $file) {
 				$files[$file->getName()] = $file->getName();
 			}
-
-			echo CHtml::checkBoxList($this->attribute."Delete", null, $files);
+            
+            $name = get_class($this->model)."[".$name."]";            
+			echo CHtml::checkBoxList($name, null, $files);
 
 		}
 

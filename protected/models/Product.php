@@ -62,7 +62,7 @@ class Product extends CActiveRecord
 	public function relations()
 	{
 		return array(
-			'productFields' => array(self::HAS_MANY, 'ProductField', 'product_id'),
+			'productFields' => array(self::HAS_MANY, 'ProductField', 'product_id', 'order'=>'productFields.position' ),
 		);
 	}
 
@@ -218,11 +218,12 @@ class Product extends CActiveRecord
 	}
 
 	public static function getElementsMenuProduct(){
-		$produts = Product::model()->findAll();
-
+		$produts = Yii::app()->db->createCommand()->select('id, name')->from('product')->queryAll();
+         
 		$items = array();
 		if ( $produts ){
 			foreach($produts as $produt){
+                $produt = (object)$produt;
 				$items[] = array(	'label'	=> CHtml::encode($produt->name),
 									'url'	=> Yii::app()->createUrl('/admin/product/view',array('id'=>$produt->id)),
 									'active'=> ( Yii::app()->controller->id =='product' && Yii::app()->request->getParam('id') == $produt->id )

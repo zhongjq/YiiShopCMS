@@ -1,5 +1,4 @@
 <?php
-ini_set('zend.ze1_compatibility_mode', 0);
 
 // для production режима эту строку удалите
 defined('YII_DEBUG') or define('YII_DEBUG',true);
