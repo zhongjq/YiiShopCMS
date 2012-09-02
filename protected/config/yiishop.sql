@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Хост: localhost
--- Время создания: Сен 01 2012 г., 00:32
+-- Время создания: Сен 02 2012 г., 23:05
 -- Версия сервера: 5.5.24-0ubuntu0.12.04.1
 -- Версия PHP: 5.3.10-1ubuntu3.2
 
@@ -754,8 +754,8 @@ ALTER TABLE `double_field`
 -- Ограничения внешнего ключа таблицы `field_tab`
 --
 ALTER TABLE `field_tab`
-  ADD CONSTRAINT `field_tab_ibfk_2` FOREIGN KEY (`tab_id`) REFERENCES `tab` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `field_tab_ibfk_1` FOREIGN KEY (`field_id`) REFERENCES `product_field` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `field_tab_ibfk_1` FOREIGN KEY (`field_id`) REFERENCES `product_field` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `field_tab_ibfk_2` FOREIGN KEY (`tab_id`) REFERENCES `tab` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Ограничения внешнего ключа таблицы `image_field`
