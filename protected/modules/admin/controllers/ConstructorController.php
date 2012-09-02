@@ -15,9 +15,7 @@ class ConstructorController extends Controller
 
 	public function actionIndex()
 	{
-    	$criteria = new CDbCriteria();
-		$criteria->with = 'productFields';
-        $products = new CActiveDataProvider('Product',array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
+        $products = new CActiveDataProvider('Product',array('pagination'=>array('pageSize'=>'20')));
 
 		$this->render('index', array(
 			'products' => $products
@@ -271,4 +269,19 @@ class ConstructorController extends Controller
 			}
 		}
 	}
+
+
+	public function actionForm($id) {
+
+		$product = Product::model()->with('productFields')->findByPk($id);
+		$record = $product->getRecordObject();
+
+		$form = $record->getMotelCForm();
+
+		$this->render('form/index', array(
+			'product' => $product,
+			'form' => $form,
+		));
+	}
+
 }

@@ -12,17 +12,16 @@ class Files extends CMultiFileUpload
 	{
 		parent::run();
 
-        $name = md5($this->attribute);        
-		if ( is_array($this->model->{$name}) && empty($this->model->{$name}) == true ){
+		try {
+			$name = md5($this->attribute);
 			$files = array();
 			foreach ($this->model->{$name} as $file) {
 				$files[$file->getName()] = $file->getName();
 			}
-            
-            $name = get_class($this->model)."[".$name."]";            
-			echo CHtml::checkBoxList($name, null, $files);
 
-		}
+			$name = get_class($this->model)."[".$name."]";
+			echo CHtml::checkBoxList($name, null, $files);
+		} catch (Exception $e) {}
 
 	}
 

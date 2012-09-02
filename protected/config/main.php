@@ -8,8 +8,8 @@ return array(
 	'theme'             =>  'classic',
 
 	'params'=>array(
-		'keywords'		=>	array(),
-		'description'	=>	'',
+		'keywords' => array(),
+		'description' => '',
 	 ),
 
 	// подгружаем модели к классы
@@ -36,30 +36,25 @@ return array(
 			'layout'=>'application.modules.admin.views.layouts.main',
 		),
     ),
-	'preload'=>array('log'),
+	//'preload'=>array('log'),
 	// Компоненты
 	'components'=>array(
 
 		'clientScript'=>array(
             'scriptMap'=>array(
                 'jquery.js' => 'https://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js',
-                //'jquery-ui.js' => 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js',
-				//'jquery.ajaxqueue.js'	=> false,
-				//'jquery.metadata.js' => false,
-				//'jquery.yiilistview.js' => false,
-				//'jquery.ba-bbq.js' => false,
-				'styles.css' => false,
+                'jquery-ui.js' => 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js',
+				
             ),
-            //'enableJavaScript'=>false,    // Эта опция отключает любую генерацию javascript'а фреймворком
         ),
-        
-		//'cache'=>array(
-		//	'class'=>'system.caching.CDbCache',
-		//),
+
+//		'cache'=>array(
+//			'class'=>'system.caching.CApcCache',
+//		),
 		// База
 		'db'=>array(
-			//'connectionString' => 'mysql:host=localhost;dbname=enchikiben_fbfde',
-            'connectionString' => 'mysql:host=mysql0.db.koding.com;dbname=enchikiben_fbfde',
+			'connectionString' => 'mysql:host=localhost;dbname=enchikiben_fbfde',
+            //'connectionString' => 'mysql:host=mysql0.db.koding.com;dbname=enchikiben_fbfde',
 			'emulatePrepare' => true,
 			'username' => 'enchikiben_fbfde',
 			'password' => '754089db',

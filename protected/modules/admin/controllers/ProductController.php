@@ -17,24 +17,17 @@ class ProductController extends Controller
 
 	public function actionView($id)
 	{
-		//$product = Product::model()->findByPk($id);
-        //$product->getAttributes();
-        $product = (object)Yii::app()->db->createCommand()->select('id, name, alias')->from('product')->where('id=:id', array(':id'=>$id))->queryRow();
-		
+        $product = Product::getProductByPk($id);
 
 		$record = Record::model($product->alias);
-        //$record->getProductFields();
-        $criteria = new CDbCriteria;
-    	$criteria->with = $record->getRelationsNameArray();
-        
-        //$records = new CActiveDataProvider($record->cache(2592000, $dependency, 2),array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
-        
-        $records = $record->findAll($criteria);
-        
+
+		if ( isset($_GET[get_class($record)]) ){
+			$record->attributes = $_GET[get_class($record)];
+		}
+
 		$this->render('records/view', array(
 			'product' => $product,
-			//'record' => $record,
-            'records' => $records,
+			'record' => $record
 		));
 	}
 

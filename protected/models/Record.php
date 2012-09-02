@@ -2,7 +2,7 @@
 
 class Record extends CActiveRecord
 {
-    
+
     private $_attributes=array();
 	private $_productId = null;
 	private $_product = null;
@@ -10,48 +10,38 @@ class Record extends CActiveRecord
 	private $_productFields = null;
     private $_tableFields = null;
     private $_searchFields = null;
-    //private $_md = null;
-	//private $_manufacturerFilter = null;
-	//private $_categoryFilter = null;
+    public $data = null;
 
+	private $_manufacturerFilter = null;
+	private $_categoryFilter = null;
 
     public static function model($className=__CLASS__)
 	{
     	eval("class ".$className." extends Record{}");
 		return new $className();
 	}
-    
+
     public function __construct($scenario = 'add')
 	{
 		parent::__construct($scenario);
-        
+
         Yii::setPathOfAlias('files', Yii::getPathOfAlias('webroot')."/data/".get_class($this)."/");
     	Yii::setPathOfAlias('url', Yii::app()->baseUrl."/data/".get_class($this)."/");
-        
-        
-    	//$this->setScenario($scenario);
-		//$this->setIsNewRecord(true);
-        
-        //$a = serialize(new CActiveRecordMetaData($this));
-        
-        //$this->_md = unserialize($a):
 
-		 
-        //$this->getProductFields();
-        
+		$this->getProductFields();
 	}
 
-	/*
+
 	public function __get($name)
 	{
 		try {
 			return parent::__get($name);
 		} catch (Exception $exc) {
             $name = strtolower($name);
-            if( isset($this->_attributes[$name]) ) 
+            if( isset($this->_attributes[$name]) )
                 return $this->_attributes[strtolower($name)];
             else
-                throw new CException("NOT ".$name );    	
+                throw new CException("NOT ".$name );
 		}
 
 	}
@@ -64,7 +54,7 @@ class Record extends CActiveRecord
 			return $this->_attributes[strtolower($name)] = $value;
 		}
 	}
-*/
+
 	public function setProductID($v)
 	{
 		$this->_productId = $v;
@@ -72,13 +62,16 @@ class Record extends CActiveRecord
 
 	public function getProductID()
 	{
-		return $this->_product->id;
+		return isset($this->_product->id) ? $this->_product->id : null;
 	}
-    
+
 	public function getProductFields($update = false)
-	{        
-		if ( $this->_productFields === null && $this->_product === null ) {
-            
+	{
+
+		if( isset(Yii::app()->params[$this->tableName()]) && !$update ) return Yii::app()->params[$this->tableName()];
+
+		if ( $this->_productFields === null && $this->_product === null && !$update ) {
+
 			$this->_product = Product::model()->with('productFields')->find(array(
 				'condition'=>'t.alias = :alias',
 				'order'=>'productFields.position',
@@ -91,35 +84,36 @@ class Record extends CActiveRecord
 
 				if ( $this->_productFields ){
 					foreach ($this->_productFields as $field) {
-						switch( $field->field_type ){
-							case TypeField::STRING:
-								$this->_with['stringField'] = 'stringField';
-							break;
-							case TypeField::TEXT:
-								$this->_with['textField'] = 'textField';
-							break;
-							case TypeField::INTEGER:
-								$this->_with['integerField'] = 'integerField';
-							break;
-							case TypeField::PRICE:
-								$this->_with['priceField'] = 'priceField';
-							break;
-							case TypeField::LISTS:
-								$this->_with['listField'] = 'listField';
-							break;
-							case TypeField::CATEGORIES:
-								$this->_with['categoryField'] = 'categoryField';
-							break;
-							case TypeField::MANUFACTURER:
-								$this->_with['manufacturerField'] = 'manufacturerField';
-							break;
-							case TypeField::IMAGE:
-								$this->_with['imageField'] = 'imageField';
-							break;
-    						case TypeField::DATETIME:
-								$this->_with['dateTimeField'] = 'dateTimeField';
-							break;
-						}
+						if ( $field->is_column_table )
+							switch( $field->field_type ){
+								case TypeField::STRING:
+									$this->_with['stringField'] = 'stringField';
+								break;
+								case TypeField::TEXT:
+									$this->_with['textField'] = 'textField';
+								break;
+								case TypeField::INTEGER:
+									$this->_with['integerField'] = 'integerField';
+								break;
+								case TypeField::PRICE:
+									$this->_with['priceField'] = 'priceField';
+								break;
+								case TypeField::LISTS:
+									$this->_with['listField'] = 'listField';
+								break;
+								case TypeField::CATEGORIES:
+									$this->_with['categoryField'] = 'categoryField';
+								break;
+								case TypeField::MANUFACTURER:
+									$this->_with['manufacturerField'] = 'manufacturerField';
+								break;
+								case TypeField::IMAGE:
+									$this->_with['imageField'] = 'imageField';
+								break;
+								case TypeField::DATETIME:
+									$this->_with['dateTimeField'] = 'dateTimeField';
+								break;
+							}
 					}
 
 					$this->_productFields = ProductField::model()->with($this->_with)->findAll(array(
@@ -131,9 +125,11 @@ class Record extends CActiveRecord
 				}
 
 			} else
-				throw new CException("NOT product");            
+				throw new CException("NOT product");
 
 		}
+
+		Yii::app()->params[$this->tableName()] = $this->_productFields;
 
 		return $this->_productFields;
 	}
@@ -574,7 +570,7 @@ class Record extends CActiveRecord
 
 		        	case TypeField::IMAGE:
                         // получаем имеющиеся файлы если они есть
-                        if ( is_dir($this->getRecordFolder()) ) $this->{md5($field->alias)} = LoaderFiles::Load($this->getRecordFolder());						
+                        if ( is_dir($this->getRecordFolder()) ) $this->{md5($field->alias)} = LoaderFiles::Load($this->getRecordFolder());
 					break;
 				}
 			}
@@ -672,25 +668,27 @@ class Record extends CActiveRecord
         			case TypeField::IMAGE :
 
 						// новые файлы
-						if ( is_array($this->{$field->alias}) && !empty($this->{$field->alias}) ){                            
+						if ( is_array($this->{$field->alias}) && !empty($this->{$field->alias}) ){
                             $folder = $this->getRecordFolder();
                             if(!is_dir($folder)) mkdir($folder,0777,true);
     					    foreach($this->{$field->alias} as $file){
 			                    $file->saveAs($folder.$file->getName());
     					    }
 						}
-                        
-                        
+
+
 						// удлаение старых файлов
                         $name = md5($field->alias);
-                        ${$name} = $_POST[get_class($this)][$name];
-                        if ( is_array( ${$name} ) && !empty( ${$name} ) ){
-                            $folder = $this->getRecordFolder();
-        				    foreach( ${$name} as $file){                                
-                                $this->getRecordDeleteFile($folder, $file );
-    					    }    
-                        }
-                        
+						if ( isset($_POST[get_class($this)][$name]) ){
+							${$name} = $_POST[get_class($this)][$name];
+							if ( is_array( ${$name} ) && !empty( ${$name} ) ){
+								$folder = $this->getRecordFolder();
+								foreach( ${$name} as $file){
+									$this->getRecordDeleteFile($folder, $file );
+								}
+							}
+						}
+
                     break;
 				}
 			}
@@ -806,7 +804,7 @@ class Record extends CActiveRecord
 	{
 		$criteria = new CDbCriteria;
 		$criteria->with = $this->getRelationsNameArray();
-        
+
 		foreach ($this->getProductFields() as $field) {
 			if ( $field->is_filter ){
 				switch( $field->field_type ){
@@ -841,9 +839,9 @@ class Record extends CActiveRecord
 				}
 			}
 		}
-      
+
 		return new CActiveDataProvider($this,array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));;
-          
+
 	}
 
 	public function beforeValidate()
@@ -857,5 +855,5 @@ class Record extends CActiveRecord
 		}
 		return true;
 	}
-    
+
 }

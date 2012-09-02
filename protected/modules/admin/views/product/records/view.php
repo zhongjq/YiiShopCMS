@@ -5,15 +5,12 @@ $this->breadcrumbs=array($product->name);
 
 $this->renderPartial('records/secondMenu',array('product'=>$product));
 
-/*
 $this->widget('zii.widgets.grid.CGridView', array(
-    'dataProvider'=>$records,
-	//'dataProvider'=>$record->search(),
-	//'filter'=>$record,
+	'dataProvider'=>$record->search(),
+	'filter'=>$record,
 	'columns' =>
 		array_merge(
-			//$record->getTableFields()
-            array()
+			$record->getTableFields()
 			,
 			array(
 				array(
@@ -59,41 +56,5 @@ $this->widget('zii.widgets.grid.CGridView', array(
 		'htmlOptions'	=> array("class"=>false),
 	),
 ));
-*/
 
 ?>
-
-
-<?php if ( $records ) : ?>
-    
-    <?php foreach($records as $record) : ?>
-        <?= $record->name ?>
-    <?php endforeach ?>
-<?php endif ?>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

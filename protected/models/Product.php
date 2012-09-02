@@ -219,7 +219,7 @@ class Product extends CActiveRecord
 
 	public static function getElementsMenuProduct(){
 		$produts = Yii::app()->db->createCommand()->select('id, name')->from('product')->queryAll();
-         
+
 		$items = array();
 		if ( $produts ){
 			foreach($produts as $produt){
@@ -258,4 +258,13 @@ class Product extends CActiveRecord
 
         return $product;
     }
+
+	public static function getProductByPk($id, $select = "id, name, alias" ){
+		$product = Yii::app()->db->createCommand()
+						->select($select)
+						->from('product')
+						->where('id=:id', array(':id'=>$id))->queryRow();
+
+		return $product ? (object)$product : null;
+	}
 }

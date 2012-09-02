@@ -15,6 +15,11 @@
             'name',
             array(
                 'type'=>'raw',
+                'value'=>'CHtml::link("форма добаления", Yii::app()->createUrl("/admin/constructor/form",array("id"=>$data->id)) )',
+                 'htmlOptions'=>array('width'=> '140'),
+            ),
+            array(
+                'type'=>'raw',
                 'value'=>'CHtml::link("поля", Yii::app()->createUrl("/admin/constructor/fields",array("id"=>$data->id)) )',
                  'htmlOptions'=>array('width'=> '40'),
             ),

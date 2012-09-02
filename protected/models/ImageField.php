@@ -75,7 +75,7 @@ class ImageField extends CActiveRecord
 
     public function getElementCForm(){
 	    return array(
-    		'type' => 'ext.files.files',
+    		'type' => 'Files',
             'accept'=>'jpg|gif|png',
         );
     }

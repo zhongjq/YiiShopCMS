@@ -31,11 +31,17 @@ return array(
                 // Продукты
 		        '/admin/constructor' => 'admin/constructor/index',
                 '/admin/constructor/<action:(edit|view|delete)>/<id:\d+>'=>  'admin/constructor/<action>',
-					// поля
+				// Поля
                 '/admin/constructor/<id:\d+>/fields' => 'admin/constructor/fields',
                 '/admin/constructor/<id:\d+>/sorting' => 'admin/constructor/sorting',
 		        '/admin/constructor/<id:\d+>/fields/add' => 'admin/constructor/addfield',
 		        '/admin/constructor/<productId:\d+>/field/<action:(edit|delete)>/<fieldId:\d+>' => 'admin/constructor/<action>field',
+				// Форма
+                '/admin/constructor/<id:\d+>/form' => 'admin/constructor/form',
+                '/admin/constructor/<id:\d+>/sorting' => 'admin/constructor/sorting',
+		        '/admin/constructor/<id:\d+>/fields/add' => 'admin/constructor/addfield',
+		        '/admin/constructor/<productId:\d+>/field/<action:(edit|delete)>/<fieldId:\d+>' => 'admin/constructor/<action>field',
+
 
                 // записи
                 '/admin/product/<id:\d+>' => 'admin/product/view',
