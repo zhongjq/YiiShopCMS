@@ -452,7 +452,16 @@ class Record extends CActiveRecord
 
 		return new CForm($Form,$this);
 	}
-
+    
+    public static function getSEOFieldsArray(){
+        return array(
+            'alias' => array('type'=>'text','class'=>"span5",'maxlength' => 255),
+            'title' => array('type'=>'textarea','class'=>"span5",'rows' => 5),
+            'keywords' => array('type'=>'textarea','class'=>"span5",'rows' => 5),
+            'description' => array('type'=>'textarea','class'=>"span5",'rows' => 5),
+        );
+    }
+    
     public function getRelationsNameArray()
 	{
         return array_keys($this->relations());

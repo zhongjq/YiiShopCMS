@@ -71,19 +71,22 @@ class ProductField extends CActiveRecord
 	public function relations()
 	{
 		return array(
-			'product'=>array(self::BELONGS_TO, 'Product', 'product_id'),
-
-			'integerField' => array(self::HAS_ONE, 'IntegerField', 'field_id'),
-			'priceField' => array(self::HAS_ONE, 'PriceField', 'field_id'),
-			'stringField' => array(self::HAS_ONE, 'StringField', 'field_id'),
-			'textField' => array(self::HAS_ONE, 'TextField', 'field_id'),
-			'listField' => array(self::HAS_ONE, 'ListField', 'field_id'),
-			'categoryField' => array(self::HAS_ONE, 'CategoryField', 'field_id'),
-			'manufacturerField' => array(self::HAS_ONE, 'ManufacturerField', 'field_id'),
-			'imageField' => array(self::HAS_ONE, 'ImageField', 'field_id'),
-			'fileField' => array(self::HAS_ONE, 'FileField', 'field_id'),
+            'product' => array(self::BELONGS_TO, 'Product', 'product_id'),
+            
+            'booleanField' => array(self::HAS_ONE, 'BooleanField', 'field_id'),
+            'categoryField' => array(self::HAS_ONE, 'CategoryField', 'field_id'),
             'dateTimeField' => array(self::HAS_ONE, 'DateTimeField', 'field_id'),
-
+            'doubleField' => array(self::HAS_ONE, 'DoubleField', 'field_id'),            
+            'imageField' => array(self::HAS_ONE, 'ImageField', 'field_id'),
+            'integerField' => array(self::HAS_ONE, 'IntegerField', 'field_id'),
+            'listField' => array(self::HAS_ONE, 'ListField', 'field_id'),
+            'manufacturerField' => array(self::HAS_ONE, 'ManufacturerField', 'field_id'),
+            'priceField' => array(self::HAS_ONE, 'PriceField', 'field_id'),            
+            'stringField' => array(self::HAS_ONE, 'StringField', 'field_id'),            
+            'textField' => array(self::HAS_ONE, 'TextField', 'field_id'),
+            
+            'tabs' => array(self::HAS_MANY, 'Tab', 'product_id'),
+            'fieldTab' => array(self::HAS_ONE, 'FieldTab', 'field_id'),
 		);
 	}
 

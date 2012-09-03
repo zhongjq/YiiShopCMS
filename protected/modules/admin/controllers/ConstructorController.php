@@ -274,9 +274,50 @@ class ConstructorController extends Controller
 	public function actionForm($id) {
 
 		$product = Product::model()->with('productFields')->findByPk($id);
+        
+        /*
+        if ( $product->productFields() ){
+            foreach($product->productFields() as $p){
+                var_dump( $p->fieldTab );
+            }
+        }
+        */
+        
+        $elementsSEO = Record::getSEOFieldsArray();
+    	$form = array(
+    		'attributes' => array(
+				'enctype' => 'multipart/form-data',
+				'class' => 'well',
+				'id' => "recordForm",
+			),            
+			'elements' => array(
+				'<div class="tabbable">',
+					'<ul class="nav nav-tabs">
+						<li class="active"><a href="#tab1" data-toggle="tab">Общее</a></li>
+						<li class="exclude"><a href="#seoTab" data-toggle="tab">SEO</a></li>
+                        <li class="exclude"><a id="addtab" href="javascript:void(0)"><i class="icon-plus"></i></a></li>
+					</ul>
+					<div class="tab-content">
+						<div class="tab-pane active" id="tab1">
+							<p></p>',
+                        '</div>',
+     					'<div id="seoTab" class="tab-pane exclude">',
+                            '<p>',
+                            'alias' => array('type'=>'text','class'=>"span5",'maxlength' => 255),
+                            'title' => array('type'=>'textarea','class'=>"span5",'rows' => 5),
+                            'keywords' => array('type'=>'textarea','class'=>"span5",'rows' => 5),
+                            'description' => array('type'=>'textarea','class'=>"span5",'rows' => 5),
+                            '</p>',
+                        '</div>',
+                    '</div>',
+                '</div>'
+			)
+		);        
+        
+        
 		$record = $product->getRecordObject();
 
-		$form = $record->getMotelCForm();
+		$form = new CForm($form, $record );
 
 		$this->render('form/index', array(
 			'product' => $product,
