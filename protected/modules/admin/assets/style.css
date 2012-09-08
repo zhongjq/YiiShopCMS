@@ -199,3 +199,18 @@ li.ui-state-hover > a{
     height: 16px;
     margin-top: 2px;
 }
+
+.tabbable li > a:first-child{
+    float:left;
+}
+
+.tabbable li .close {
+    float: right;
+    border: none;
+    height: 19px;
+    line-height: 0;
+    margin: -8px -11px 0 2px;
+    padding: 0;
+    width: 16px;
+    background-color: inherit;
+}

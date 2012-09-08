@@ -38,8 +38,8 @@ return array(
 		        '/admin/constructor/<productId:\d+>/field/<action:(edit|delete)>/<fieldId:\d+>' => 'admin/constructor/<action>field',
 				// Форма
                 '/admin/constructor/<id:\d+>/form' => 'admin/constructor/form',
-                '/admin/constructor/<id:\d+>/sorting' => 'admin/constructor/sorting',
-		        '/admin/constructor/<id:\d+>/fields/add' => 'admin/constructor/addfield',
+                '/admin/constructor/<id:\d+>/addtab' => 'admin/constructor/addtab',
+		        '/admin/constructor/<productId:\d+>/form/tab<action:(edit|delete)>/<tabId:\d+>' => 'admin/constructor/<action>tab',
 		        '/admin/constructor/<productId:\d+>/field/<action:(edit|delete)>/<fieldId:\d+>' => 'admin/constructor/<action>field',
 
 

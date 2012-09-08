@@ -18,7 +18,7 @@ class Record extends CActiveRecord
     public static function model($className=__CLASS__)
 	{
     	eval("class ".$className." extends Record{}");
-		return new $className();
+		return parent::model($className);
 	}
 
     public function __construct($scenario = 'add')
@@ -864,5 +864,13 @@ class Record extends CActiveRecord
 		}
 		return true;
 	}
-
+    
+    public function getProductTab(){        
+        $this->getProductFields();
+        return Tab::model()->findAll(array(
+            'order'=>'position',
+            'condition'=>'product_id = :product_id',
+            'params'=>array(":product_id"=> $this->getProductID())
+        ));
+    }
 }

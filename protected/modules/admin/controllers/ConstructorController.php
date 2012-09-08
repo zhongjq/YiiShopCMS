@@ -283,6 +283,28 @@ class ConstructorController extends Controller
         }
         */
         
+        $record = $product->getRecordObject();
+        
+        $tab = $record->getProductTab();
+        
+        $a = '';
+        if ( $tab ){
+            foreach($tab as $t){
+                
+                $idelement = "deltab".$t->id;
+                
+                $l = CHtml::ajaxButton('×', $this->createUrl('/admin/constructor/deletetab', array('productId'=>$id,"tabId"=>$t->id)), 
+                                            array(
+                                                'type'=>'POST',
+                                                'success' => 'function(){ $("#'.$idelement.'").closest("li").remove(); }',
+                                            ),
+                                            array('id' => $idelement,"class"=>"close")                                            
+                                        );
+                
+                $a .= '<li><a href="#tab'.$t->id.'" data-toggle="tab">'.$t->name.$l.'</a></li>'; 
+            }
+        }
+        
         $elementsSEO = Record::getSEOFieldsArray();
     	$form = array(
     		'attributes' => array(
@@ -293,21 +315,17 @@ class ConstructorController extends Controller
 			'elements' => array(
 				'<div class="tabbable">',
 					'<ul class="nav nav-tabs">
-						<li class="active"><a href="#tab1" data-toggle="tab">Общее</a></li>
-						<li class="exclude"><a href="#seoTab" data-toggle="tab">SEO</a></li>
-                        <li class="exclude"><a id="addtab" href="javascript:void(0)"><i class="icon-plus"></i></a></li>
+						<li id=""tab_0class="active"><a href="#tab1" data-toggle="tab">Общее</a></li>',$a,
+                        '<li class="exclude"><a href="#seoTab" data-toggle="tab">SEO</a></li>
+                        <li class="exclude"><a id="addTab" href="javascript:void(0);"><i class="icon-plus"></i></a></li>
 					</ul>
 					<div class="tab-content">
-						<div class="tab-pane active" id="tab1">
-							<p></p>',
-                        '</div>',
+						<div class="tab-pane active" id="tab1"></div>',
      					'<div id="seoTab" class="tab-pane exclude">',
-                            '<p>',
                             'alias' => array('type'=>'text','class'=>"span5",'maxlength' => 255),
                             'title' => array('type'=>'textarea','class'=>"span5",'rows' => 5),
                             'keywords' => array('type'=>'textarea','class'=>"span5",'rows' => 5),
                             'description' => array('type'=>'textarea','class'=>"span5",'rows' => 5),
-                            '</p>',
                         '</div>',
                     '</div>',
                 '</div>'
@@ -315,14 +333,42 @@ class ConstructorController extends Controller
 		);        
         
         
-		$record = $product->getRecordObject();
+		
 
 		$form = new CForm($form, $record );
 
 		$this->render('form/index', array(
 			'product' => $product,
 			'form' => $form,
+            'tab'=> new Tab('add')
 		));
 	}
+        
+    public function actionAddTab($id){
+        $this->layout=false;
+        $tab = new Tab('add');
+        $tab->product_id = $id;
 
+    	if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "addTabModal" ){
+			echo CActiveForm::validate($tab);
+			Yii::app()->end();
+		}
+        
+        if (isset($_POST['Tab'])){            
+            $tab->name = $_POST['Tab']['name'];
+            if ( $tab->save() ){
+                $this->redirect($this->createUrl('/admin/constructor/form',array('id'=>$id)));
+            }
+        }
+    }
+         
+    public function actionDeleteTab($productId,$tabId){
+        $this->layout=false;
+        $tab = Tab::model()->findByPk(array("id"=>$tabId,"product_id"=>$productId));
+        
+        if ( $tab && $tab->delete() ){
+            $this->redirect($this->createUrl('/admin/constructor/form',array('id'=>$productId)));
+        }
+    }
+    
 }

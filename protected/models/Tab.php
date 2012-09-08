@@ -41,7 +41,7 @@ class Tab extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('product_id', 'required'),
+			array('name, product_id', 'required', 'on'=>"add,edit"),
 			array('position', 'numerical', 'integerOnly'=>true),
 			array('product_id', 'length', 'max'=>10),
 			array('name', 'length', 'max'=>45),

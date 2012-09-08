@@ -209,12 +209,8 @@ class Product extends CActiveRecord
 		), $this);
 	}
 
-	public function getRecordObject($action = 'add'){
-		eval("class {$this->alias} extends Record{}");
-		$Goods = new $this->alias($action);
-		$Goods->setProductID($this->id);
-		//$Goods->setGoodsAttributes();
-		return $Goods;
+	public function getRecordObject(){
+		return Record::model($this->alias);
 	}
 
 	public static function getElementsMenuProduct(){
