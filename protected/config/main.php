@@ -44,7 +44,7 @@ return array(
             'scriptMap'=>array(
                 'jquery.js' => 'https://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js',
                 'jquery-ui.js' => 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js',
-				
+
             ),
         ),
 
@@ -53,8 +53,8 @@ return array(
 //		),
 		// База
 		'db'=>array(
-			//'connectionString' => 'mysql:host=localhost;dbname=enchikiben_fbfde',
-            'connectionString' => 'mysql:host=mysql0.db.koding.com;dbname=enchikiben_fbfde',
+			'connectionString' => 'mysql:host=localhost;dbname=enchikiben_fbfde',
+            //'connectionString' => 'mysql:host=mysql0.db.koding.com;dbname=enchikiben_fbfde',
 			'emulatePrepare' => true,
 			'username' => 'enchikiben_fbfde',
 			'password' => '754089db',

@@ -17,7 +17,7 @@ Yii::app()->getClientScript()->registerScript("select",'$("form select").chosen(
 
 $js = <<<EQF
 $( "div.tabbable ul.nav" ).sortable({
-    items:"li:not(.exclude)", 
+    items:"li:not(.exclude)",
     axis: "x",
     update: function(event, ui) {
         var newOrder = $(this).sortable('toArray').toString();
@@ -35,36 +35,23 @@ $( "ul:first li:not(.exclude)", "div.tabbable" ).droppable({
 		var \$item = $( this );
 		var \$list = $( \$item.find( "a" ).attr( "href" ) );
 		ui.draggable.hide( "slow", function() {
-			$( this ).appendTo( $list ).show( "slow" );
+			$( this ).appendTo( \$list ).show( "slow" );
 		});
 	}
 });
 
 $("#addTab").click(function(){
-$('#addTabModal').modal({
-        backdrop: true,
-        keyboard: true
-    }).css({
-        width: 'auto',
-        'margin-left': function () {
-            return -($(this).width() / 2);
-        }
-    });
-/*
-    var tabbable = $(this).closest("div.tabbable");
-    var content = tabbable.find("div.tab-content");
-    var id = "t1";
-    var a = $("<a>").text("123").attr({"href":"#"+id,"data-toggle":"tab"});
-    var li = $("<li></li>").append(a);
-    tabbable.find("ul:first li:not(.exclude)").after(li);
-    var div = $("<div></div>").attr("id",id).text(123).addClass("tab-pane");
-    content.append(div);
-*/
+	$('#addTabModal').modal({
+			backdrop: true,
+			keyboard: true
+		}).css({
+			width: 'auto',
+			'margin-left': function () {
+				return -($(this).width() / 2);
+			}
+		});
 });
 
-$("div.tabbable .close1").click(function(){
-    $(this).closest("li").remove();
-});
 
 EQF;
 
@@ -85,7 +72,7 @@ echo $form->render();
     'clientOptions' => array(
 		'validateOnSubmit' => true,
         'validateOnChange' => false,
-	),    
+	),
     'htmlOptions'=>array("class"=>"modal hide span3","role"=>"dialog","tabindex"=>"-1","aria-labelledby"=>"myModalLabel","aria-hidden"=>"true")
 )); ?>
 <div class="modal-header">
@@ -95,12 +82,12 @@ echo $form->render();
 <div class="modal-body row">
     <?php echo $activeForm->labelEx($tab, 'name'); ?>
     <?php echo $activeForm->textField($tab, 'name'); ?>
-    <?php echo $activeForm->error($tab, 'name'); ?>       
+    <?php echo $activeForm->error($tab, 'name'); ?>
 </div>
 <div class="modal-footer">
 <?php echo CHtml::htmlButton('Отмена', array('type'=>'submit',"class"=>"btn","data-dismiss"=>"modal","aria-hidden"=>"true")); ?>
 <?php echo CHtml::htmlButton('Создать',array('type' => 'submit',"class"=>"btn btn-primary")); ?>
-</div>    
+</div>
 <?php $this->endWidget(); ?>
 
 

@@ -97,4 +97,9 @@ class Tab extends CActiveRecord
 			'criteria'=>$criteria,
 		));
 	}
+
+	public static function Tabs($arTabs){
+		
+	}
+
 }
