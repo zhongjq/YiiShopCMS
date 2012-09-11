@@ -106,7 +106,14 @@ class Tab extends CActiveRecord
         $ul = ' <ul class="nav nav-tabs">';
         if ( !empty($arTabs) ){
             foreach($arTabs as $tab){
-                $ul .= '<li id="tab_'.$tab['id'].'"><a href="#content_'.$tab['id'].'" data-toggle="tab">'.$tab['name'].'</a></li>';
+                $l = null;
+                if ( isset($tab['productId']) )
+                    $l = CHtml::ajaxButton('×', Yii::app()->createUrl('/admin/constructor/deletetab', array('productId'=>$tab['productId'],"tabId"=>$tab['id'])),
+                                                array('type'=>'POST','success' => 'function(){ $("#tab_'.$tab['id'].'").remove(); }'),
+                                                array("class"=>"close")
+                                            );                
+                
+                $ul .= '<li id="tab_'.$tab['id'].'"><a href="#content_'.$tab['id'].'" data-toggle="tab">'.$tab['name'].$l.'</a></li>';
             }
         }
         

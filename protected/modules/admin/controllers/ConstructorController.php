@@ -270,65 +270,16 @@ class ConstructorController extends Controller
 		}
 	}
 
-
-    protected function searchForId($id, $array) {
-       foreach ($array as $key => $val) {
-           if ($val['id'] === $id) {
-               return $key;
-           }
-       }
-       return null;
-    }
-
-
 	public function actionForm($id) {
 
 		$product = Product::model()->with('productFields')->findByPk($id);
         $record = $product->getRecordObject();
         
-        
-		$arTabs = array(array("id"=>0,"position"=>0,"name"=>"Общее","content"=>array()));
-        $tabs = $record->getProductTab();        
-        if ( !empty($tabs) ){
-            foreach($tabs as $tab){
-                $arTabs[] = array("id"=>$tab->id,"position"=>$tab->position,"name"=>$tab->name,"content"=>array());
-            }
-        }
-
-        
-        if ( $product->productFields() ){
-            foreach($product->productFields() as $p){
-                
-                $id = $this->searchForId( $p->fieldTab ? $p->fieldTab->tab_id : 0 , $arTabs);
-                       
-                if( isset( $arTabs[$id] ) ){
-                    $field = Record::getFormField($p);
-                    $arTabs[$id]['content'][key($field)] = $field[key($field)];
-                }
-            }
-        }
-        
-        $a = '';
-        if ( $tab ){
-            foreach($tab as $t){
-
-                $idelement = "deltab".$t->id;
-
-                $l = CHtml::ajaxButton('×', $this->createUrl('/admin/constructor/deletetab', array('productId'=>$id,"tabId"=>$t->id)),
-                                            array('type'=>'POST','success' => 'function(){ $("#'.$idelement.'").closest("li").remove(); }'),
-                                            array('id' => $idelement,"class"=>"close")
-                                        );
-
-                $a .= '<li id="tab_'.$t->id.'"><a href="#tab'.$t->id.'" data-toggle="tab">'.$t->name.$l.'</a></li>';
-            }
-        }
-        
-        
     	$form = array(
     		'attributes' => array(
 				'class' => 'well',
 			),
-			'elements' => Tab::Tabs($arTabs)
+			'elements' => $record->getTabsFormElements()
 		);
 
 		$form = new CForm($form, $record );

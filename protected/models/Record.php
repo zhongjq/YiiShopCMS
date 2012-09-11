@@ -327,16 +327,7 @@ class Record extends CActiveRecord
 					'validateOnChange' => false,
 				),
 			),
-			'elements'      =>  array(
-				'<div class="tabbable">
-					<ul class="nav nav-tabs">
-						<li class="active"><a href="#tab1" data-toggle="tab">Поля</a></li>
-						<li><a href="#tab2" data-toggle="tab">SEO</a></li>
-					</ul>
-					<div class="tab-content">
-						<div class="tab-pane active" id="tab1">
-							<p>'
-			),
+			'elements'      =>  $this->getTabsFormElements(false),
 			'buttons'       =>  array(
 				'<br/>',
 				'submit'=>array(
@@ -346,121 +337,9 @@ class Record extends CActiveRecord
 				),
 			),
 		);
-
-		$productFields = $this->getProductFields();
-
-		if ( $productFields ){
-			foreach( $productFields as $field ){
-                $Form['elements'][$field->alias] = TypeField::getFieldFormData($field->field_type);
-				switch( $field->field_type ){
-        			case TypeField::IMAGE :
-						$Form['elements'][$field->alias] = $field->imageField->getElementCForm();
-					break;
-    				case TypeField::DATETIME :
-						$Form['elements'][$field->alias] = $field->dateTimeField->getElementCForm();
-					break;
-					case TypeField::TEXT :
-						$Form['elements'][$field->alias]['rows'] = $field->textField->rows;
-					break;
-    				case TypeField::LISTS :
-						$Form['elements'][$field->alias]['items'] = CHtml::listData(ListItem::model()->findAll('list_id = :list_id',array(':list_id'=>$field->listField->list_id)), 'id', 'name');
-						if ( $field->listField->is_multiple_select ){
-
-							$selected = array();
-							if ( $this->{$field->alias."Items"} ) {
-								foreach( $this->{$field->alias."Items"} as $Item ){
-									$selected[] = $Item->id;
-								}
-							}
-
-                            $this->{$field->alias} = $selected;
-
-							$Form['elements'][$field->alias]['multiple'] = true;
-							$Form['elements'][$field->alias]['class'] = 'chzn-select';
-						}
-					break;
-
-    				case TypeField::CATEGORIES :
-
-						if( $field->categoryField->category_id ){
-							$category = Category::model()
-												->findByPk($field->categoryField->category_id)
-												->descendants()->findAll();
-						} else {
-							$category = Category::model()->findAll();
-						}
-
-						$Form['elements'][$field->alias]['items'] = CHtml::listData($category, 'id', 'name');
-                        if ( $field->categoryField->is_multiple_select ){
-							$selected = array();
-							if ( $this->{$field->alias} ) {
-								foreach( $this->{$field->alias} as $Item ){
-									$selected[] = $Item->id;
-								}
-							}
-
-                            $this->{$field->alias} = $selected;
-
-							$Form['elements'][$field->alias]['multiple'] = true;
-							$Form['elements'][$field->alias]['class'] = 'chzn-select';
-                        }
-					break;
-				case TypeField::MANUFACTURER :
-
-						if( $field->manufacturerField->manufacturer_id ){
-							$manufacturer = Manufacturer::model()
-												->findByPk($field->manufacturerField->manufacturer_id)
-												->descendants()->findAll();
-						} else {
-							$manufacturer = Manufacturer::model()->findAll();
-						}
-
-						$Form['elements'][$field->alias]['items'] = CHtml::listData($manufacturer, 'id', 'name');
-                        if ( $field->manufacturerField->is_multiple_select ){
-							$selected = array();
-							if ( $this->{$field->alias} ) {
-								foreach( $this->{$field->alias} as $item ){
-									$selected[] = $item->id;
-								}
-							}
-
-                            $this->{$field->alias} = $selected;
-
-							$Form['elements'][$field->alias]['multiple'] = true;
-							$Form['elements'][$field->alias]['class'] = 'chzn-select';
-                        }
-					break;
-				}
-			}
-		}
-
-
-		$Form['elements'][]="</p></div>";
-
-
-		$Form['elements'][]='<div class="tab-pane" id="tab2"><p>';
-		$Form['elements']['alias'] = array('type'=>'text','class'=>"span5",'maxlength' =>  255);
-		$Form['elements']['title'] = array('type'=>'textarea','class'=>"span5");
-		$Form['elements']['keywords'] = array('type'=>'textarea','class'=>"span5");
-		$Form['elements']['description'] = array('type'=>'textarea','class'=>"span5",'rows'=>5);
-		$Form['elements'][]="</p></div>";
-
-
-		$Form['elements'][]='</div></div>';
-
-		//print_r($Form);
-
+            
 		return new CForm($Form,$this);
 	}
-    
-    public static function getSEOFieldsArray(){
-        return array(
-            'alias' => array('type'=>'text','class'=>"span5",'maxlength' => 255),
-            'title' => array('type'=>'textarea','class'=>"span5",'rows' => 5),
-            'keywords' => array('type'=>'textarea','class'=>"span5",'rows' => 5),
-            'description' => array('type'=>'textarea','class'=>"span5",'rows' => 5),
-        );
-    }
   
     public static function getFormField($field){
         $return = array($field->alias => TypeField::getFieldFormData($field->field_type) );
@@ -480,7 +359,20 @@ class Record extends CActiveRecord
     		
             case TypeField::LISTS :
 				$return[$field->alias]['items'] = CHtml::listData(ListItem::model()->findAll('list_id = :list_id',array(':list_id'=>$field->listField->list_id)), 'id', 'name');
-				
+    			if ( $field->listField->is_multiple_select ){
+
+					$selected = array();
+					if ( $this->{$field->alias."Items"} ) {
+						foreach( $this->{$field->alias."Items"} as $Item ){
+							$selected[] = $Item->id;
+						}
+					}
+
+                    $this->{$field->alias} = $selected;
+
+					$return[$field->alias]['multiple'] = true;
+					$return[$field->alias]['class'] = 'chzn-select';
+				}				
 			break;
 
     		case TypeField::CATEGORIES :
@@ -492,7 +384,19 @@ class Record extends CActiveRecord
 				}
 
 				$return[$field->alias]['items'] = CHtml::listData($category, 'id', 'name');
-                
+                if ( $field->categoryField->is_multiple_select ){
+    				$selected = array();
+					if ( $this->{$field->alias} ) {
+						foreach( $this->{$field->alias} as $Item ){
+							$selected[] = $Item->id;
+						}
+					}
+
+                    $this->{$field->alias} = $selected;
+
+					$return[$field->alias]['multiple'] = true;
+					$return[$field->alias]['class'] = 'chzn-select';
+                }                
 			break;
             
 		    case TypeField::MANUFACTURER :
@@ -503,15 +407,64 @@ class Record extends CActiveRecord
 					$manufacturer = Manufacturer::model()->findAll();
 				}
 
-				$return[$field->alias]['items'] = CHtml::listData($manufacturer, 'id', 'name');
-                    
+                $return[$field->alias]['items'] = CHtml::listData($manufacturer, 'id', 'name');
+                if ( $field->manufacturerField->is_multiple_select ){
+    				$selected = array();
+					if ( $this->{$field->alias} ) {
+					    foreach( $this->{$field->alias} as $item ){
+							$selected[] = $item->id;
+						}
+					}
+
+                    $this->{$field->alias} = $selected;
+
+					$return[$field->alias]['multiple'] = true;
+					$return[$field->alias]['class'] = 'chzn-select';
+                }                   
 			break;
 		}
         
         return $return;
     }  
-  
-  
+
+
+
+    protected function searchForId($id, $array) {
+       foreach ($array as $key => $val) {
+           if ($val['id'] === $id) {
+               return $key;
+           }
+       }
+       return null;
+    }
+    
+    public function getTabsFormElements($isEdit = true){
+        
+    	$arTabs = array(array("id"=>0,"position"=>0,"name"=>"Общее","content"=>array()));
+        $tabs = $this->getProductTab();        
+        if ( !empty($tabs) ){
+            foreach($tabs as $tab){
+                $arTabs[] = array("id"=>$tab->id,"position"=>$tab->position,"name"=>$tab->name,"content"=>array(),'productId'=> $isEdit ? $this->getProductID() : null );
+            }
+        }
+
+        
+        if ( $this->getProductFields() ){
+            foreach($this->getProductFields() as $p){
+                
+                $id = $this->searchForId( $p->fieldTab ? $p->fieldTab->tab_id : 0 , $arTabs);
+                       
+                if( isset( $arTabs[$id] ) ){
+                    $field = Record::getFormField($p);
+                    $arTabs[$id]['content'][key($field)] = $field[key($field)];
+                }
+            }
+        }
+        
+        return Tab::Tabs($arTabs);        
+    }
+
+
     public function getRelationsNameArray()
 	{
         return array_keys($this->relations());
