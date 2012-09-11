@@ -271,26 +271,43 @@ class ConstructorController extends Controller
 	}
 
 
+    protected function searchForId($id, $array) {
+       foreach ($array as $key => $val) {
+           if ($val['id'] === $id) {
+               return $key;
+           }
+       }
+       return null;
+    }
+
+
 	public function actionForm($id) {
 
 		$product = Product::model()->with('productFields')->findByPk($id);
-
-		$arTabs = array(
-			array("id"=>-1,"name"=>"Общее","content"=>"")
-		);
-
-        /*
-        if ( $product->productFields() ){
-            foreach($product->productFields() as $p){
-                var_dump( $p->fieldTab );
+        $record = $product->getRecordObject();
+        
+        
+		$arTabs = array(array("id"=>0,"position"=>0,"name"=>"Общее","content"=>array()));
+        $tabs = $record->getProductTab();        
+        if ( !empty($tabs) ){
+            foreach($tabs as $tab){
+                $arTabs[] = array("id"=>$tab->id,"position"=>$tab->position,"name"=>$tab->name,"content"=>array());
             }
         }
-        */
 
-        $record = $product->getRecordObject();
-
-        $tab = $record->getProductTab();
-
+        
+        if ( $product->productFields() ){
+            foreach($product->productFields() as $p){
+                
+                $id = $this->searchForId( $p->fieldTab ? $p->fieldTab->tab_id : 0 , $arTabs);
+                       
+                if( isset( $arTabs[$id] ) ){
+                    $field = Record::getFormField($p);
+                    $arTabs[$id]['content'][key($field)] = $field[key($field)];
+                }
+            }
+        }
+        
         $a = '';
         if ( $tab ){
             foreach($tab as $t){
@@ -305,32 +322,13 @@ class ConstructorController extends Controller
                 $a .= '<li id="tab_'.$t->id.'"><a href="#tab'.$t->id.'" data-toggle="tab">'.$t->name.$l.'</a></li>';
             }
         }
-
-        $elementsSEO = Record::getSEOFieldsArray();
+        
+        
     	$form = array(
     		'attributes' => array(
-				'enctype' => 'multipart/form-data',
 				'class' => 'well',
-				'id' => "recordForm",
 			),
-			'elements' => array(
-				'<div class="tabbable">',
-					'<ul class="nav nav-tabs">
-						<li id="tab_0" class="active"><a href="#tab1" data-toggle="tab">Общее</a></li>',$a,
-                        '<li class="exclude"><a href="#seoTab" data-toggle="tab">SEO</a></li>
-                        <li class="exclude"><a id="addTab" href="javascript:void(0);"><i class="icon-plus"></i></a></li>
-					</ul>
-					<div class="tab-content">
-						<div class="tab-pane active" id="tab1"></div>',
-     					'<div id="seoTab" class="tab-pane exclude">',
-                            'alias' => array('type'=>'text','class'=>"span5",'maxlength' => 255),
-                            'title' => array('type'=>'textarea','class'=>"span5",'rows' => 5),
-                            'keywords' => array('type'=>'textarea','class'=>"span5",'rows' => 5),
-                            'description' => array('type'=>'textarea','class'=>"span5",'rows' => 5),
-                        '</div>',
-                    '</div>',
-                '</div>'
-			)
+			'elements' => Tab::Tabs($arTabs)
 		);
 
 		$form = new CForm($form, $record );
@@ -369,4 +367,59 @@ class ConstructorController extends Controller
         }
     }
 
+    public function actionSavePositionTabs($id){
+        $this->layout=false;
+        $isСommon = false;
+        $command = Yii::app()->db->createCommand();
+        $tabs = $_POST['tab'];
+       
+        if ( !empty($tabs) ){
+            foreach($tabs as $position => $id){
+                $position++;
+                if ( $id == 0 ) $isСommon = true;                
+                if ( $id != 0 ) {                
+                    $command->update('tab', array('position'=> $position * ( $isСommon ? 1 : -1 ) ), 'id=:id', array(':id'=>$id));
+                }
+            }
+        }
+        
+    }
+
+    public function actionSavePositionField($id){
+        $this->layout=false;        
+        
+        $fieldName = $_POST['fieldName'];
+        $tabId = $_POST['tabId'];
+        $field = ProductField::model()->find('alias = :alias and product_id = :product_id',array(":alias"=>$fieldName,":product_id"=>$id));
+        
+        if ( $field ){
+            FieldTab::model()->deleteAll('field_id =:field_id',array(":field_id"=>$field->id));
+                        
+            $fieldTab = new FieldTab('add');
+            $fieldTab->field_id = $field->id;
+            $fieldTab->tab_id = $tabId;
+            $fieldTab->save();
+            
+        }
+        
+    }
+  
+    public function actionSavePositionFields($id){
+        $this->layout=false;        
+        
+        $fields = $_POST['fields'];
+        $tabId = $_POST['tabId'];
+        $command = Yii::app()->db->createCommand();
+        
+        if ( !empty($fields) ){
+            
+            foreach($fields as $position => $fieldAlias){
+                $command->update('product_field', array('position'=> $position), 'alias = :alias and product_id = :product_id',array(":alias"=>$fieldAlias,":product_id"=>$id));      
+                
+            }
+        }
+        
+
+        
+    }  
 }

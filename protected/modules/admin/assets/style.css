@@ -186,7 +186,7 @@ tr.filters input, tr.filters select {
 	font-weight: bold;
 }
 
-li.ui-state-hover > a{
+li.tab-hover > a{
 	border-color: #EEE #EEE #DDD;
 	background-color: #eee;
 }

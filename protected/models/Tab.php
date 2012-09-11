@@ -77,15 +77,8 @@ class Tab extends CActiveRecord
 		);
 	}
 
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
-	 */
 	public function search()
 	{
-		// Warning: Please modify the following code to remove attributes that
-		// should not be searched.
-
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('id',$this->id,true);
@@ -100,6 +93,54 @@ class Tab extends CActiveRecord
 
 	public static function Tabs($arTabs){
 		
+        // сортировка
+        $positions = array();
+        foreach ($arTabs as $key => $row){
+            $positions[$key] = $row['position'];
+        }
+        
+        array_multisort($positions, SORT_ASC, $arTabs);
+
+        
+        // вормируем вкладки
+        $ul = ' <ul class="nav nav-tabs">';
+        if ( !empty($arTabs) ){
+            foreach($arTabs as $tab){
+                $ul .= '<li id="tab_'.$tab['id'].'"><a href="#content_'.$tab['id'].'" data-toggle="tab">'.$tab['name'].'</a></li>';
+            }
+        }
+        
+        $ul .= '    <li class="exclude"><a href="#seoTab" data-toggle="tab">SEO</a></li>
+                    <li class="exclude"><a id="addTab" href="javascript:void(0);"><i class="icon-plus"></i></a></li>
+                </ul>';
+                
+                
+        $content[] = '<div class="tab-content">';
+        
+        $content[] = '<div id="seoTab" class="tab-pane exclude">';
+        $content['alias'] = array('type'=>'text','class'=>"span5",'maxlength' => 255);
+        $content['title'] = array('type'=>'textarea','class'=>"span5",'rows' => 5);
+        $content['keywords'] = array('type'=>'textarea','class'=>"span5",'rows' => 5);
+        $content['description'] = array('type'=>'textarea','class'=>"span5",'rows' => 5);
+        $content[] = "</div>";
+
+        if ( !empty($arTabs) ){
+            foreach($arTabs as $tab){
+                $content[] = '<div id="content_'.$tab['id'].'" class="tab-pane">';
+                $content = array_merge($content,$tab['content']);
+                $content[] = "</div>";                
+            }
+        }
+
+
+        $content[] = "</div>";
+        
+        
+        $return = array('<div class="tabbable">'.$ul);
+        $return = array_merge($return,$content);
+        
+        $return[] = "</div>";
+        return $return;
 	}
 
 }

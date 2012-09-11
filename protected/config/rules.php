@@ -39,9 +39,12 @@ return array(
 				// Форма
                 '/admin/constructor/<id:\d+>/form' => 'admin/constructor/form',
                 '/admin/constructor/<id:\d+>/addtab' => 'admin/constructor/addtab',
+                '/admin/constructor/<id:\d+>/form/savepositiontabs' => 'admin/constructor/savePositionTabs',
+                '/admin/constructor/<id:\d+>/form/savepositionfield' => 'admin/constructor/savePositionField',
+                '/admin/constructor/<id:\d+>/form/savepositionfields' => 'admin/constructor/savePositionFields',
 		        '/admin/constructor/<productId:\d+>/form/tab<action:(edit|delete)>/<tabId:\d+>' => 'admin/constructor/<action>tab',
 		        '/admin/constructor/<productId:\d+>/field/<action:(edit|delete)>/<fieldId:\d+>' => 'admin/constructor/<action>field',
-
+                
 
                 // записи
                 '/admin/product/<id:\d+>' => 'admin/product/view',

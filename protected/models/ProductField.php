@@ -86,7 +86,7 @@ class ProductField extends CActiveRecord
             'textField' => array(self::HAS_ONE, 'TextField', 'field_id'),
             
             'tabs' => array(self::HAS_MANY, 'Tab', 'product_id'),
-            'fieldTab' => array(self::HAS_ONE, 'FieldTab', 'field_id'),
+            'fieldTab' => array(self::HAS_ONE, 'FieldTab', 'field_id', 'order'=>'fieldTab.position ASC'),
 		);
 	}
 

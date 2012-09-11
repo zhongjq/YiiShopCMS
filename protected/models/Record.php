@@ -115,10 +115,10 @@ class Record extends CActiveRecord
 								break;
 							}
 					}
-
+                    
 					$this->_productFields = ProductField::model()->with($this->_with)->findAll(array(
 												'condition'=>'product_id=:product_id',
-												'order'=>'position',
+												'order'=>'t.position',
 												'params'=>array(':product_id'=>$this->getProductID())
 											));
 
@@ -351,7 +351,7 @@ class Record extends CActiveRecord
 
 		if ( $productFields ){
 			foreach( $productFields as $field ){
-               $Form['elements'][$field->alias] = TypeField::getFieldFormData($field->field_type);
+                $Form['elements'][$field->alias] = TypeField::getFieldFormData($field->field_type);
 				switch( $field->field_type ){
         			case TypeField::IMAGE :
 						$Form['elements'][$field->alias] = $field->imageField->getElementCForm();
@@ -461,7 +461,57 @@ class Record extends CActiveRecord
             'description' => array('type'=>'textarea','class'=>"span5",'rows' => 5),
         );
     }
-    
+  
+    public static function getFormField($field){
+        $return = array($field->alias => TypeField::getFieldFormData($field->field_type) );
+    			
+        switch( $field->field_type ){
+        	case TypeField::IMAGE :
+				$return[$field->alias] = $field->imageField->getElementCForm();
+			break;
+    		
+            case TypeField::DATETIME :
+				$return[$field->alias] = $field->dateTimeField->getElementCForm();
+			break;
+			
+            case TypeField::TEXT :
+				$return[$field->alias]['rows'] = $field->textField->rows;
+			break;
+    		
+            case TypeField::LISTS :
+				$return[$field->alias]['items'] = CHtml::listData(ListItem::model()->findAll('list_id = :list_id',array(':list_id'=>$field->listField->list_id)), 'id', 'name');
+				
+			break;
+
+    		case TypeField::CATEGORIES :
+
+				if( $field->categoryField->category_id ){
+					$category = Category::model()->findByPk($field->categoryField->category_id)->descendants()->findAll();
+				} else {
+					$category = Category::model()->findAll();
+				}
+
+				$return[$field->alias]['items'] = CHtml::listData($category, 'id', 'name');
+                
+			break;
+            
+		    case TypeField::MANUFACTURER :
+
+				if( $field->manufacturerField->manufacturer_id ){
+					$manufacturer = Manufacturer::model()->findByPk($field->manufacturerField->manufacturer_id)->descendants()->findAll();
+                } else {
+					$manufacturer = Manufacturer::model()->findAll();
+				}
+
+				$return[$field->alias]['items'] = CHtml::listData($manufacturer, 'id', 'name');
+                    
+			break;
+		}
+        
+        return $return;
+    }  
+  
+  
     public function getRelationsNameArray()
 	{
         return array_keys($this->relations());

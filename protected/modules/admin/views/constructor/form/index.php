@@ -14,42 +14,48 @@ Yii::app()->getClientScript()->registerScriptFile($this->assetsBase.'/chosen/cho
 
 Yii::app()->getClientScript()->registerScript("select",'$("form select").chosen({allow_single_deselect:true});');
 
-
+$savePositionTabs = $this->createUrl('/admin/constructor/savePositionTabs',array('id'=>$product->id));
+$savePositionField = $this->createUrl('/admin/constructor/savePositionField',array('id'=>$product->id));
+$savePositionFields = $this->createUrl('/admin/constructor/savePositionFields',array('id'=>$product->id));
 $js = <<<EQF
 $( "div.tabbable ul.nav" ).sortable({
     items:"li:not(.exclude)",
     axis: "x",
-    update: function(event, ui) {
-        var newOrder = $(this).sortable('toArray').toString();
-        console.log($(this).sortable('serialize'));
+    update: function(event, ui) {        
+        $.post( "$savePositionTabs" , $(this).sortable('serialize') );       
     }
 });
 
-$( "div.tab-pane:not(.exclude)" ).sortable().disableSelection();
+$( "div.tab-pane:not(.exclude)" ).sortable({
+    update: function(event, ui) {        
+        var fields = new Array; 
+        $(this).find("*[name^='{$product->alias}\\[']").each(function(index,field) {
+            fields.push( $(field).attr('name').match(/\[(.*)\]/)[1] );
+        });
+        var tabId = $(this).attr('id').replace("content_","");
+        $.post( "$savePositionFields" , {'fields':fields, "tabId":tabId} );
+    }
+}).disableSelection();
 
 $( "ul:first li:not(.exclude)", "div.tabbable" ).droppable({
 	tolerance: "touch",
 	accept: "div.row:not(.exclude)",
-	hoverClass: "ui-state-hover",
+	hoverClass: "tab-hover",
 	drop: function( event, ui ) {
-		var \$item = $( this );
-		var \$list = $( \$item.find( "a" ).attr( "href" ) );
+		var item = $( this );
+		var list = $( item.find( "a" ).attr( "href" ) );
 		ui.draggable.hide( "slow", function() {
-			$( this ).appendTo( \$list ).show( "slow" );
+            var draggable = $( this )
+			draggable.appendTo( list ).show( "slow" );
+            var name = draggable.find("*[name^='{$product->alias}\\[']").attr('name').match(/\[(.*)\]/)[1];
+            var tabId = list.attr('id').replace("content_","");
+            $.post( "$savePositionField" , { "fieldName":name, "tabId":tabId } );
 		});
 	}
 });
 
 $("#addTab").click(function(){
-	$('#addTabModal').modal({
-			backdrop: true,
-			keyboard: true
-		}).css({
-			width: 'auto',
-			'margin-left': function () {
-				return -($(this).width() / 2);
-			}
-		});
+	$('#addTabModal').modal({backdrop: true,keyboard: true}).css({width: 'auto','margin-left': function () {return -($(this).width() / 2);}});
 });
 
 
