@@ -45,7 +45,7 @@ class ProductController extends Controller
 
 		$product = Product::model()->with('productFields')->findByPk($id);
 		$record = $product->getRecordObject();
-
+        $record->isNewRecord = true;
 		$this->performAjaxRecordValidation($record);
 
 		$form = $record->getMotelCForm();
@@ -181,7 +181,6 @@ class ProductController extends Controller
 
 	public function actionEdit($id)
 	{
-
 		$product = Product::model()->findByPk($id);
 
 		$this->performAjaxValidation($product);

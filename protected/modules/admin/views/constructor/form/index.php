@@ -29,7 +29,7 @@ $( "div.tab-pane:not(.exclude)" ).sortable({
     update: function(event, ui) {        
         var fields = new Array; 
         $(this).find("*[name^='{$product->alias}\\[']").each(function(index,field) {
-            fields.push( $(field).attr('name').match(/\[(.*)\]/)[1] );
+            fields.push( $(field).attr('name').match(/\[(.*?)\]/)[1] );
         });
         var tabId = $(this).attr('id').replace("content_","");
         $.post( "$savePositionFields" , {'fields':fields, "tabId":tabId} );
@@ -37,7 +37,7 @@ $( "div.tab-pane:not(.exclude)" ).sortable({
 }).disableSelection();
 
 $( "ul:first li:not(.exclude)", "div.tabbable" ).droppable({
-	tolerance: "touch",
+	tolerance: "pointer",
 	accept: "div.row:not(.exclude)",
 	hoverClass: "tab-hover",
 	drop: function( event, ui ) {
@@ -46,7 +46,7 @@ $( "ul:first li:not(.exclude)", "div.tabbable" ).droppable({
 		ui.draggable.hide( "slow", function() {
             var draggable = $( this )
 			draggable.appendTo( list ).show( "slow" );
-            var name = draggable.find("*[name^='{$product->alias}\\[']").attr('name').match(/\[(.*)\]/)[1];
+            var name = draggable.find("*[name^='{$product->alias}\\[']").attr('name').match(/\[(.*?)\]/)[1];
             var tabId = list.attr('id').replace("content_","");
             $.post( "$savePositionField" , { "fieldName":name, "tabId":tabId } );
 		});
@@ -56,7 +56,6 @@ $( "ul:first li:not(.exclude)", "div.tabbable" ).droppable({
 $("#addTab").click(function(){
 	$('#addTabModal').modal({backdrop: true,keyboard: true}).css({width: 'auto','margin-left': function () {return -($(this).width() / 2);}});
 });
-
 
 EQF;
 

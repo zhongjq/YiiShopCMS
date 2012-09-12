@@ -14,6 +14,8 @@ class Record extends CActiveRecord
 
 	private $_manufacturerFilter = null;
 	private $_categoryFilter = null;
+    private $_productFieldsOrder = null;
+
 
     public static function model($className=__CLASS__)
 	{
@@ -62,7 +64,7 @@ class Record extends CActiveRecord
 
 	public function getProductID()
 	{
-		return isset($this->_product->id) ? $this->_product->id : null;
+		return $this->_productId;
 	}
 
 	public function getProductFields($update = false)
@@ -70,11 +72,10 @@ class Record extends CActiveRecord
 
 		if( isset(Yii::app()->params[$this->tableName()]) && !$update ) return Yii::app()->params[$this->tableName()];
 
-		if ( $this->_productFields === null && $this->_product === null && !$update ) {
+		if ( ($this->_productFields === null && $this->_product === null && !$update) || $update ) {
 
 			$this->_product = Product::model()->with('productFields')->find(array(
 				'condition'=>'t.alias = :alias',
-				'order'=>'productFields.position',
 				'params'=>array(':alias'=> get_class($this))
 			));
 
@@ -115,12 +116,15 @@ class Record extends CActiveRecord
 								break;
 							}
 					}
+                    $this->_with['fieldTab'] = 'fieldTab';
                     
-					$this->_productFields = ProductField::model()->with($this->_with)->findAll(array(
-												'condition'=>'product_id=:product_id',
-												'order'=>'t.position',
-												'params'=>array(':product_id'=>$this->getProductID())
-											));
+                    $criteria = new CDbCriteria;
+                    $criteria->condition = 'product_id=:product_id';
+                    $criteria->with = $this->_with;
+                    $criteria->params = array(':product_id'=>$this->getProductID());
+                    if ( $this->getProductFieldsOrder() ) $criteria->order = $this->getProductFieldsOrder();
+                                        
+					$this->_productFields = ProductField::model()->findAll($criteria);
 
 				}
 
@@ -142,12 +146,21 @@ class Record extends CActiveRecord
 		return CHtml::link($text, Yii::app()->createUrl('product/view',array('product'=> get_class($this), "id"=>$id) ) );
 	}
 
+    public function setProductFieldsOrder($order){
+		$this->_productFieldsOrder = $order;
+	}
+
+    public function getProductFieldsOrder(){
+    	return $this->_productFieldsOrder;
+	}
+    
 	public function getTableFields($update = false)
 	{
 
 		if ( $this->_tableFields === null && $update === false ){
-			$productFields = $this->getProductFields();
-
+            $this->setProductFieldsOrder("t.position");
+			$productFields = $this->getProductFields(true);
+            
 			if ( $productFields ){
 				foreach( $productFields as $field ){
 					if( $field->is_column_table ){
@@ -310,38 +323,36 @@ class Record extends CActiveRecord
 
 	public function getMotelCForm()
 	{
-
-		$Form = array(
-			'attributes'    =>  array(
-				'enctype' => 'multipart/form-data',
-				'class' => 'well',
-				'id' => "recordForm",
+		$form = array(
+			'attributes' => array(
+                'id' => "recordForm",
+                'class' => 'well',
+				'enctype' => 'multipart/form-data',				
 			),
-			'activeForm'    =>  array(
+			'activeForm' => array(
 				'class' => 'CActiveForm',
 				'enableAjaxValidation' => false,
 				'enableClientValidation' => false,
-				'id' => "recordForm",
 				'clientOptions' => array(
 					'validateOnSubmit' => false,
 					'validateOnChange' => false,
 				),
 			),
-			'elements'      =>  $this->getTabsFormElements(false),
-			'buttons'       =>  array(
+			'elements' => $this->getTabsFormElements(false),
+			'buttons' => array(
 				'<br/>',
 				'submit'=>array(
-					'type'  =>  'submit',
-					'label' =>  $this->isNewRecord ? 'Создать' : "Сохранить",
-					'class' =>  "btn"
+					'type' => 'submit',
+					'label' => $this->isNewRecord ? 'Создать' : "Сохранить",
+					'class' => "btn"
 				),
 			),
 		);
             
-		return new CForm($Form,$this);
+		return new CForm($form,$this);
 	}
   
-    public static function getFormField($field){
+    public function getFormField($field){
         $return = array($field->alias => TypeField::getFieldFormData($field->field_type) );
     			
         switch( $field->field_type ){
@@ -427,8 +438,6 @@ class Record extends CActiveRecord
         return $return;
     }  
 
-
-
     protected function searchForId($id, $array) {
        foreach ($array as $key => $val) {
            if ($val['id'] === $id) {
@@ -440,22 +449,22 @@ class Record extends CActiveRecord
     
     public function getTabsFormElements($isEdit = true){
         
-    	$arTabs = array(array("id"=>0,"position"=>0,"name"=>"Общее","content"=>array()));
+    	$arTabs = array(array("id"=>0,"position"=>0,"name"=>"Общее","content"=>array(),'htmlOptions'=>array('class'=>'active')));
         $tabs = $this->getProductTab();        
         if ( !empty($tabs) ){
             foreach($tabs as $tab){
                 $arTabs[] = array("id"=>$tab->id,"position"=>$tab->position,"name"=>$tab->name,"content"=>array(),'productId'=> $isEdit ? $this->getProductID() : null );
             }
         }
-
-        
-        if ( $this->getProductFields() ){
-            foreach($this->getProductFields() as $p){
+        $this->setProductFieldsOrder("fieldTab.position");
+        $fields = $this->getProductFields(true);
+        if ( $fields ){
+            foreach($fields as $field){
                 
-                $id = $this->searchForId( $p->fieldTab ? $p->fieldTab->tab_id : 0 , $arTabs);
+                $id = $this->searchForId( $field->fieldTab->tab_id > 0 ? $field->fieldTab->tab_id : 0 , $arTabs);
                        
                 if( isset( $arTabs[$id] ) ){
-                    $field = Record::getFormField($p);
+                    $field = $this->getFormField($field);
                     $arTabs[$id]['content'][key($field)] = $field[key($field)];
                 }
             }
@@ -816,7 +825,7 @@ class Record extends CActiveRecord
 	{
 		$criteria = new CDbCriteria;
 		$criteria->with = $this->getRelationsNameArray();
-
+        
 		foreach ($this->getProductFields() as $field) {
 			if ( $field->is_filter ){
 				switch( $field->field_type ){
@@ -852,8 +861,7 @@ class Record extends CActiveRecord
 			}
 		}
 
-		return new CActiveDataProvider($this,array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));;
-
+		return new CActiveDataProvider($this,array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
 	}
 
 	public function beforeValidate()
@@ -868,10 +876,11 @@ class Record extends CActiveRecord
 		return true;
 	}
     
-    public function getProductTab(){        
+    public function getProductTab(){
         $this->getProductFields();
+        
         return Tab::model()->findAll(array(
-            'order'=>'position',
+            'order'=>'t.position',
             'condition'=>'product_id = :product_id',
             'params'=>array(":product_id"=> $this->getProductID())
         ));

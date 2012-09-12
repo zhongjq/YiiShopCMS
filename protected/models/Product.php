@@ -62,7 +62,7 @@ class Product extends CActiveRecord
 	public function relations()
 	{
 		return array(
-			'productFields' => array(self::HAS_MANY, 'ProductField', 'product_id', 'order'=>'productFields.position' ),
+			'productFields' => array(self::HAS_MANY, 'ProductField', 'product_id'),
 		);
 	}
 
@@ -72,13 +72,13 @@ class Product extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id'        => 'ID',
-			'status'    => Yii::t('products','Status'),
-			'name'      => Yii::t('products','Name'),
-			'alias'     => Yii::t('products','Alias'),
-			'title'     => Yii::t('products','Title'),
-			'keywords'      => Yii::t('products','Keywords'),
-			'description'   => Yii::t('products','Description'),
+			'id' => 'ID',
+			'status' => Yii::t('products','Status'),
+			'name' => Yii::t('products','Name'),
+			'alias' => Yii::t('products','Alias'),
+			'title' => Yii::t('products','Title'),
+			'keywords' => Yii::t('products','Keywords'),
+			'description' => Yii::t('products','Description'),
 		);
 	}
 
@@ -88,9 +88,6 @@ class Product extends CActiveRecord
 	 */
 	public function search()
 	{
-		// Warning: Please modify the following code to remove attributes that
-		// should not be searched.
-
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('ID',$this->ID);
@@ -103,10 +100,6 @@ class Product extends CActiveRecord
 		));
 	}
 
-	/**
-	 * Save Fields propucts
-	 * @param array $ProductsFields
-	 */
 	public function saveProductsFields( array $ProductsFields ){
 
 		if ( !empty($ProductsFields) ) {
@@ -210,7 +203,9 @@ class Product extends CActiveRecord
 	}
 
 	public function getRecordObject(){
-		return Record::model($this->alias);
+		$record = Record::model($this->alias);
+        $record->setProductID($this->id);
+        return $record;
 	}
 
 	public static function getElementsMenuProduct(){
