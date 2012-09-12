@@ -436,7 +436,7 @@ class Record extends CActiveRecord
 		}
 
         return $return;
-    }
+    }  
 
     protected function searchForId($id, $array) {
        foreach ($array as $key => $val) {
