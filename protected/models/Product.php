@@ -62,7 +62,9 @@ class Product extends CActiveRecord
 	public function relations()
 	{
 		return array(
-			'productFields' => array(self::HAS_MANY, 'ProductField', 'product_id', 'order'=>'productFields.position' ),
+			'productFields' => array(self::HAS_MANY, 'ProductField', 'product_id',
+										//'order'=>'productFields.position'
+									),
 		);
 	}
 

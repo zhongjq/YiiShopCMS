@@ -115,10 +115,10 @@ class Record extends CActiveRecord
 								break;
 							}
 					}
-                    
+					$this->_with['fieldTab'] = 'fieldTab';
 					$this->_productFields = ProductField::model()->with($this->_with)->findAll(array(
 												'condition'=>'product_id=:product_id',
-												'order'=>'t.position',
+												'order'=>'t.position, fieldTab.position',
 												'params'=>array(':product_id'=>$this->getProductID())
 											));
 
@@ -337,26 +337,26 @@ class Record extends CActiveRecord
 				),
 			),
 		);
-            
+
 		return new CForm($Form,$this);
 	}
-  
-    public static function getFormField($field){
+
+    public function getFormField($field){
         $return = array($field->alias => TypeField::getFieldFormData($field->field_type) );
-    			
+
         switch( $field->field_type ){
         	case TypeField::IMAGE :
 				$return[$field->alias] = $field->imageField->getElementCForm();
 			break;
-    		
+
             case TypeField::DATETIME :
 				$return[$field->alias] = $field->dateTimeField->getElementCForm();
 			break;
-			
+
             case TypeField::TEXT :
 				$return[$field->alias]['rows'] = $field->textField->rows;
 			break;
-    		
+
             case TypeField::LISTS :
 				$return[$field->alias]['items'] = CHtml::listData(ListItem::model()->findAll('list_id = :list_id',array(':list_id'=>$field->listField->list_id)), 'id', 'name');
     			if ( $field->listField->is_multiple_select ){
@@ -372,7 +372,7 @@ class Record extends CActiveRecord
 
 					$return[$field->alias]['multiple'] = true;
 					$return[$field->alias]['class'] = 'chzn-select';
-				}				
+				}
 			break;
 
     		case TypeField::CATEGORIES :
@@ -396,9 +396,9 @@ class Record extends CActiveRecord
 
 					$return[$field->alias]['multiple'] = true;
 					$return[$field->alias]['class'] = 'chzn-select';
-                }                
+                }
 			break;
-            
+
 		    case TypeField::MANUFACTURER :
 
 				if( $field->manufacturerField->manufacturer_id ){
@@ -420,12 +420,12 @@ class Record extends CActiveRecord
 
 					$return[$field->alias]['multiple'] = true;
 					$return[$field->alias]['class'] = 'chzn-select';
-                }                   
+                }
 			break;
 		}
-        
+
         return $return;
-    }  
+    }
 
 
 
@@ -437,31 +437,31 @@ class Record extends CActiveRecord
        }
        return null;
     }
-    
+
     public function getTabsFormElements($isEdit = true){
-        
+
     	$arTabs = array(array("id"=>0,"position"=>0,"name"=>"Общее","content"=>array()));
-        $tabs = $this->getProductTab();        
+        $tabs = $this->getProductTab();
         if ( !empty($tabs) ){
             foreach($tabs as $tab){
                 $arTabs[] = array("id"=>$tab->id,"position"=>$tab->position,"name"=>$tab->name,"content"=>array(),'productId'=> $isEdit ? $this->getProductID() : null );
             }
         }
 
-        
+
         if ( $this->getProductFields() ){
             foreach($this->getProductFields() as $p){
-                
+
                 $id = $this->searchForId( $p->fieldTab ? $p->fieldTab->tab_id : 0 , $arTabs);
-                       
+
                 if( isset( $arTabs[$id] ) ){
-                    $field = Record::getFormField($p);
+                    $field = $this->getFormField($p);
                     $arTabs[$id]['content'][key($field)] = $field[key($field)];
                 }
             }
         }
-        
-        return Tab::Tabs($arTabs);        
+
+        return Tab::Tabs($arTabs);
     }
 
 
@@ -867,8 +867,8 @@ class Record extends CActiveRecord
 		}
 		return true;
 	}
-    
-    public function getProductTab(){        
+
+    public function getProductTab(){
         $this->getProductFields();
         return Tab::model()->findAll(array(
             'order'=>'position',
