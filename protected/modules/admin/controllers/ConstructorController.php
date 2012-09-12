@@ -97,7 +97,7 @@ class ConstructorController extends Controller
 
 	public function actionFields($id)
 	{
-		$product = Product::model()->with('productFields')->findByPk($id);
+		$product = Product::model()->findByPk($id);
 
         $criteria=new CDbCriteria;
     	$criteria->compare('product_id',$id);
@@ -345,12 +345,13 @@ class ConstructorController extends Controller
         
         if ( $field ){
             FieldTab::model()->deleteAll('field_id =:field_id',array(":field_id"=>$field->id));
-                        
-            $fieldTab = new FieldTab('add');
-            $fieldTab->field_id = $field->id;
-            $fieldTab->tab_id = $tabId;
-            $fieldTab->save();
             
+            if ( $tabId > 0 ) {
+                $fieldTab = new FieldTab('add');
+                $fieldTab->field_id = $field->id;
+                $fieldTab->tab_id = $tabId;
+                $fieldTab->save();
+            }
         }
         
     }
@@ -365,8 +366,19 @@ class ConstructorController extends Controller
         if ( !empty($fields) ){
             
             foreach($fields as $position => $fieldAlias){
-                $command->update('product_field', array('position'=> $position), 'alias = :alias and product_id = :product_id',array(":alias"=>$fieldAlias,":product_id"=>$id));      
+                //$command->update('product_field', array('position'=> $position), 'alias = :alias and product_id = :product_id',array(":alias"=>$fieldAlias,":product_id"=>$id));      
+                $field = ProductField::model()->find('alias = :alias and product_id = :product_id',array(":alias"=>$fieldAlias,":product_id"=>$id));
                 
+                if ( $field ){
+                    FieldTab::model()->deleteAll('field_id =:field_id',array(":field_id"=>$field->id));                    
+                    
+                    $fieldTab = new FieldTab('add');
+                    $fieldTab->field_id = $field->id;
+                    $fieldTab->tab_id = $tabId > 0 ? $tabId : null;
+                    $fieldTab->position = $position;
+                    $fieldTab->save();
+                    
+                }               
             }
         }
         

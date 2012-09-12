@@ -111,9 +111,13 @@ class Tab extends CActiveRecord
                     $l = CHtml::ajaxButton('×', Yii::app()->createUrl('/admin/constructor/deletetab', array('productId'=>$tab['productId'],"tabId"=>$tab['id'])),
                                                 array('type'=>'POST','success' => 'function(){ $("#tab_'.$tab['id'].'").remove(); }'),
                                                 array("class"=>"close")
-                                            );                
+                                            );         
                 
-                $ul .= '<li id="tab_'.$tab['id'].'"><a href="#content_'.$tab['id'].'" data-toggle="tab">'.$tab['name'].$l.'</a></li>';
+                
+                $a = CHtml::tag('a',array('href'=>'#content_'.$tab['id'],"data-toggle"=>"tab"),$tab['name'].$l);
+                $htmlOptions = array('id'=>'tab_'.$tab['id']);
+                if ( isset($tab['htmlOptions']) ) $htmlOptions = array_merge($htmlOptions,$tab['htmlOptions']);
+                $ul .= CHtml::tag('li',$htmlOptions,$a);
             }
         }
         
@@ -133,7 +137,12 @@ class Tab extends CActiveRecord
 
         if ( !empty($arTabs) ){
             foreach($arTabs as $tab){
-                $content[] = '<div id="content_'.$tab['id'].'" class="tab-pane">';
+                $htmlOptions = array('id'=>'content_'.$tab['id'], 'class'=>"tab-pane");
+                if ( isset($tab['htmlOptions']) ) {
+                    if ( isset($tab['htmlOptions']['class']) ) $tab['htmlOptions']['class'] .= " ".$htmlOptions['class'];
+                    $htmlOptions = array_merge($htmlOptions,$tab['htmlOptions']); 
+                }               
+                $content[] =  CHtml::openTag('div',$htmlOptions);
                 $content = array_merge($content,$tab['content']);
                 $content[] = "</div>";                
             }
