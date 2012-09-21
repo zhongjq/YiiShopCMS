@@ -221,10 +221,10 @@ class ProductField extends CActiveRecord
 
 	public function afterSave(){
 		parent::afterSave();
-
+                
 		${$this->product->alias} = $this->product->getRecordObject();
 
-		if ( $this->moredata ) {
+		if ( $this->isNewRecord && $this->moredata ) {
 			$this->moredata->field_id = $this->id;
 			if ( $this->moredata->save() ){
 

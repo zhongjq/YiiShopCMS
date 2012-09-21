@@ -44,21 +44,19 @@ class UsersController extends Controller
 	 * Creates a new model.
 	 * If creation is successful, the browser will be redirected to the 'view' page.
 	 */
-	public function actionCreate()
+	public function actionAdd()
 	{
-		$model=new Users;
-
-		// Uncomment the following line if AJAX validation is needed
-		 $this->performAjaxValidation($model);
-
-		if(isset($_POST['Users']))
+		$model=new User('add');
+        $model->status = true;
+		
+		if(isset($_POST['User']))
 		{
-			$model->attributes=$_POST['Users'];
+			$model->attributes=$_POST['User'];
 			if($model->save())
-				$this->redirect(array('view','id'=>$model->ID));
+				$this->redirect(array('/admin/users/index'));
 		}
 
-		$this->render('create',array(
+		$this->render('add',array(
 			'model'=>$model,
 		));
 	}
@@ -74,13 +72,13 @@ class UsersController extends Controller
 
 		$model->scenario = "edit";
 		// Uncomment the following line if AJAX validation is needed
-		// $this->performAjaxValidation($model);
+		//$this->performAjaxValidation($model);
 
-		if(isset($_POST['Users']))
+		if(isset($_POST['User']))
 		{
-			$model->attributes = $_POST['Users'];
-			if($model->validate() && $model->save())
-				$this->redirect(array('view','id'=>$model->ID));
+			$model->attributes = $_POST['User'];
+			if($model->save())
+				$this->redirect(array('/admin/users/index'));
 		}
 
 		$this->render('edit',array(
@@ -91,9 +89,6 @@ class UsersController extends Controller
 	public function actionPasswordEdit($id)
 	{
 		$model=$this->loadModel($id);
-
-		// Uncomment the following line if AJAX validation is needed
-		// $this->performAjaxValidation($model);
 
 		if(isset($_POST['Users']))
 		{
@@ -132,28 +127,20 @@ class UsersController extends Controller
 			throw new CHttpException(400,'Invalid request. Please do not repeat this request again.');
 	}
 
-	/**
-	 * Lists all models.
+    /**
+     * Lists all models.
 	 */
 	public function actionIndex()
-	{
-		$criteria = new CDbCriteria();
-
-		$count = Users::model()->count($criteria);
-
-		$pages=new CPagination($count);
-		// элементов на страницу
-		$pages->pageSize=10;
-		$pages->applyLimit($criteria);
-
-		$Users = Users::model()->findAll($criteria);
-
+	{   
+        $model = new User('search');
+        $model->unsetAttributes();
+        if(isset($_GET['User']))
+            $model->attributes=$_GET['User'];
+            
 		$this->render('index', array(
-			'Users' => $Users,
-			'pages' => $pages
+			'users' => $model
 		));
 	}
-
 	/**
 	 * Returns the data model based on the primary key given in the GET variable.
 	 * If the data model is not found, an HTTP exception will be raised.
@@ -161,7 +148,7 @@ class UsersController extends Controller
 	 */
 	public function loadModel($id)
 	{
-		$model=Users::model()->findByPk($id);
+		$model=User::model()->findByPk($id);
 		if($model===null)
 			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;
@@ -173,7 +160,7 @@ class UsersController extends Controller
 	 */
 	protected function performAjaxValidation($model)
 	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='users-form')
+		if(isset($_POST['ajax']) && $_POST['ajax']==='userForm')
 		{
 			echo CActiveForm::validate($model);
 			Yii::app()->end();

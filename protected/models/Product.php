@@ -202,9 +202,10 @@ class Product extends CActiveRecord
 		), $this);
 	}
 
-	public function getRecordObject(){
+	public function getRecordObject($scenario = "add"){
 		$record = Record::model($this->alias);
         $record->setProductID($this->id);
+        $record->setScenario($scenario);
         return $record;
 	}
 
@@ -228,12 +229,14 @@ class Product extends CActiveRecord
 
     public function searchByManufacturer($manufacturer_id){
 
-        $product = $this->getRecordObject('search');
-
+        $product = $this->getRecordObject('search');        
+        
     	foreach($this->productFields() as $field) {
         	if( $field->field_type == TypeField::MANUFACTURER )
                 $product->{$field->alias} = $manufacturer_id;
-        }
+        }        
+        
+        $product->attributes = $_GET[get_class($product)];  
 
         return $product;
     }

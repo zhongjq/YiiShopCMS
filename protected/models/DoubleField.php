@@ -64,7 +64,7 @@ class DoubleField extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'decimal' => Yii::t('fields','Decimal'),
+			'decimal' => Yii::t('fields','Количество знаков после запятой'),
 		);
 	}
 
