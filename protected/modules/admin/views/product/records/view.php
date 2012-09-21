@@ -1,4 +1,10 @@
 <?php
+
+Yii::app()->getClientScript()->registerCssFile($this->assetsBase.'/chosen/chosen.css');
+Yii::app()->getClientScript()->registerScriptFile($this->assetsBase.'/chosen/chosen.jquery.min.js');
+$js = '$("select.chzn-select").css("width","100%").chosen({allow_single_deselect:true});';
+Yii::app()->getClientScript()->registerScript("select",'$(function(){'.$js.'});');
+
 $this->pageTitle = $product->name;
 
 $this->breadcrumbs=array($product->name);
@@ -6,9 +12,10 @@ $this->breadcrumbs=array($product->name);
 $this->renderPartial('records/secondMenu',array('product'=>$product));
 
 $this->widget('zii.widgets.grid.CGridView', array(
+    'afterAjaxUpdate'=>'function(id, data){ '.$js.' }',
 	'dataProvider'=>$record->search(),
 	'filter'=>$record,
-	'columns' =>
+	'columns'=>
 		array_merge(
 			$record->getTableFields()
 			,

@@ -23,7 +23,13 @@ class User extends CActiveRecord
 	public $remember;
 	// Язык пользователя
 	public $language;
-
+    // 
+    public static $statuses = array(
+        0=>"Включен",
+        1=>"Выключен", 
+        2=>"Ждет активации", 
+    );
+    
 	public function __construct($scenario = 'insert') {
 		parent::__construct($scenario);
 
@@ -31,11 +37,6 @@ class User extends CActiveRecord
 			$this->language = Yii::app()->request->cookies['language']->value;
 	}
 
-		/**
-	 * Returns the static model of the specified AR class.
-	 * @param string $className active record class name.
-	 * @return Users the static model class
-	 */
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
@@ -56,33 +57,32 @@ class User extends CActiveRecord
 	{
 		return array(
 			// Логин и пароль - обязательные поля
-			array('email, password', 'required', 'on' => 'login, registration'),
+			array('email, password', 'required', 'on' => 'add, login, registration'),
 			array('password', 'required', 'on' => 'passwordedit'),
 			array('email', 'required', 'on' => 'edit'),
-			array('email', 'email', 'on' => 'login, registration, edit'),
+			array('email', 'email', 'on' => 'add, login, registration, edit'),
 			// Длина логина должна быть в пределах от 5 до 30 символов
 			array('username', 'length', 'min'=>3, 'max'=>30),
 			// Статус, роль, и сервис цифры
 			array('status, role_id, remember, language', 'numerical', 'integerOnly' => true, 'min'=> 0 ),
 		    // Логин должен быть уникальным
-			array('email', 'unique', 'on'=>'editemail, registration'),
+			array('email', 'unique', 'on'=>'add, edit, registration'),
 			// Длина пароля не менее 6 символов
-			array('password', 'length', 'min'=>6, 'max'=>30, 'on'=>'registration, passwordedit'),
+			array('password, passwordRepeat, verifyCode', 'length', 'min'=>6, 'max'=>30, 'on'=>'add, registration, passwordedit'),
 			// проверка пароля нашим методом authenticate
 			array('password', 'authenticate', 'on' => 'login'),
 			// Повторный пароль обязательны для сценария регистрации
-			array('passwordRepeat, verifyCode', 'required', 'on'=>'registration, passwordedit' ),
-			// Длина повторного пароля не менее 6 символов
-			array('passwordRepeat, verifyCode', 'length', 'min'=>6, 'max'=>30),
+			array('passwordRepeat', 'required', 'on'=>'add, registration, passwordedit' ),
+            array('passwordRepeat, verifyCode', 'required', 'on'=>'registration, passwordedit' ),
 			// Пароль должен совпадать с повторным паролем для сценария регистрации
-			array('password', 'compare', 'compareAttribute'=>'PasswordRepeat', 'on'=>'registration, passwordedit'),
+			array('passwordRepeat', 'compare', 'compareAttribute'=>'password', 'on'=>'add, registration, passwordedit'),
 
 			// Время регистрации пользователя
 			array('registration_time', 'default','value'=>new CDbExpression('NOW()'),'on'=>'registration'),
 
 			// Капча
 			array(
-				'VerifyCode',
+				'verifyCode',
 				'captcha',
 				// авторизованным пользователям код можно не вводить
 				'allowEmpty'=>!Yii::app()->user->isGuest || !extension_loaded('gd'),
@@ -96,8 +96,6 @@ class User extends CActiveRecord
 	 */
 	public function relations()
 	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
 		return array(
 		);
 	}
@@ -108,15 +106,16 @@ class User extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id'					=> 'ID',
-			'status'				=>	Yii::t('users','Status'),
-			'roleID'				=>	Yii::t('users','Role'),
-			'registration_time'	    =>	Yii::t('users','Date/time registration'),
-			'email'					=>	Yii::t('users','E-mail'),
-			'password'				=>	Yii::t('users','Password'),
-			'username'				=>	Yii::t('users','Username'),
-			'remember'				=>	Yii::t('users','Remember'),
-			'language'				=>	Yii::t('users','Language'),
+			'id'=>'ID',
+			'status'=>Yii::t('users','Status'),
+			'role_id'=>Yii::t('users','Role'),
+			'registration_time'=>Yii::t('users','Date/time registration'),
+			'email'=>Yii::t('users','E-mail'),
+			'password'=>Yii::t('users','Password'),
+            'passwordRepeat'=>Yii::t('users','Password repeat'),
+			'username'=>Yii::t('users','Username'),
+			'remember'=>Yii::t('users','Remember'),
+			'language'=>Yii::t('users','Language'),
 		);
 	}
 
@@ -126,19 +125,12 @@ class User extends CActiveRecord
 	 */
 	public function search()
 	{
-		// Warning: Please modify the following code to remove attributes that
-		// should not be searched.
-
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('ID',$this->ID);
-		$criteria->compare('Status',$this->Status);
-		$criteria->compare('RoleID',$this->RoleID);
-		$criteria->compare('RegistrationDateTime',$this->RegistrationDateTime,true);
-		$criteria->compare('ServiceID',$this->ServiceID);
-		$criteria->compare('ServiceUserID',$this->ServiceUserID,true);
-		$criteria->compare('Email',$this->Email,true);
-		$criteria->compare('Password',$this->Password,true);
+		$criteria->compare('id',$this->id);
+		$criteria->compare('status',$this->status);
+		$criteria->compare('role_id',$this->role_id);
+		$criteria->compare('registration_time',$this->registration_time,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -148,18 +140,16 @@ class User extends CActiveRecord
 	// Метод, который будет вызываться до сохранения данных в БД
 	protected function beforeSave()
 	{
-		if(parent::beforeSave())
-		{
-			if($this->isNewRecord)
-			{
-				$this->RegistrationDateTime = date("Y-m-d H:i:s");
+		if(parent::beforeSave()){
+			if($this->isNewRecord){
+				$this->registration_time = date("Y-m-d H:i:s");
 			}
 
 			return true;
 		} else
 			return false;
 	}
-
+    
 	/**
 	 * Собственное правило для проверки
 	 * Данный метод являеться связующем звеном с UserIdentity
@@ -209,8 +199,8 @@ class User extends CActiveRecord
 	}
 
 	public function md5Password(){
-		if ( !empty($this->Password) )
-			$this->Password = md5($this->Password);
+		if ( !empty($this->password) )
+			$this->password = md5($this->password);
 	}
 
     // форма в формате CForm
@@ -219,7 +209,7 @@ class User extends CActiveRecord
 			'attributes' => array(
 				'enctype' => 'application/form-data',
 				'class' => 'well',
-				'id'=>'loginForm',
+				'id'=>'userForm',
 			),
 			'activeForm' => array(
 				'class' => 'CActiveForm',
@@ -231,8 +221,6 @@ class User extends CActiveRecord
 					'validateOnChange' => false,
 				),
 			),
-
-			'title' => Yii::t("users",'Login'),
 
     		'elements'=>array(
     			'email'=>array(
@@ -263,4 +251,66 @@ class User extends CActiveRecord
 			),
         );
 	}
+    
+    // форма в формате CForm
+    public function getModelCForm(){
+        $return = array(
+            
+			'attributes' => array(
+				'enctype' => 'application/form-data',
+				'class' => 'well',
+				'id'=>'loginForm',
+			),
+			'activeForm' => array(
+				'class' => 'CActiveForm',
+				'enableAjaxValidation' => false,
+				'enableClientValidation' => false,
+				'id' => "loginForm",
+				'clientOptions' => array(
+					'validateOnSubmit' => false,
+					'validateOnChange' => false,
+				),
+			),
+            //'showErrorSummary' => 1,
+
+    		'elements'=>array(
+    			'status'=>array(
+    				'type'  =>  'dropdownlist',
+					'items' =>  User::$statuses,
+    			),                
+    			'username'=>array(
+    				'type'=>'text',
+    				'maxlength'=>255
+    			),
+        		'email'=>array(
+    				'type'=>'text',
+    				'maxlength'=>255
+    			),                
+    			'role_id'=>array(
+					'type'  =>  'dropdownlist',
+					'items' =>  Roles::getRolesList(),
+					'empty'=>  '',
+				),
+            	'password'=>array(
+    				'type'=>'password',
+    				'maxlength'=>255
+    			),
+                'passwordRepeat'=>array(
+        			'type'=>'password',
+    				'maxlength'=>255
+    			),
+    		),
+    		'buttons'=>array(
+				'<br/>',
+				'submit'=>array(
+					'type'  =>  'submit',
+					'label' =>  $this->isNewRecord ? Yii::t("users",'Add') : Yii::t("users",'Save'),
+					'class' =>  "btn"
+				),
+			),
+        );
+        
+        return new CForm($return,$this);
+	}    
+    
 }

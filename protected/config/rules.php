@@ -27,13 +27,14 @@ return array(
                 '/admin/manufacturer/<action:(add|edit|delete)>/<id>' => 'admin/manufacturer/<action>',
                 '/manufacturer/<alias>' => '/manufacturer/view',
 				// Пользователи
+                '/admin/users' => 'admin/users/index',
+                '/admin/user/add' => 'admin/users/add',
 		        '/admin/user/<action:(edit|view|delete|passwordedit)>/<id>' => 'admin/users/<action>',
                 // Продукты
 		        '/admin/constructor' => 'admin/constructor/index',
                 '/admin/constructor/<action:(edit|view|delete)>/<id:\d+>'=>  'admin/constructor/<action>',
 				// Поля
-                '/admin/constructor/<id:\d+>/fields' => 'admin/constructor/fields',
-                '/admin/constructor/<id:\d+>/sorting' => 'admin/constructor/sorting',
+                '/admin/constructor/<id:\d+>/<action:(fields|sorting)>' => 'admin/constructor/<action>',
 		        '/admin/constructor/<id:\d+>/fields/add' => 'admin/constructor/addfield',
 		        '/admin/constructor/<productId:\d+>/field/<action:(edit|delete)>/<fieldId:\d+>' => 'admin/constructor/<action>field',
 				// Форма
@@ -57,11 +58,12 @@ return array(
                 '/admin/list/<id:\d+>/items' => 'admin/lists/items',
                 '/admin/list/<id:\d+>/items/add' => 'admin/lists/additems',
                 '/admin/list/<listId:\d+>/item/<action:(edit|delete)>/<itemId:\d+>' => 'admin/lists/<action>item',
-
+                
+                
 		         // своё правило для URL вида '/Производитель/Модель'
-//		         array(
-//			         'class' => 'application.components.UrlRule',
-//			         'connectionID' => 'db',
-//		         ),
+		         array(
+			         'class' => 'application.components.UrlRule',
+			         'connectionID' => 'db',
+		         ),
 
 	        );

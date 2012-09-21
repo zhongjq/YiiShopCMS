@@ -96,6 +96,9 @@ class Record extends CActiveRecord
 								case TypeField::INTEGER:
 									$this->_with['integerField'] = 'integerField';
 								break;
+    							case TypeField::DOUBLE:
+									$this->_with['doubleField'] = 'doubleField';
+								break;                                
 								case TypeField::PRICE:
 									$this->_with['priceField'] = 'priceField';
 								break;
@@ -169,9 +172,18 @@ class Record extends CActiveRecord
 						switch( $field->field_type ){
 							case TypeField::STRING:
 								$f['type']='raw';
-								$f['value'] = '$data->alias ? $data->getRecordLinkAlias($data->'.$field->alias.',$data->alias) : $data->getRecordLinkId($data->'.$field->alias.',$data->id)';
-
+								//$f['value'] = '$data->alias ? $data->getRecordLinkAlias($data->'.$field->alias.',$data->alias) : $data->getRecordLinkId($data->'.$field->alias.',$data->id)';
+                                $f['value'] = '$data->'.$field->alias;
 							break;
+    						case TypeField::BOOLEAN:
+								if ( $field->is_filter ) {
+    								$f['filter'] = CHtml::activeDropDownList(   $this,
+                                                                                $field->alias,
+                                                                                array(1=>"Yes",0=>"No"),
+                                                                                array("empty"=>"")
+                                                                                );
+								}
+							break;                            
 							case TypeField::LISTS:
 								if ($field->listField->is_multiple_select)
 									$f['value'] = '$data->getRecordItems("'.$field->alias.'Items")';
@@ -195,7 +207,16 @@ class Record extends CActiveRecord
 									$f['value'] = 'isset($data->'.$field->alias.'Manufacturer) ? $data->'.$field->alias.'Manufacturer->name : null';
 
 								if ( $field->is_filter ) {
-									$f['filter'] = CHtml::listData($this->getManufacturerFilter($field) , 'id', 'name');
+                                    $listData = CHtml::listData($this->getManufacturerFilter($field) , 'id', 'name') ;
+                                    $htmlOptions = $field->manufacturerField->is_multiple_select ? array("multiple"=>true,"class"=>"chzn-select") : null;
+                                    $htmlOptions['empty'] = "";
+									$f['filter'] = CHtml::activeDropDownList(   $this,
+                                                                                $field->alias,
+                                                                                $listData,
+                                                                                $htmlOptions
+                                                                                );
+                                    
+                                    
 								}
 							break;
 							case TypeField::DATETIME:
@@ -327,7 +348,7 @@ class Record extends CActiveRecord
 			'attributes' => array(
                 'id' => "recordForm",
                 'class' => 'well',
-				'enctype' => 'multipart/form-data',				
+				'enctype' => 'multipart/form-data',
 			),
 			'activeForm' => array(
 				'class' => 'CActiveForm',
@@ -348,7 +369,7 @@ class Record extends CActiveRecord
 				),
 			),
 		);
-            
+                
 		return new CForm($form,$this);
 	}
   
@@ -743,6 +764,16 @@ class Record extends CActiveRecord
 					case TypeField::INTEGER :
 						$rules[] = array($field->alias, 'numerical', 'integerOnly'=>true,'min'=> $field->integerField->min_value ,'max'=>$field->integerField->max_value ,'allowEmpty'=>true);
 					break;
+    				case TypeField::DOUBLE :
+						$rules[] = array($field->alias, 'numerical', );
+                        
+                        if ( $field->doubleField->decimal ){                            
+            				$rules[] = array($field->alias, 'match', 'pattern'=>'/^\s*[-+]?[0-9]*\.?[0-9]{1,'.$field->doubleField->decimal.'}?\s*$/',
+    											'message' => Yii::t("fields",'Price has the wrong format (eg 10.50).')
+    										);                            
+                        }                      
+                        
+					break;                    
 					case TypeField::PRICE:
 
 						$rules[] = array($field->alias, 'match', 'pattern'=>'/^\s*[-+]?[0-9]*\.?[0-9]{1,2}?\s*$/',
@@ -777,7 +808,7 @@ class Record extends CActiveRecord
 
 					break;
     				case TypeField::BOOLEAN :
-						$rules[] = array($field->alias, 'numerical','integerOnly'=>true,'allowEmpty'=> $field->is_mandatory );
+						$rules[] = array($field->alias, 'boolean', 'allowEmpty'=> $field->is_mandatory );
 					break;
         			case TypeField::DATETIME :
 						if ( $field->dateTimeField->is_multiple_select )
@@ -829,27 +860,30 @@ class Record extends CActiveRecord
 		foreach ($this->getProductFields() as $field) {
 			if ( $field->is_filter ){
 				switch( $field->field_type ){
-					case TypeField::INTEGER;
+					case TypeField::INTEGER:
 						$criteria->compare($field->alias, $this->{$field->alias});
 					break;
-					case TypeField::PRICE;
+    				case TypeField::BOOLEAN:
+						$criteria->compare($field->alias, $this->{$field->alias});
+					break;                    
+					case TypeField::PRICE:
 						$criteria->compare($field->alias, $this->{$field->alias});
 					break;
-					case TypeField::MANUFACTURER;
+					case TypeField::MANUFACTURER:
 						if( $field->manufacturerField->is_multiple_select ){
 							$criteria->compare($field->alias.'.id', $this->{$field->alias});
 						} else {
 							$criteria->compare($field->alias, $this->{$field->alias});
 						}
 					break;
-					case TypeField::CATEGORIES;
+					case TypeField::CATEGORIES:
 						if( $field->categoryField->is_multiple_select ){
 							$criteria->compare($field->alias.'.id', $this->{$field->alias});
 						} else {
 							$criteria->compare($field->alias, $this->{$field->alias});
 						}
 					break;
-					case TypeField::DATETIME && $this->{$field->alias};
+					case TypeField::DATETIME && $this->{$field->alias}:
 						$date = new DateTime($this->{$field->alias});
 						if( $field->dateTimeField->is_multiple_select ){
 							$criteria->compare($field->alias.'.id', $this->{$field->alias});

@@ -3,51 +3,65 @@ $this->breadcrumbs=array(
 	'Пользователи',
 );
 
-$this->SecondMenu=array(
-	array('label'=>'Добавить', 'url'=>array('create'))
-);
+$this->renderPartial('secondMenu');
+
+$this->widget('zii.widgets.grid.CGridView', array(
+    'dataProvider'	=>	$users->search(),
+	'columns' => array(
+		array('name'=>'id','htmlOptions'=>array('width'=>'10')),
+        array(
+            'name'=>'status',
+            'value'=>'User::$statuses[$data->status];'
+        ),
+        'registration_time',
+		'email',
+        'username',
+        array(
+            'name'=>'role_id',
+            'value'=>'Roles::getRoleString($data->role_id)',
+            'filter'    =>	true,
+        ),
+		array(
+			'htmlOptions'=>array('width'=>'10'),
+			'class'=>'CButtonColumn',
+			'template'=>'{update}',
+			'buttons'=> array(
+				'update' => array(
+					'url'=> 'Yii::app()->createUrl("admin/users/edit",array("id"=>$data->id) )',
+					'imageUrl'=>null,
+					'label'=>'<span class="icon-pencil pointer" title="'.Yii::t('main','Edit').'"></span>'
+				)
+			)
+		),
+		array(
+			'htmlOptions'=>array('width'=>'10'),
+			'class'=>'CButtonColumn',
+			'template'=>'{delete}',
+			'buttons'=> array(
+				'delete' => array(
+					'url'=> 'Yii::app()->createUrl("admin/users/delete",array("id"=>$data->id) )',
+					'imageUrl'=>null,
+					'label'=>'<span class="close" title="'.Yii::t('main','Delete').'">&times;</span>'
+				)
+			)
+		),
+	),
+	'htmlOptions'=>array(
+		'class'=> ''
+	),
+	'itemsCssClass'=>'table table-bordered table-striped',
+	'template'=>'{summary} {items} {pager}',
+	'pagerCssClass'=>'pagination',
+	'pager'=>array(
+		'class'         =>'myLinkPager',
+		'cssFile'    	=> false,
+		'header'        => '',
+		'firstPageLabel'=> '&laquo;',
+		'prevPageLabel'	=> '&larr;',
+		'nextPageLabel'	=> '&rarr;',
+		'lastPageLabel' => '&raquo;',
+		'htmlOptions'	=> array("class"=>false),
+	),
+));
+
 ?>
-
-<table class="table table-bordered table-striped">
-	<thead>
-	    <tr>
-			<th width="15"></th>
-			<th width="15">#</th>
-			<th width="100">Стастус</th>
-			<th>Дата/время регистрации</th>
-			<th>Email</th>
-			<th width="110"></th>
-			<th width="110"></th>
-		</tr>
-	</thead>
-	<tbody>
-	<?foreach($Users as $User):?>
-		<tr>
-			<td><?= CHtml::checkBox("users[]",$User->Status,array("value"=>$User->ID));   ?></td>
-			<td><?php echo $User->ID ?></td>
-			<td>
-				<?php if ($User->Status == 0) : ?>
-					<span class="label label-success">Активирован</span>
-				<? else : ?>
-					<span class="label label-important">Неактивирован</span>
-				<? endif ?>
-			</td>
-			<td><?php echo $User->RegistrationDateTime ?></td>
-			<td><?php echo $User->Email ?></td>
-			<td><?= CHtml::link("Редактировать", array('/admin/users/edit','id'=>$User->ID)) ?></td>
-			<td><?= CHtml::link("Изменить пароль", array('/admin/users/passwordedit','id'=>$User->ID)) ?></td>
-		</tr>
-	<?endforeach?>
-	</tbody>
-</table>
-
-<?$this->widget('myLinkPager', array(
-	'pages'			=> $pages,
-	'cssFile'		=> false,
-	'header'        => '',
-	'firstPageLabel'=> '&laquo;',
-	'prevPageLabel'	=> '&larr;',
-	'nextPageLabel'	=> '&rarr;',
-	'lastPageLabel' => '&raquo;',
-	'htmlOptions'	=> array("class"=>"pagination"),
-))?>
