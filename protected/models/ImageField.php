@@ -81,7 +81,7 @@ class ImageField extends CActiveRecord
     }
 
 	// форма в формате CForm
-	public function getElementsMotelCForm(){
+	public function getElementsMotelCForm(){        
 		return array(
 				'type'=>'form',
 				'elements'=>array(

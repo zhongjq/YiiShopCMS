@@ -895,7 +895,13 @@ class Record extends CActiveRecord
 			}
 		}
 
-		return new CActiveDataProvider($this,array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
+		return new CActiveDataProvider($this,array(
+            'criteria'=>$criteria,
+            'pagination'=>array(
+                'pageSize'=>'20',
+                'pageVar'=>'page'
+            )
+        ));
 	}
 
 	public function beforeValidate()

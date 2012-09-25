@@ -2,7 +2,7 @@
 
 return array(
 		         '/'=>'site/index',
-
+                
 		         //// ПОЛЬЗОВАТЕЛЬ
 				// просмотр пользователя
 		        '/profile/' => 'user/profile',
