@@ -16,7 +16,9 @@ class Record extends CActiveRecord
 	private $_categoryFilter = null;
     private $_productFieldsOrder = null;
 
-
+    
+    public $productName = null;
+    
     public static function model($className=__CLASS__)
 	{
     	eval("class ".$className." extends Record{}");
@@ -27,9 +29,11 @@ class Record extends CActiveRecord
 	{
 		parent::__construct($scenario);
 
-        Yii::setPathOfAlias('files', Yii::getPathOfAlias('webroot')."/data/".get_class($this)."/");
-    	Yii::setPathOfAlias('url', Yii::app()->baseUrl."/data/".get_class($this)."/");
+        $this->productName = get_class($this);
 
+        Yii::setPathOfAlias('files', Yii::getPathOfAlias('webroot')."/data/".$this->productName."/");
+    	Yii::setPathOfAlias('url', Yii::app()->baseUrl."/data/".$this->productName."/");
+        
 		$this->getProductFields();
 	}
 
@@ -261,12 +265,141 @@ class Record extends CActiveRecord
 		return $this->_tableFields;
 	}
 
-	private function getManufacturerFilter($field)
+    public function getAdminTableFields($update = false)
+	{
+        
+		if ( $this->_tableFields === null && $update === false ){
+            $this->setProductFieldsOrder("t.position");
+			$productFields = $this->getProductFields(true);
+            
+			if ( $productFields ){
+				foreach( $productFields as $field ){
+                    
+                    if ( $field->is_editing_table_admin ) {
+                        $f['type']='raw';
+                        $f['value'] = 'CHtml::textField("'.$this->productName.'[$data->id]['.$field->alias.']",$data->'.$field->alias.',array("class"=>"filter_price"));';                                                                 
+                	} 
+                    
+					if( $field->is_column_table_admin ){
+						$f['name'] = $field->alias;
+
+						switch( $field->field_type ){
+							case TypeField::PRICE:
+								$f['type']='raw';
+								
+							break;
+    						case TypeField::STRING:
+								$f['type']='raw';
+								//$f['value'] = '$data->alias ? $data->getRecordLinkAlias($data->'.$field->alias.',$data->alias) : $data->getRecordLinkId($data->'.$field->alias.',$data->id)';
+                                $f['value'] = '$data->'.$field->alias;
+							break;                            
+    						case TypeField::BOOLEAN:
+								if ( $field->is_filter ) {
+    								$f['filter'] = CHtml::activeDropDownList(   $this,
+                                                                                $field->alias,
+                                                                                array(1=>"Yes",0=>"No"),
+                                                                                array("empty"=>"")
+                                                                                );
+								}
+							break;                            
+							case TypeField::LISTS:
+								if ($field->listField->is_multiple_select)
+									$f['value'] = '$data->getRecordItems("'.$field->alias.'Items")';
+								else
+									$f['value'] = 'isset($data->'.$field->alias.'Item) ? $data->'.$field->alias.'Item->name : null';
+							break;
+							case TypeField::CATEGORIES:
+                                $multiple = 'array()';
+                                if ($field->categoryField->is_multiple_select)
+                                    $multiple = 'array("multiple"=>true,"class"=>"chzn-select")';
+                                
+								$f['value'] = 'CHtml::dropDownList("'.$this->productName.'[$data->id]['.$field->alias.']",
+                                                                    $data->'.$field->alias.', CHtml::listData($data->getCategoryFilter('.$field->categoryField->category_id.') , "id", "name"),
+                                                                    '.$multiple.'
+                                                                        );';                        
+
+                                
+								if ( $field->is_filter ) {
+									$f['filter'] = CHtml::listData($this->getCategoryFilter($field->categoryField->category_id) , 'id', 'name');
+								}
+							break;
+							case TypeField::MANUFACTURER:
+
+                                $multiple = 'array()';
+                                if ($field->manufacturerField->is_multiple_select)
+                                    $multiple = 'array("multiple"=>true,"class"=>"chzn-select")';
+                                
+    							$f['value'] = 'CHtml::dropDownList("'.$this->productName.'[$data->id]['.$field->alias.']",
+                                                                    $data->'.$field->alias.', CHtml::listData($data->getManufacturerFilter('.$field->manufacturerField->manufacturer_id.') , "id", "name"),
+                                                                    '.$multiple.'
+                                                                        );'; 
+
+								if ( $field->is_filter ) {
+                                    $listData = CHtml::listData($this->getManufacturerFilter($field) , 'id', 'name') ;
+                                    $htmlOptions = $field->manufacturerField->is_multiple_select ? array("multiple"=>true,"class"=>"chzn-select") : null;
+                                    $htmlOptions['empty'] = "";
+									$f['filter'] = CHtml::activeDropDownList(   $this,
+                                                                                $field->alias,
+                                                                                $listData,
+                                                                                $htmlOptions
+                                                                                );
+                                    
+                                    
+								}
+							break;
+							case TypeField::DATETIME:
+								if ( $field->dateTimeField->is_multiple_select )
+									$f['value'] = '$data->getRecordDateTime("'.$field->alias.'");';
+									//$f['value'] = 'isset($data->'.$field->alias.'->datetime) ? $data->'.$field->alias.'->datetime : null ;';
+								else {
+
+									switch ($field->dateTimeField->type) {
+										case DateTimeField::DATETIME:
+											$f['value'] = 'Yii::app()->dateFormatter->formatDateTime($data->'.$field->alias.',"medium","short");';
+										break;
+										case DateTimeField::DATE:
+											$f['value'] = 'Yii::app()->dateFormatter->formatDateTime($data->'.$field->alias.',"medium",null);';
+										break;
+										case DateTimeField::TIME:
+											$f['value'] = 'Yii::app()->dateFormatter->formatDateTime($data->'.$field->alias.',null,"short");';
+										break;
+
+									}
+								}
+
+
+								if ( $field->is_filter && !$field->dateTimeField->is_multiple_select) {
+									$f['filter'] = Yii::app()->controller->widget(	'zii.widgets.jui.CJuiDatePicker', array(
+																					'model'=>$this,'attribute'=>$field->alias,
+																					'language'=>Yii::app()->getLanguage(),
+																					'htmlOptions'=>array('onclick'=>'$(this).datepicker( $.datepicker.regional["'.Yii::app()->getLanguage().'"]);$(this).datepicker().focus();')),true);
+								}
+                                
+    							                               
+                                
+                                
+							break;
+						}
+
+						if ( $field->is_filter == 0 && !isset($f['filter']) ) $f['filter'] = false;
+                        
+
+                                
+						$this->_tableFields[] = $f;
+						unset($f);
+					}
+				}
+			}
+		}
+
+		return $this->_tableFields;
+	}
+
+	public function getManufacturerFilter($manufacturer_id)
 	{
 		if ( $this->_manufacturerFilter === null ){
-			if( $field->manufacturerField->manufacturer_id ){
-				$this->_manufacturerFilter = Manufacturer::model()->findByPk($field->manufacturerField->manufacturer_id)
-									->descendants()->findAll();
+			if( is_numeric($manufacturer_id) ){
+				$this->_manufacturerFilter = Manufacturer::model()->findByPk($manufacturer_id)->descendants()->findAll();
 			} else {
 				$this->_manufacturerFilter = Manufacturer::model()->findAll();
 			}
@@ -274,12 +407,11 @@ class Record extends CActiveRecord
 		return $this->_manufacturerFilter;
 	}
 
-	private function getCategoryFilter($field)
+	public function getCategoryFilter($category_id)
 	{
 		if ( $this->_categoryFilter === null ){
-			if( $field->categoryField->category_id ){
-				$this->_categoryFilter = Category::model()->findByPk($field->categoryField->category_id)
-									->descendants()->findAll();
+			if( is_numeric($category_id) ){                
+				$this->_categoryFilter = Category::model()->findByPk($category_id)->descendants()->findAll();
 			} else {
 				$this->_categoryFilter = Category::model()->findAll();
 			}
@@ -895,7 +1027,13 @@ class Record extends CActiveRecord
 			}
 		}
 
-		return new CActiveDataProvider($this,array('criteria'=>$criteria,'pagination'=>array('pageSize'=>'20')));
+		return new CActiveDataProvider($this,array(
+            'criteria'=>$criteria,
+            'pagination'=>array(
+                'pageSize'=>'20',
+                'pageVar'=>'page'
+            )
+        ));
 	}
 
 	public function beforeValidate()

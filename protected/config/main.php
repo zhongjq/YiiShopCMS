@@ -25,16 +25,16 @@ return array(
 
 	// Модули
 	'modules'=>array(
+        'admin' => array(
+			'layout'=>'application.modules.admin.views.layouts.main',
+		),        
         'gii'=>array(
             'class'         =>  'system.gii.GiiModule',
             'password'      =>  '1',
             'ipFilters'     =>  array("192.168.56.1","127.0.0.1",),
             'newFileMode'   =>  0666,
             'newDirMode'    =>  0777,
-        ),
-    	'admin' => array(
-			'layout'=>'application.modules.admin.views.layouts.main',
-		),
+        )
     ),
 	//'preload'=>array('log'),
 	// Компоненты

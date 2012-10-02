@@ -15,12 +15,12 @@
             'name',
             array(
                 'type'=>'raw',
-                'value'=>'CHtml::link("форма добаления", Yii::app()->createUrl("/admin/constructor/form",array("id"=>$data->id)) )',
-                 'htmlOptions'=>array('width'=> '140'),
+                'value'=>'CHtml::link(Yii::t("products","form"), Yii::app()->createUrl("/admin/constructor/form",array("id"=>$data->id)) )',
+                 'htmlOptions'=>array('width'=> '50'),
             ),
             array(
                 'type'=>'raw',
-                'value'=>'CHtml::link("поля", Yii::app()->createUrl("/admin/constructor/fields",array("id"=>$data->id)) )',
+                'value'=>'CHtml::link(Yii::t("products","fields"), Yii::app()->createUrl("/admin/constructor/fields",array("id"=>$data->id)) )',
                  'htmlOptions'=>array('width'=> '40'),
             ),
             array(

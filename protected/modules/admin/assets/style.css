@@ -172,9 +172,14 @@ div.summary{
 	margin-bottom: 10px;
 }
 
-tr.filters input, tr.filters select {
-	margin: 0px;
-	width: auto;
+.table td input, .filters input {
+    margin-bottom: 0;
+    width: 96%;
+}
+
+.table td select, .filters select {
+    margin-bottom: 0;
+    width: 101%;
 }
 
 
@@ -213,4 +218,9 @@ li.tab-hover > a{
     padding: 0;
     width: 16px;
     background-color: inherit;
+}
+
+input.filter_price {
+    width: auto;
+    margin: 0;
 }

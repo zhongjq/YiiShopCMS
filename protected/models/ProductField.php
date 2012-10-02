@@ -16,7 +16,9 @@
  */
 class ProductField extends CActiveRecord
 {
-	public $moredata;
+    public $subClass = null;
+    public $subClassName = null;
+    
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
@@ -44,7 +46,7 @@ class ProductField extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('field_type, name, alias', 'required', 'on'=>'add, edit'),
-			array('product_id, field_type, is_mandatory, is_filter,position', 'numerical', 'integerOnly'=>true),
+			array('product_id, field_type, position', 'numerical', 'integerOnly'=>true),
 			array('name', 'length', 'max'=>255),
 			array('alias', 'length', 'max'=>50),
 			array('name, alias', 'unique', 'criteria' => array(
@@ -52,7 +54,7 @@ class ProductField extends CActiveRecord
 												'params'=>array(':product_id'=> $this->product_id )
 											)),
 
-			array('is_column_table', 'boolean'),
+			array('is_filter, is_mandatory, is_column_table, is_editing_table_admin, is_column_table_admin', 'boolean' ),
             array('unit_name, hint', 'safe'),
 			array('alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u','message' => Yii::t("products",'Field contains invalid characters.')),
 			// The following rule is used by search().
@@ -107,35 +109,25 @@ class ProductField extends CActiveRecord
 			'is_column_table' => Yii::t("fields",'Used In Table Header?'),
 			'unit_name' => Yii::t("fields",'Unitname'),
 			'hint' => Yii::t("fields",'Hint'),
+            'is_editing_table_admin'=> Yii::t("fields","Editing table"),
+            'is_column_table_admin'=> Yii::t("fields","is_column_table_admin")
 		);
 	}
 
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// Warning: Please modify the following code to remove attributes that
-		// should not be searched.
-
-		$criteria=new CDbCriteria;
-
-		$criteria->compare('ID',$this->ID);
-		$criteria->compare('ProductID',$this->ProductID);
-		$criteria->compare('FieldType',$this->FieldType);
-		$criteria->compare('Name',$this->Name,true);
-		$criteria->compare('IsMandatory',$this->IsMandatory);
-		$criteria->compare('IsFilter',$this->IsFilter);
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
-	}
-
 	// форма в формате CForm
-	public function getMotelArrayCForm(){
-		return array(
+	public function getCForm(){
+        
+        $tab = '<ul class="nav nav-tabs">
+                    <li class="active"><a href="#field" data-toggle="tab">Поле</a></li>
+                    <li><a href="#admin" data-toggle="tab">Администрирование</a></li>
+                </ul>';   
+           
+    	if ( $this->isNewRecord && $this->field_type ){
+			$this->subClassName = TypeField::$Fields[$this->field_type]['class'];
+			$this->subClass = $this->CreateField($this->field_type);
+		}
+
+		$arForm = array(
 			'attributes' => array(
 				'enctype' => 'application/form-data',
 				'class' => 'well',
@@ -153,62 +145,81 @@ class ProductField extends CActiveRecord
 			),
 
 			'elements'=>array(
-                'productField'=> array(
-    				'type'=>'form',
-					'elements'=>array(
-						'field_type'=>array(
-							'type'  =>  'dropdownlist',
-							'items' =>  TypeField::getFieldsList(),
-							'empty'=>  '',
-
-							'ajax' => array(
-								'type'  =>  'POST',
-								'url'   =>  "",
-								'replace'=>  '#fieldForm',
-							)
-
-						),
-						'name'=>array(
-							'type'=>'text',
-							'maxlength'=>255
-						),
-						'alias'=>array(
-							'type'      =>  'text',
-							'maxlength' =>  255,
-						),
-						'is_mandatory'=>array(
-							'type'=>'checkbox',
-							'layout'=>'{input}{label}{error}{hint}',
-						),
-						'is_filter'=>array(
-							'type'=>'checkbox',
-							'layout'=>'{input}{label}{error}{hint}',
-						),
-						'is_column_table'=>array(
-							'type'=>'checkbox',
-							'layout'=>'{input}{label}{error}{hint}',
-						),
-    					'unit_name'=>array(
-							'type'=>'text',
-							'maxlength'=>255
-						),
-    					'hint'=>array(
-							'type'=>'text',
-							'maxlength'=>255
-						),
-					)
-				)
+                $tab,
+                '<div class="tab-content">',
+                    '<div id="field" class="tab-pane active">',
+                        
+        				'field_type'=>array(
+        					'type' => 'dropdownlist',
+        					'items' => TypeField::getFieldsList(),
+        					'empty'=> '',        
+        					'ajax' => array(
+                                'url' => "",
+        						'type' => 'POST',
+        						'replace'=>  '#fieldForm',
+        					)
+        				),
+        				'name'=>array(
+        					'type'=>'text',
+        					'maxlength'=>255
+        				),
+        				'alias'=>array(
+        					'type'      =>  'text',
+        					'maxlength' =>  255,
+        				),
+        				'is_mandatory'=>array(
+        					'type'=>'checkbox',
+        					'layout'=>'{input}{label}{error}{hint}',
+        				),
+        				'is_filter'=>array(
+        					'type'=>'checkbox',
+        					'layout'=>'{input}{label}{error}{hint}',
+        				),
+        				'is_column_table'=>array(
+        					'type'=>'checkbox',
+        					'layout'=>'{input}{label}{error}{hint}',
+        				),
+            			'unit_name'=>array(
+        					'type'=>'text',
+        					'maxlength'=>255
+        				),
+            			'hint'=>array(
+        					'type'=>'text',
+        					'maxlength'=>255
+        				),
+                       
+                        $this->subClassName => ( $this->subClass ? $this->subClass->getElementsMotelCForm() : null ),
+                    '</div>',
+                
+                    '<div id="admin" class="tab-pane">',
+                        'is_editing_table_admin'=>array(
+                    		'type'=>'checkbox',
+        					'layout'=>'{input}{label}{error}{hint}',
+        				),
+                        'is_column_table_admin'=>array(
+            				'type'=>'checkbox',
+        					'layout'=>'{input}{label}{error}{hint}',
+        				),
+                    '</div>',
+                
+                '</div>'
 			),
 
 			'buttons'=>array(
 				'<br/>',
 				'submit'=>array(
 					'type'  =>  'submit',
-					'label' =>  $this->isNewRecord ? 'Создать' : "Сохранить",
+					'label' =>  $this->isNewRecord ? Yii::t('main','Create') : Yii::t('main','Save'),
 					'class' =>  "btn"
 				),
 			),
 		);
+        
+        $form = new CForm($arForm,$this);
+        
+        if ( $this->subClass ) $form[$this->subClassName]->model = $this->subClass;
+        
+        return $form;
 	}
 
 	public static function CreateField($FieldType){
@@ -224,23 +235,28 @@ class ProductField extends CActiveRecord
                 
 		${$this->product->alias} = $this->product->getRecordObject();
 
-		if ( $this->isNewRecord && $this->moredata ) {
-			$this->moredata->field_id = $this->id;
-			if ( $this->moredata->save() ){
+		if ( $this->subClass ) {
+            
+            // чтобы сохранять значение
+            if( $this->subClass && isset($_POST[$this->subClassName]) )
+                $this->subClass->attributes = $_POST[$this->subClassName];
+            
+			$this->subClass->field_id = $this->id;
+			if ( $this->subClass->save() ){
 
-				if( isset($this->moredata->is_multiple_select) ){
-					if ($this->isNewRecord && $this->moredata->is_multiple_select == 0){
+				if( isset($this->subClass->is_multiple_select) ){
+					if ($this->isNewRecord && $this->subClass->is_multiple_select == 0){
 						Yii::app()->db->createCommand()->addColumn( $this->product->alias,
 							$this->alias,
 							TypeField::$Fields[$this->field_type]['dbType']
 						);
-					} elseif ( $this->moredata->is_multiple_select && isset(${$this->product->alias}->tableSchema->columns[$this->alias]) ){
+					} elseif ( $this->subClass->is_multiple_select && isset(${$this->product->alias}->tableSchema->columns[$this->alias]) ){
 						Yii::app()->db->createCommand()->dropColumn( $this->product->alias, $this->alias );
-					} elseif ( !$this->moredata->is_multiple_select && !isset(${$this->product->alias}->tableSchema->columns[$this->alias]) ){
+					} elseif ( !$this->subClass->is_multiple_select && !isset(${$this->product->alias}->tableSchema->columns[$this->alias]) ){
 						Yii::app()->db->createCommand()->addColumn( $this->product->alias,$this->alias,TypeField::$Fields[$this->field_type]['dbType']);
 					}
 
-				} else {
+				} elseif( !isset(${$this->product->alias}->tableSchema->columns[$this->alias]) ) {
 					Yii::app()->db->createCommand()->addColumn( $this->product->alias,
 						$this->alias,
 						TypeField::$Fields[$this->field_type]['dbType']
@@ -256,4 +272,14 @@ class ProductField extends CActiveRecord
 		parent::afterDelete();
 		Yii::app()->db->createCommand()->dropColumn( $this->product->alias, $this->alias );
 	}
+    
+    public function afterFind(){
+        parent::afterFind();
+        
+        if ( $this->field_type ){
+			$this->subClassName = TypeField::$Fields[$this->field_type]['class'];
+			$class = $this->CreateField($this->field_type);
+            $this->subClass = $class::model()->findByPk($this->id);            
+		}        
+    }
 }
