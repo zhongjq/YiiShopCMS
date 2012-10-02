@@ -17,12 +17,28 @@ class ProductController extends Controller
 
 	public function actionView($id)
 	{
-        $product = Product::getProductByPk($id);
-
+        $product = Product::getProductByPk($id);       
 		$record = Record::model($product->alias);
 
-		if ( isset($_GET[get_class($record)]) ){
-			$record->attributes = $_GET[get_class($record)];
+		if ( isset($_GET[$record->productName]) ){
+			$record->attributes = $_GET[$record->productName];
+		}
+
+    	if ( isset($_POST[$record->productName]) && is_array($_POST[$record->productName]) && !empty($_POST[$record->productName]) ){
+                        
+            $records = $_POST[$record->productName];
+
+            foreach( $records as $id => $data ){
+                if ( is_numeric($id) ) {
+                    $a = $record->findByPk($id);
+                    if ( $a ){
+                        $a->attributes = $data;
+                        $a->save();
+                    }
+                }
+            }
+            
+			$this->redirect($this->createUrl('/admin/product/view',array('id'=>$product->id)));
 		}
 
 		$this->render('records/view', array(

@@ -38,11 +38,8 @@ return array(
 		        '/admin/constructor/<id:\d+>/fields/add' => 'admin/constructor/addfield',
 		        '/admin/constructor/<productId:\d+>/field/<action:(edit|delete)>/<fieldId:\d+>' => 'admin/constructor/<action>field',
 				// Форма
-                '/admin/constructor/<id:\d+>/form' => 'admin/constructor/form',
-                '/admin/constructor/<id:\d+>/addtab' => 'admin/constructor/addtab',
-                '/admin/constructor/<id:\d+>/form/savepositiontabs' => 'admin/constructor/savePositionTabs',
-                '/admin/constructor/<id:\d+>/form/savepositionfield' => 'admin/constructor/savePositionField',
-                '/admin/constructor/<id:\d+>/form/savepositionfields' => 'admin/constructor/savePositionFields',
+                '/admin/constructor/<id:\d+>/<action:(form|addtab)>' => 'admin/constructor/<action>',
+                '/admin/constructor/<id:\d+>/form/<action:(savepositiontabs|savepositionfield|savepositionfields)>' => 'admin/constructor/<action>',
 		        '/admin/constructor/<productId:\d+>/form/tab<action:(edit|delete)>/<tabId:\d+>' => 'admin/constructor/<action>tab',
 		        '/admin/constructor/<productId:\d+>/field/<action:(edit|delete)>/<fieldId:\d+>' => 'admin/constructor/<action>field',
                 

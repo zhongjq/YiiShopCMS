@@ -110,44 +110,30 @@ class ConstructorController extends Controller
 		));
 	}
 
+    protected function performAjaxFieldValidation($productField)
+	{
+    	if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "fieldForm" ){
+			$validate = array($productField);
+			if ( $productField->subClass ) $validate[] = $productField->subClass;
+			echo CActiveForm::validate($validate);
+			Yii::app()->end();
+		}
+	}
+
 	public function actionAddField($id)
 	{
 		$product = Product::model()->findByPk($id);
 		$productField = new ProductField('add');
 		$productField->product_id = $product->id;
+        
+        if( isset($_POST['ProductField']) ) $productField->attributes = $_POST['ProductField'];
+                        
+		$form = $productField->getCForm();
 
-		$arProductFieldForm = $productField->getMotelArrayCForm();
-
-		$class = null;
-		$fieldType = null;
-		$className = null;
-		if ( isset($_POST['ProductField']['field_type']) )
-			$fieldType = $_POST['ProductField']['field_type'];
-
-		if ( $fieldType > 0 && isset(TypeField::$Fields[$fieldType]['class']) ){
-			$className = TypeField::$Fields[$fieldType]['class'];
-			$class = $productField->CreateField($fieldType);
-			$arProductFieldForm['elements'][$className] = $class->getElementsMotelCForm();
-			$productField->moredata = $class;
-		}
-
-		$form = new CForm($arProductFieldForm);
-		$form['productField']->model = $productField;
-		if( $fieldType > 0 && $class ) $form[$className]->model = $class;
-
-		if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "fieldForm" ){
-			$validate = array($productField);
-			if ( $class ) $validate[] = $class;
-			echo CActiveForm::validate($validate);
-			Yii::app()->end();
-		}
+		$this->performAjaxFieldValidation($productField);
 
 		if( isset($_POST['ProductField']) ) {
 			$productField->attributes = $_POST['ProductField'];
-
-            // чтобы сохранять значение
-            if( $className && isset($_POST[$className]) )
-                $class->attributes = $_POST[$className];
 
 			$transaction = Yii::app()->db->beginTransaction();
 			try
@@ -164,7 +150,7 @@ class ConstructorController extends Controller
 			}
 		}
 
-		if( Yii::app()->request->isAjaxRequest && $fieldType > 0 ){
+		if( Yii::app()->request->isAjaxRequest && $productField->subClass ){
 			$form = $form->render();
 			$sc = '';
 			Yii::app()->clientScript->render($sc);
@@ -185,39 +171,12 @@ class ConstructorController extends Controller
 		$productField = ProductField::model()->findByPk($fieldId);
 		$productField->setScenario('edit');
 
-		$arProductFieldForm = $productField->getMotelArrayCForm();
+    	$form = $productField->getCForm();
 
-		$class = null;
-		$fieldType = null;
-		$className = null;
-		$fieldType = $productField->field_type;
-		if ( isset(TypeField::$Fields[$fieldType]['class']) ){
-			$className = TypeField::$Fields[$fieldType]['class'];
-			$class = $productField::CreateField($fieldType);
-			$class = $class::model()->findByPk($fieldId);
-			$arProductFieldForm['elements'][$className] = $class->getElementsMotelCForm();
-			$productField->moredata = $class;
-		}
-
-
-		$form = new CForm($arProductFieldForm);
-		$form['productField']->model = $productField;
-
-		if ( $class ) $form[$className]->model = $class;
-
-		if( Yii::app()->request->isAjaxRequest && isset($_POST['ajax']) && $_POST['ajax'] == "fieldForm" ){
-			$validate = array($productField);
-			if ( $class ) $validate[] = $class;
-			echo CActiveForm::validate($validate);
-			Yii::app()->end();
-		}
+    	$this->performAjaxFieldValidation($productField);
 
 		if( isset($_POST['ProductField']) ) {
 			$productField->attributes = $_POST['ProductField'];
-
-            // чтобы сохранять значение
-            if( $className && isset($_POST[$className]) )
-                $class->attributes = $_POST[$className];
 
 			$transaction = Yii::app()->db->beginTransaction();
 			try
@@ -251,7 +210,7 @@ class ConstructorController extends Controller
 		{
 			if( $productField && $productField->delete() ){
 				$transaction->commit();
-				$this->redirect($this->createUrl('/admin/product/fields',array('id'=>$productId)));
+				$this->redirect($this->createUrl('/admin/constructor/fields',array('id'=>$productId)));
 			}
 		}
 		catch(Exception $e)
