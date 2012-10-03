@@ -172,16 +172,23 @@ div.summary{
 	margin-bottom: 10px;
 }
 
+.table th, .table td {
+    padding: 8px 21px 8px 8px;
+}
+
 .table td input, .filters input {
-    margin-bottom: 0;
-    width: 96%;
+    margin: 0;
+    width: 100%;
 }
 
 .table td select, .filters select {
-    margin-bottom: 0;
-    width: 101%;
+    margin: 0;
+    width: auto;
 }
 
+.table td .chzn-container {
+     margin: 0;
+}
 
 .ui-datepicker-trigger {
 	margin-bottom: 5px;

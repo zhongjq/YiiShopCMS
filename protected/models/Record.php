@@ -30,11 +30,12 @@ class Record extends CActiveRecord
 		parent::__construct($scenario);
 
         $this->productName = get_class($this);
-
+        $this->setProduct();
+        
+        $this->getProductFields(); 
+        
         Yii::setPathOfAlias('files', Yii::getPathOfAlias('webroot')."/data/".$this->productName."/");
     	Yii::setPathOfAlias('url', Yii::app()->baseUrl."/data/".$this->productName."/");
-        
-		$this->getProductFields();
 	}
 
 
@@ -49,7 +50,6 @@ class Record extends CActiveRecord
             else
                 throw new CException("NOT ".$name );
 		}
-
 	}
 
 	public function __set($name,$value)
@@ -61,32 +61,25 @@ class Record extends CActiveRecord
 		}
 	}
 
-	public function setProductID($v)
-	{
-		$this->_productId = $v;
-	}
-
 	public function getProductID()
 	{
-		return $this->_productId;
+		return $this->_product->id;
 	}
-
+    
+    private function setProduct(){
+        $this->_product = Product::model()->with('productFields')->find(array('condition'=>'t.alias = :alias','params'=>array(':alias'=> $this->productName )));
+    }
+    
 	public function getProductFields($update = false)
 	{
-
+        
 		if( isset(Yii::app()->params[$this->tableName()]) && !$update ) return Yii::app()->params[$this->tableName()];
 
-		if ( ($this->_productFields === null && $this->_product === null && !$update) || $update ) {
-
-			$this->_product = Product::model()->with('productFields')->find(array(
-				'condition'=>'t.alias = :alias',
-				'params'=>array(':alias'=> get_class($this))
-			));
+		if ( ($this->_productFields === null && !$update) || $update ) {
 
 			if ( $this->_product ){
 				$this->_productFields = $this->_product->productFields();
-				$this->setProductID($this->_product->id);
-
+				
 				if ( $this->_productFields ){
 					foreach ($this->_productFields as $field) {
 						if ( $field->is_column_table )
@@ -130,9 +123,8 @@ class Record extends CActiveRecord
                     $criteria->with = $this->_with;
                     $criteria->params = array(':product_id'=>$this->getProductID());
                     if ( $this->getProductFieldsOrder() ) $criteria->order = $this->getProductFieldsOrder();
-                                        
+                    
 					$this->_productFields = ProductField::model()->findAll($criteria);
-
 				}
 
 			} else
@@ -275,25 +267,40 @@ class Record extends CActiveRecord
 			if ( $productFields ){
 				foreach( $productFields as $field ){
                     
-                    if ( $field->is_editing_table_admin ) {
-                        $f['type']='raw';
-                        $f['value'] = 'CHtml::textField("'.$this->productName.'[$data->id]['.$field->alias.']",$data->'.$field->alias.',array("class"=>"filter_price"));';                                                                 
-                	} 
-                    
 					if( $field->is_column_table_admin ){
 						$f['name'] = $field->alias;
-
+                        
+                        if ( $field->is_editing_table_admin ) {
+                            $name = $this->productName.'[$data->id]['.$field->alias.']';
+                            
+                            $f['type']='raw';
+                            $f['value'] = 'CHtml::textField("'.$name.'",$data->'.$field->alias.',array("class"=>"filter_price"));';                                                                 
+                        } 
+                        
 						switch( $field->field_type ){
 							case TypeField::PRICE:
-								$f['type']='raw';
+								if ( !$field->is_editing_table_admin ) {
+                                    $f['type']='text';
+                                    $f['value'] = '$data->'.$field->alias;                                                                 
+                                } 
 								
 							break;
     						case TypeField::STRING:
-								$f['type']='raw';
-								//$f['value'] = '$data->alias ? $data->getRecordLinkAlias($data->'.$field->alias.',$data->alias) : $data->getRecordLinkId($data->'.$field->alias.',$data->id)';
-                                $f['value'] = '$data->'.$field->alias;
+							 
+    							if ( !$field->is_editing_table_admin ) {
+                                    $f['type']='text';
+                                    $f['value'] = '$data->'.$field->alias;                                                                 
+                                }                                
+                                
 							break;                            
     						case TypeField::BOOLEAN:
+                                
+    							if ( $field->is_editing_table_admin ) {
+                                    $f['type']='raw';
+                                    $f['value'] = 'CHtml::dropDownList("'.$name.'",$data->'.$field->alias.',array(1=>"Yes",0=>"No"),array("empty"=>""));';                                                                 
+                                }                                 
+                                
+                                
 								if ( $field->is_filter ) {
     								$f['filter'] = CHtml::activeDropDownList(   $this,
                                                                                 $field->alias,
@@ -309,15 +316,22 @@ class Record extends CActiveRecord
 									$f['value'] = 'isset($data->'.$field->alias.'Item) ? $data->'.$field->alias.'Item->name : null';
 							break;
 							case TypeField::CATEGORIES:
-                                $multiple = 'array()';
-                                if ($field->categoryField->is_multiple_select)
-                                    $multiple = 'array("multiple"=>true,"class"=>"chzn-select")';
+                               
+                                if ($field->categoryField->is_multiple_select){
+                                    $name = $name.'[]';
+                                }
                                 
-								$f['value'] = 'CHtml::dropDownList("'.$this->productName.'[$data->id]['.$field->alias.']",
-                                                                    $data->'.$field->alias.', CHtml::listData($data->getCategoryFilter('.$field->categoryField->category_id.') , "id", "name"),
-                                                                    '.$multiple.'
-                                                                        );';                        
+                                 if ( $field->is_editing_table_admin ) {
+                                    $multiple = 'array()';
+                                    if ($field->categoryField->is_multiple_select) $multiple = 'array("multiple"=>true,"class"=>"chzn-select")';                                
+                               
+                                    $f['type']='raw';
+    								$f['value'] = 'CHtml::dropDownList("'.$name.'",
+                                                                        $data->'.$field->alias.', CHtml::listData($data->getCategoryFilter('.$field->categoryField->category_id.') , "id", "name"),
+                                                                        '.$multiple.'
+                                                                            );';                        
 
+                                }
                                 
 								if ( $field->is_filter ) {
 									$f['filter'] = CHtml::listData($this->getCategoryFilter($field->categoryField->category_id) , 'id', 'name');
@@ -326,10 +340,11 @@ class Record extends CActiveRecord
 							case TypeField::MANUFACTURER:
 
                                 $multiple = 'array()';
-                                if ($field->manufacturerField->is_multiple_select)
+                                if ($field->manufacturerField->is_multiple_select){
+                                    $name = $name.'[]';
                                     $multiple = 'array("multiple"=>true,"class"=>"chzn-select")';
-                                
-    							$f['value'] = 'CHtml::dropDownList("'.$this->productName.'[$data->id]['.$field->alias.']",
+                                }
+    							$f['value'] = 'CHtml::dropDownList("'.$name.'",
                                                                     $data->'.$field->alias.', CHtml::listData($data->getManufacturerFilter('.$field->manufacturerField->manufacturer_id.') , "id", "name"),
                                                                     '.$multiple.'
                                                                         );'; 
@@ -800,7 +815,10 @@ class Record extends CActiveRecord
 									$RecordCategory->product_id = $this->getProductID();
 									$RecordCategory->record_id = $this->id;
 									$RecordCategory->category_id = $category_id;
-									if ( !$RecordCategory->save() ) throw new CException("ERROR SEVE CATEGORIES");
+									if ( !$RecordCategory->save() ) {
+                                       
+                                        throw new CException("ERROR SEVE CATEGORIES ".$RecordCategory->category_id );
+									}
 								}
 							}
 						}
@@ -928,9 +946,9 @@ class Record extends CActiveRecord
     				case TypeField::CATEGORIES :
 						if ($field->categoryField->is_multiple_select)
 							$rules[] = array($field->alias, 'ArrayValidator', 'validator'=>'numerical', 'params'=>array(
-												'integerOnly'=>true, 'allowEmpty'=> $field->is_mandatory));
+												'integerOnly'=>true));
 						else
-							$rules[] = array($field->alias, 'numerical','integerOnly'=>true,'allowEmpty'=> $field->is_mandatory );
+							$rules[] = array($field->alias, 'numerical','integerOnly'=>true );
 
 					break;
     				case TypeField::IMAGE :

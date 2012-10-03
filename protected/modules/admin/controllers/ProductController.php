@@ -33,7 +33,12 @@ class ProductController extends Controller
                     $a = $record->findByPk($id);
                     if ( $a ){
                         $a->attributes = $data;
-                        $a->save();
+                        if (!$a->save()) {
+                            
+                            print_r( $a->category );
+                            print_r( $a->getErrors() );
+                            die;
+                        };
                     }
                 }
             }

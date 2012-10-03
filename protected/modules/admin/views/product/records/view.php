@@ -2,7 +2,7 @@
 
 Yii::app()->getClientScript()->registerCssFile($this->assetsBase.'/chosen/chosen.css');
 Yii::app()->getClientScript()->registerScriptFile($this->assetsBase.'/chosen/chosen.jquery.min.js');
-$js = '$("select.chzn-select").css("width","100%").chosen({allow_single_deselect:true});';
+$js = '$("select.chzn-select").chosen({allow_single_deselect:true});';
 Yii::app()->getClientScript()->registerScript("select",'$(function(){'.$js.'});');
 
 $this->pageTitle = $product->name;
