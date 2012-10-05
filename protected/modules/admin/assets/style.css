@@ -231,3 +231,15 @@ input.filter_price {
     width: auto;
     margin: 0;
 }
+
+.chzn-container-multi .chzn-choices {
+    border-color: #CCCCCC;
+    border-radius: 3px;
+    background-image: none;
+}
+.chzn-container-multi .chzn-choices .search-choice {
+    background-clip: none;
+    background-color: #fff;
+    background-image: none;
+    box-shadow: none;
+}

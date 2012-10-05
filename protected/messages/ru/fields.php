@@ -4,9 +4,16 @@ return array(
 	'Add field product'=>'Добавление поля',
 	'Edit field product'=>'Редактирование поля',
 
-
-	'Used In Table Header?'		=>	"Использовать поле в таблице?",
-
+    'Is Multiple Select?'=>'Множественный выбор',
+	'Used In Table Header?'=>"Использовать поле в таблице на сайте",
+    
+    'Editing table'=>'Редактирование в таблице',
+    'is_column_table_admin'=>"Использовать поле в таблице на администратирования",
+    
+    // 
+    'Unitname'=>'Единица измерения',
+    'Hint'=>'Подсказка',
+    
 	// string field
 	'Min length'=>'Минимальная длинна',
 	'Max length'=>'Максимальная длинна',
@@ -15,11 +22,14 @@ return array(
 	'Min value'=>'Минимальное значние',
 	'Max value'=>'Максимальное значние',
 
-	// int field
-	'Max value'=>'Максимальное цена',
+	// price field
+	'Max price'=>'Максимальное цена',
 
 	// list field
-	'List'						=>	"Список",
-	'Multiple Select'			=>	"Множественный выбор",
-	'Select list'				=>	"Выберите список",
+	'List'=>"Список",
+	'Multiple Select'=>"Множественный выбор",
+	'Select list'=>"Выберите список",
+    
+    // Category
+    'Category'=>'Категории',
 );

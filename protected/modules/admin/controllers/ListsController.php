@@ -2,7 +2,33 @@
 
 class ListsController extends Controller
 {
-	public $layout='/layouts/main';
+    /**
+	 * @return array action filters
+	 */
+	public function filters()
+	{
+		return array(
+			'accessControl', // perform access control for CRUD operations
+		);
+	}
+
+	public function accessRules()
+	{
+		$rules = array_merge(
+			parent::accessRules(),
+			array(
+				array(  'allow',    // allow admin user to perform 'admin' and 'delete' actions
+						'actions'   =>  array('admin','delete'),
+						'roles'     =>  array('Administrator')
+				),
+				array(  'deny',  // deny all users
+						'users'=>array('*'),
+				)
+			)
+		);
+
+		return $rules;
+	}
 
 	protected function performAjaxValidation($list)
 	{

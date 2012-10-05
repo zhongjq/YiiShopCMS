@@ -157,15 +157,17 @@ class ProductField extends CActiveRecord
                                 'url' => "",
         						'type' => 'POST',
         						'replace'=>  '#fieldForm',
-        					)
+        					),
+                            'disabled' => !$this->isNewRecord ? true : false,
         				),
         				'name'=>array(
         					'type'=>'text',
         					'maxlength'=>255
         				),
         				'alias'=>array(
-        					'type'      =>  'text',
-        					'maxlength' =>  255,
+        					'type' => 'text',
+        					'maxlength' => 255,
+                            'disabled' => !$this->isNewRecord ? true : false,
         				),
         				'is_mandatory'=>array(
         					'type'=>'checkbox',

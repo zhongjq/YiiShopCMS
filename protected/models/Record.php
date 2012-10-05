@@ -10,14 +10,13 @@ class Record extends CActiveRecord
 	private $_productFields = null;
     private $_tableFields = null;
     private $_searchFields = null;
-    public $data = null;
 
 	private $_manufacturerFilter = null;
 	private $_categoryFilter = null;
     private $_productFieldsOrder = null;
 
-
     public $productName = null;
+    public $data = null;
 
     public static function model($className=__CLASS__)
 	{
@@ -66,16 +65,24 @@ class Record extends CActiveRecord
 		return $this->_product->id;
 	}
 
-    private function setProduct(){
-        $this->_product = Product::model()->with('productFields')->find(array('condition'=>'t.alias = :alias','params'=>array(':alias'=> $this->productName )));
+    private function setProduct()
+    {
+        $name = $this->productName."ProductСache";
+
+        if ( isset(Yii::app()->params[$name]) ) return Yii::app()->params[$name];
+
+        if ( $this->_product === null ) {
+            $this->_product = Product::model()->with('productFields')->find(array('condition'=>'t.alias = :alias','params'=>array(':alias'=> $this->productName )));
+            Yii::app()->params[$name] = $this->_product;
+        }
     }
 
 	public function getProductFields($update = false)
 	{
 
-		if( isset(Yii::app()->params[$this->tableName()]) && !$update ) return Yii::app()->params[$this->tableName()];
+		if ( isset(Yii::app()->params[$this->tableName()]) && $update === false ) return Yii::app()->params[$this->tableName()];
 
-		if ( ($this->_productFields === null && !$update) || $update ) {
+		if ( $this->_productFields === null || $update === true ) {
 
 			if ( $this->_product ){
 				$this->_productFields = $this->_product->productFields();
@@ -302,11 +309,7 @@ class Record extends CActiveRecord
 
 
 								if ( $field->is_filter ) {
-    								$f['filter'] = CHtml::activeDropDownList(   $this,
-                                                                                $field->alias,
-                                                                                BooleanField::getValues(),
-                                                                                array("empty"=>"")
-                                                                                );
+    								$f['filter'] = CHtml::dropDownList($field->alias,null,array(1=>"Yes",0=>"No"),array("empty"=>""));
 								}
 							break;
 							case TypeField::LISTS:
@@ -315,89 +318,75 @@ class Record extends CActiveRecord
 								else
 									$f['value'] = 'isset($data->'.$field->alias.'Item) ? $data->'.$field->alias.'Item->name : null';
 							break;
+
 							case TypeField::CATEGORIES:
 
-                                if ($field->categoryField->is_multiple_select){
-                                    $name = $name.'[]';
-                                }
-
-                                 if ( $field->is_editing_table_admin ) {
-                                    $multiple = 'array()';
-                                    if ($field->categoryField->is_multiple_select) $multiple = 'array("multiple"=>true,"class"=>"chzn-select")';
-
+                                if ( $field->is_editing_table_admin ) {
                                     $f['type']='raw';
-    								$f['value'] = 'CHtml::dropDownList("'.$name.'",
-                                                                        $data->'.$field->alias.', CHtml::listData($data->getCategoryFilter('.$field->categoryField->category_id.') , "id", "name"),
-                                                                        '.$multiple.'
-                                                                            );';
 
+                                    $multiple = 'array()';
+                                    if ($field->categoryField->is_multiple_select){
+                                        $name = $name.'[]';
+                                        $multiple = 'array("multiple"=>true,"class"=>"chzn-select")';
+                                    }
+
+                                    $f['value'] = 'CHtml::dropDownList("'.$name.'",
+                                                                        $data->'.$field->alias.',
+                                                                        CHtml::listData($data->getCategoryFilter('.$field->categoryField->category_id.') , "id", "name"),
+                                                                        '.$multiple.'
+                                                                        );';
+
+                                } else {
+                                    if ($field->categoryField->is_multiple_select)
+                                        $f['value'] = '$data->getRecordCategory("'.$field->alias.'")';
+                                    else
+        							    $f['value'] = 'isset($data->'.$field->alias.'Category) ? $data->'.$field->alias.'Category->name : null';
                                 }
 
 								if ( $field->is_filter ) {
 									$f['filter'] = CHtml::listData($this->getCategoryFilter($field->categoryField->category_id) , 'id', 'name');
 								}
+
 							break;
+
 							case TypeField::MANUFACTURER:
 
-                                $multiple = 'array()';
-                                if ($field->manufacturerField->is_multiple_select){
-                                    $name = $name.'[]';
-                                    $multiple = 'array("multiple"=>true,"class"=>"chzn-select")';
-                                }
-    							$f['value'] = 'CHtml::dropDownList("'.$name.'",
-                                                                    $data->'.$field->alias.', CHtml::listData($data->getManufacturerFilter('.$field->manufacturerField->manufacturer_id.') , "id", "name"),
-                                                                    '.$multiple.'
+                                if ( $field->is_editing_table_admin ) {
+                                    $f['type']='raw';
+
+                                    $multiple = 'array()';
+                                    if ($field->manufacturerField->is_multiple_select){
+                                        $name = $name.'[]';
+                                        $multiple = 'array("multiple"=>true,"class"=>"chzn-select","data-placeholder"=>"")';
+                                    }
+        						    $f['value'] = 'CHtml::dropDownList("'.$name.'",
+                                                                        $data->'.$field->alias.',
+                                                                        CHtml::listData($data->getManufacturerFilter('.$field->manufacturerField->manufacturer_id.') , "id", "name"),
+                                                                        '.$multiple.'
                                                                         );';
+
+                                } else {
+        							if ( $field->manufacturerField->is_multiple_select )
+    									$f['value'] = '$data->getRecordManufacturer("'.$field->alias.'")';
+    								else
+    									$f['value'] = 'isset($data->'.$field->alias.'Manufacturer) ? $data->'.$field->alias.'Manufacturer->name : null';
+                                }
 
 								if ( $field->is_filter ) {
                                     $listData = CHtml::listData($this->getManufacturerFilter($field) , 'id', 'name') ;
-                                    $htmlOptions = $field->manufacturerField->is_multiple_select ? array("multiple"=>true,"class"=>"chzn-select") : null;
+                                    $htmlOptions = $field->manufacturerField->is_multiple_select ? array("multiple"=>true,"class"=>"chzn-select","data-placeholder"=>" ") : null;
                                     $htmlOptions['empty'] = "";
-									$f['filter'] = CHtml::activeDropDownList(   $this,
-                                                                                $field->alias,
-                                                                                $listData,
-                                                                                $htmlOptions
-                                                                                );
-
-
+									$f['filter'] = CHtml::activeDropDownList($this,$field->alias,$listData,$htmlOptions);
 								}
+
 							break;
+
 							case TypeField::DATETIME:
-								if ( $field->dateTimeField->is_multiple_select )
-									$f['value'] = '$data->getRecordDateTime("'.$field->alias.'");';
-									//$f['value'] = 'isset($data->'.$field->alias.'->datetime) ? $data->'.$field->alias.'->datetime : null ;';
-								else {
-
-									switch ($field->dateTimeField->type) {
-										case DateTimeField::DATETIME:
-											$f['value'] = 'Yii::app()->dateFormatter->formatDateTime($data->'.$field->alias.',"medium","short");';
-										break;
-										case DateTimeField::DATE:
-											$f['value'] = 'Yii::app()->dateFormatter->formatDateTime($data->'.$field->alias.',"medium",null);';
-										break;
-										case DateTimeField::TIME:
-											$f['value'] = 'Yii::app()->dateFormatter->formatDateTime($data->'.$field->alias.',null,"short");';
-										break;
-
-									}
-								}
-
-
-								if ( $field->is_filter && !$field->dateTimeField->is_multiple_select) {
-									$f['filter'] = Yii::app()->controller->widget(	'zii.widgets.jui.CJuiDatePicker', array(
-																					'model'=>$this,'attribute'=>$field->alias,
-																					'language'=>Yii::app()->getLanguage(),
-																					'htmlOptions'=>array('onclick'=>'$(this).datepicker( $.datepicker.regional["'.Yii::app()->getLanguage().'"]);$(this).datepicker().focus();')),true);
-								}
-
-
-
 
 							break;
 						}
 
 						if ( $field->is_filter == 0 && !isset($f['filter']) ) $f['filter'] = false;
-
 
 
 						$this->_tableFields[] = $f;
@@ -412,24 +401,35 @@ class Record extends CActiveRecord
 
 	public function getManufacturerFilter($manufacturer_id)
 	{
+        $name = "manufacturerFilterСache";
+
+        if ( isset(Yii::app()->params[$name]) ) return Yii::app()->params[$name];
+
 		if ( $this->_manufacturerFilter === null ){
 			if( is_numeric($manufacturer_id) ){
 				$this->_manufacturerFilter = Manufacturer::model()->findByPk($manufacturer_id)->descendants()->findAll();
 			} else {
 				$this->_manufacturerFilter = Manufacturer::model()->findAll();
 			}
+            Yii::app()->params[$name] = $this->_manufacturerFilter ;
 		}
 		return $this->_manufacturerFilter;
 	}
 
 	public function getCategoryFilter($category_id)
 	{
+        $name = "categoryFilterСache";
+
+        if ( isset(Yii::app()->params[$name]) ) return Yii::app()->params[$name];
+
 		if ( $this->_categoryFilter === null ){
 			if( is_numeric($category_id) ){
 				$this->_categoryFilter = Category::model()->findByPk($category_id)->descendants()->findAll();
 			} else {
 				$this->_categoryFilter = Category::model()->findAll();
 			}
+
+            Yii::app()->params[$name] = $this->_categoryFilter ;
 		}
 		return $this->_categoryFilter;
 	}
@@ -446,11 +446,11 @@ class Record extends CActiveRecord
 
     public function getRecordCategory($name, $sSep = ', ')
 	{
-       $aRes = array();
+        $aRes = array();
 
-       foreach ($this->{$name} as $item) {
-          $aRes[] = $item->name;
-       }
+        foreach ($this->{$name} as $item) {
+            $aRes[] = $item->name;
+        }
 
        return implode($sSep, $aRes);
     }
@@ -656,14 +656,16 @@ class Record extends CActiveRecord
 			foreach( $productFields as $field ){
 				switch( $field->field_type ){
 					case TypeField::LISTS :
-                        if ($field->listField->is_multiple_select)
-    						$relations[$field->alias.'Items'] = array(	self::MANY_MANY,
-																		'ListItem', 'RecordsLists(record_id, list_item_id)',
-																		'condition'=> $field->alias.'_ListItem.`product_id` = :product_id',
-																		'params' => array(":product_id" => $this->getProductID() ),
-																		'together'=>true
-																	);
-						else
+
+                        if ($field->listField->is_multiple_select) {
+                            $name = $field->alias.'Items';
+    						$relations[$name] = array(	self::MANY_MANY,
+														'ListItem', 'record_list(record_id, list_item_id)',
+														'condition'=> '`'.$name."_".$name.'`.`product_id` = :product_id',
+														'params' => array(":product_id" => $this->getProductID() ),
+														'together'=>true
+													);
+						} else
                             $relations[$field->alias.'Item'] = array( self::BELONGS_TO,'ListItem', $field->alias );
                     break;
 					case TypeField::CATEGORIES :
@@ -675,19 +677,20 @@ class Record extends CActiveRecord
 																'together'=>true
 															);
                         else
-                            $relations[$field->alias.'Category'] = array( self::BELONGS_TO,'Category', $field->alias );
+                            $relations[$field->alias.'Category'] = array( self::BELONGS_TO,'Category', $field->alias, 'select'=> "`{$field->alias}'_category`.`name`" );
                     break;
 
 					case TypeField::MANUFACTURER :
                         if ($field->manufacturerField->is_multiple_select)
     						$relations[$field->alias] = array(	self::MANY_MANY,
 																'Manufacturer', 'record_manufacturer(record_id, manufacturer_id)',
+                                                                'select'=> "`{$field->alias}'_manufacturer`.`name`",
 																'condition'=> $field->alias.'_manufacturer.`product_id` = :product_id',
 																'params' => array(":product_id" => $this->getProductID() ),
 																'together'=>true
 															);
                         else
-                            $relations[$field->alias.'Manufacturer'] = array( self::BELONGS_TO,'Manufacturer', $field->alias );
+                            $relations[$field->alias.'Manufacturer'] = array( self::BELONGS_TO,'Manufacturer', $field->alias, 'select'=> "`{$field->alias}'_manufacturer`.`name`" );
                     break;
 
     				case TypeField::DATETIME :
@@ -1010,6 +1013,10 @@ class Record extends CActiveRecord
 		foreach ($this->getProductFields() as $field) {
 			if ( $field->is_filter ){
 				switch( $field->field_type ){
+    				case TypeField::STRING:
+                        $name = $this->getTableAlias().'.'.$field->alias;
+						$criteria->compare($name, $this->{$field->alias},true);
+					break;
 					case TypeField::INTEGER:
 						$criteria->compare($field->alias, $this->{$field->alias});
 					break;
@@ -1033,7 +1040,7 @@ class Record extends CActiveRecord
 							$criteria->compare($field->alias, $this->{$field->alias});
 						}
 					break;
-					case TypeField::DATETIME && $this->{$field->alias}:
+					case TypeField::DATETIME :
 						$date = new DateTime($this->{$field->alias});
 						if( $field->dateTimeField->is_multiple_select ){
 							$criteria->compare($field->alias.'.id', $this->{$field->alias});

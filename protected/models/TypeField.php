@@ -170,4 +170,7 @@ class TypeField
 		}
 		return $return;
 	}
+    public static function getFieldName($fieldId){		
+		return self::$Fields[$fieldId]['name'];
+	}    
 }

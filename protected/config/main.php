@@ -36,7 +36,7 @@ return array(
             'newDirMode'    =>  0777,
         )
     ),
-	//'preload'=>array('log'),
+	'preload'=>array('log'),
 	// Компоненты
 	'components'=>array(
 
@@ -48,9 +48,12 @@ return array(
             ),
         ),
 
-//		'cache'=>array(
-//			'class'=>'system.caching.CApcCache',
-//		),
+		'cache1'=>array(
+			'class'=>'system.caching.CApcCache',
+            'class'=>'system.caching.CZendDataCache',
+            'class'=>'system.caching.CDbCache'
+            
+		),
 		// База
 		'db'=>array(
 			'connectionString' => 'mysql:host=localhost;dbname=enchikiben_fbfde',
