@@ -18,7 +18,7 @@ class ProductField extends CActiveRecord
 {
     public $subClass = null;
     public $subClassName = null;
-    
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
@@ -74,19 +74,19 @@ class ProductField extends CActiveRecord
 	{
 		return array(
             'product' => array(self::BELONGS_TO, 'Product', 'product_id'),
-            
+
             'booleanField' => array(self::HAS_ONE, 'BooleanField', 'field_id'),
             'categoryField' => array(self::HAS_ONE, 'CategoryField', 'field_id'),
             'dateTimeField' => array(self::HAS_ONE, 'DateTimeField', 'field_id'),
-            'doubleField' => array(self::HAS_ONE, 'DoubleField', 'field_id'),            
+            'doubleField' => array(self::HAS_ONE, 'DoubleField', 'field_id'),
             'imageField' => array(self::HAS_ONE, 'ImageField', 'field_id'),
             'integerField' => array(self::HAS_ONE, 'IntegerField', 'field_id'),
             'listField' => array(self::HAS_ONE, 'ListField', 'field_id'),
             'manufacturerField' => array(self::HAS_ONE, 'ManufacturerField', 'field_id'),
-            'priceField' => array(self::HAS_ONE, 'PriceField', 'field_id'),            
-            'stringField' => array(self::HAS_ONE, 'StringField', 'field_id'),            
+            'priceField' => array(self::HAS_ONE, 'PriceField', 'field_id'),
+            'stringField' => array(self::HAS_ONE, 'StringField', 'field_id'),
             'textField' => array(self::HAS_ONE, 'TextField', 'field_id'),
-            
+
             'tabs' => array(self::HAS_MANY, 'Tab', 'product_id'),
             'fieldTab' => array(self::HAS_ONE, 'FieldTab', 'field_id'),
 		);
@@ -116,12 +116,12 @@ class ProductField extends CActiveRecord
 
 	// форма в формате CForm
 	public function getCForm(){
-        
+
         $tab = '<ul class="nav nav-tabs">
                     <li class="active"><a href="#field" data-toggle="tab">Поле</a></li>
                     <li><a href="#admin" data-toggle="tab">Администрирование</a></li>
-                </ul>';   
-           
+                </ul>';
+
     	if ( $this->isNewRecord && $this->field_type ){
 			$this->subClassName = TypeField::$Fields[$this->field_type]['class'];
 			$this->subClass = $this->CreateField($this->field_type);
@@ -148,11 +148,11 @@ class ProductField extends CActiveRecord
                 $tab,
                 '<div class="tab-content">',
                     '<div id="field" class="tab-pane active">',
-                        
+
         				'field_type'=>array(
         					'type' => 'dropdownlist',
         					'items' => TypeField::getFieldsList(),
-        					'empty'=> '',        
+        					'empty'=> '',
         					'ajax' => array(
                                 'url' => "",
         						'type' => 'POST',
@@ -187,10 +187,10 @@ class ProductField extends CActiveRecord
         					'type'=>'text',
         					'maxlength'=>255
         				),
-                       
+
                         $this->subClassName => ( $this->subClass ? $this->subClass->getElementsMotelCForm() : null ),
                     '</div>',
-                
+
                     '<div id="admin" class="tab-pane">',
                         'is_editing_table_admin'=>array(
                     		'type'=>'checkbox',
@@ -201,7 +201,7 @@ class ProductField extends CActiveRecord
         					'layout'=>'{input}{label}{error}{hint}',
         				),
                     '</div>',
-                
+
                 '</div>'
 			),
 
@@ -214,11 +214,11 @@ class ProductField extends CActiveRecord
 				),
 			),
 		);
-        
+
         $form = new CForm($arForm,$this);
-        
+
         if ( $this->subClass ) $form[$this->subClassName]->model = $this->subClass;
-        
+
         return $form;
 	}
 
@@ -232,15 +232,15 @@ class ProductField extends CActiveRecord
 
 	public function afterSave(){
 		parent::afterSave();
-                
+
 		${$this->product->alias} = $this->product->getRecordObject();
 
 		if ( $this->subClass ) {
-            
+
             // чтобы сохранять значение
             if( $this->subClass && isset($_POST[$this->subClassName]) )
                 $this->subClass->attributes = $_POST[$this->subClassName];
-            
+
 			$this->subClass->field_id = $this->id;
 			if ( $this->subClass->save() ){
 
@@ -272,14 +272,14 @@ class ProductField extends CActiveRecord
 		parent::afterDelete();
 		Yii::app()->db->createCommand()->dropColumn( $this->product->alias, $this->alias );
 	}
-    
+
     public function afterFind(){
         parent::afterFind();
-        
+
         if ( $this->field_type ){
 			$this->subClassName = TypeField::$Fields[$this->field_type]['class'];
 			$class = $this->CreateField($this->field_type);
-            $this->subClass = $class::model()->findByPk($this->id);            
-		}        
+            $this->subClass = $class::model()->findByPk($this->id);
+		}
     }
 }

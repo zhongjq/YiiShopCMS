@@ -16,9 +16,9 @@ class Record extends CActiveRecord
 	private $_categoryFilter = null;
     private $_productFieldsOrder = null;
 
-    
+
     public $productName = null;
-    
+
     public static function model($className=__CLASS__)
 	{
     	eval("class ".$className." extends Record{}");
@@ -31,9 +31,9 @@ class Record extends CActiveRecord
 
         $this->productName = get_class($this);
         $this->setProduct();
-        
-        $this->getProductFields(); 
-        
+
+        $this->getProductFields();
+
         Yii::setPathOfAlias('files', Yii::getPathOfAlias('webroot')."/data/".$this->productName."/");
     	Yii::setPathOfAlias('url', Yii::app()->baseUrl."/data/".$this->productName."/");
 	}
@@ -65,21 +65,21 @@ class Record extends CActiveRecord
 	{
 		return $this->_product->id;
 	}
-    
+
     private function setProduct(){
         $this->_product = Product::model()->with('productFields')->find(array('condition'=>'t.alias = :alias','params'=>array(':alias'=> $this->productName )));
     }
-    
+
 	public function getProductFields($update = false)
 	{
-        
+
 		if( isset(Yii::app()->params[$this->tableName()]) && !$update ) return Yii::app()->params[$this->tableName()];
 
 		if ( ($this->_productFields === null && !$update) || $update ) {
 
 			if ( $this->_product ){
 				$this->_productFields = $this->_product->productFields();
-				
+
 				if ( $this->_productFields ){
 					foreach ($this->_productFields as $field) {
 						if ( $field->is_column_table )
@@ -95,7 +95,7 @@ class Record extends CActiveRecord
 								break;
     							case TypeField::DOUBLE:
 									$this->_with['doubleField'] = 'doubleField';
-								break;                                
+								break;
 								case TypeField::PRICE:
 									$this->_with['priceField'] = 'priceField';
 								break;
@@ -117,13 +117,13 @@ class Record extends CActiveRecord
 							}
 					}
                     $this->_with['fieldTab'] = 'fieldTab';
-                    
+
                     $criteria = new CDbCriteria;
                     $criteria->condition = 'product_id=:product_id';
                     $criteria->with = $this->_with;
                     $criteria->params = array(':product_id'=>$this->getProductID());
                     if ( $this->getProductFieldsOrder() ) $criteria->order = $this->getProductFieldsOrder();
-                    
+
 					$this->_productFields = ProductField::model()->findAll($criteria);
 				}
 
@@ -152,14 +152,14 @@ class Record extends CActiveRecord
     public function getProductFieldsOrder(){
     	return $this->_productFieldsOrder;
 	}
-    
+
 	public function getTableFields($update = false)
 	{
 
 		if ( $this->_tableFields === null && $update === false ){
             $this->setProductFieldsOrder("t.position");
 			$productFields = $this->getProductFields(true);
-            
+
 			if ( $productFields ){
 				foreach( $productFields as $field ){
 					if( $field->is_column_table ){
@@ -179,7 +179,7 @@ class Record extends CActiveRecord
                                                                                 array("empty"=>"")
                                                                                 );
 								}
-							break;                            
+							break;
 							case TypeField::LISTS:
 								if ($field->listField->is_multiple_select)
 									$f['value'] = '$data->getRecordItems("'.$field->alias.'Items")';
@@ -211,8 +211,8 @@ class Record extends CActiveRecord
                                                                                 $listData,
                                                                                 $htmlOptions
                                                                                 );
-                                    
-                                    
+
+
 								}
 							break;
 							case TypeField::DATETIME:
@@ -259,56 +259,56 @@ class Record extends CActiveRecord
 
     public function getAdminTableFields($update = false)
 	{
-        
+
 		if ( $this->_tableFields === null && $update === false ){
             $this->setProductFieldsOrder("t.position");
 			$productFields = $this->getProductFields(true);
-            
+
 			if ( $productFields ){
 				foreach( $productFields as $field ){
-                    
+
 					if( $field->is_column_table_admin ){
 						$f['name'] = $field->alias;
-                        
+
                         if ( $field->is_editing_table_admin ) {
                             $name = $this->productName.'[$data->id]['.$field->alias.']';
-                            
+
                             $f['type']='raw';
-                            $f['value'] = 'CHtml::textField("'.$name.'",$data->'.$field->alias.',array("class"=>"filter_price"));';                                                                 
-                        } 
-                        
+                            $f['value'] = 'CHtml::textField("'.$name.'",$data->'.$field->alias.',array("class"=>"filter_price"));';
+                        }
+
 						switch( $field->field_type ){
 							case TypeField::PRICE:
 								if ( !$field->is_editing_table_admin ) {
                                     $f['type']='text';
-                                    $f['value'] = '$data->'.$field->alias;                                                                 
-                                } 
-								
+                                    $f['value'] = '$data->'.$field->alias;
+                                }
+
 							break;
     						case TypeField::STRING:
-							 
+
     							if ( !$field->is_editing_table_admin ) {
                                     $f['type']='text';
-                                    $f['value'] = '$data->'.$field->alias;                                                                 
-                                }                                
-                                
-							break;                            
+                                    $f['value'] = '$data->'.$field->alias;
+                                }
+
+							break;
     						case TypeField::BOOLEAN:
-                                
+
     							if ( $field->is_editing_table_admin ) {
                                     $f['type']='raw';
-                                    $f['value'] = 'CHtml::dropDownList("'.$name.'",$data->'.$field->alias.',array(1=>"Yes",0=>"No"),array("empty"=>""));';                                                                 
-                                }                                 
-                                
-                                
+                                    $f['value'] = 'CHtml::dropDownList("'.$name.'",$data->'.$field->alias.',array(1=>"Yes",0=>"No"),array("empty"=>""));';
+                                }
+
+
 								if ( $field->is_filter ) {
     								$f['filter'] = CHtml::activeDropDownList(   $this,
                                                                                 $field->alias,
-                                                                                array(1=>"Yes",0=>"No"),
+                                                                                BooleanField::getValues(),
                                                                                 array("empty"=>"")
                                                                                 );
 								}
-							break;                            
+							break;
 							case TypeField::LISTS:
 								if ($field->listField->is_multiple_select)
 									$f['value'] = '$data->getRecordItems("'.$field->alias.'Items")';
@@ -316,23 +316,23 @@ class Record extends CActiveRecord
 									$f['value'] = 'isset($data->'.$field->alias.'Item) ? $data->'.$field->alias.'Item->name : null';
 							break;
 							case TypeField::CATEGORIES:
-                               
+
                                 if ($field->categoryField->is_multiple_select){
                                     $name = $name.'[]';
                                 }
-                                
+
                                  if ( $field->is_editing_table_admin ) {
                                     $multiple = 'array()';
-                                    if ($field->categoryField->is_multiple_select) $multiple = 'array("multiple"=>true,"class"=>"chzn-select")';                                
-                               
+                                    if ($field->categoryField->is_multiple_select) $multiple = 'array("multiple"=>true,"class"=>"chzn-select")';
+
                                     $f['type']='raw';
     								$f['value'] = 'CHtml::dropDownList("'.$name.'",
                                                                         $data->'.$field->alias.', CHtml::listData($data->getCategoryFilter('.$field->categoryField->category_id.') , "id", "name"),
                                                                         '.$multiple.'
-                                                                            );';                        
+                                                                            );';
 
                                 }
-                                
+
 								if ( $field->is_filter ) {
 									$f['filter'] = CHtml::listData($this->getCategoryFilter($field->categoryField->category_id) , 'id', 'name');
 								}
@@ -347,7 +347,7 @@ class Record extends CActiveRecord
     							$f['value'] = 'CHtml::dropDownList("'.$name.'",
                                                                     $data->'.$field->alias.', CHtml::listData($data->getManufacturerFilter('.$field->manufacturerField->manufacturer_id.') , "id", "name"),
                                                                     '.$multiple.'
-                                                                        );'; 
+                                                                        );';
 
 								if ( $field->is_filter ) {
                                     $listData = CHtml::listData($this->getManufacturerFilter($field) , 'id', 'name') ;
@@ -358,8 +358,8 @@ class Record extends CActiveRecord
                                                                                 $listData,
                                                                                 $htmlOptions
                                                                                 );
-                                    
-                                    
+
+
 								}
 							break;
 							case TypeField::DATETIME:
@@ -389,17 +389,17 @@ class Record extends CActiveRecord
 																					'language'=>Yii::app()->getLanguage(),
 																					'htmlOptions'=>array('onclick'=>'$(this).datepicker( $.datepicker.regional["'.Yii::app()->getLanguage().'"]);$(this).datepicker().focus();')),true);
 								}
-                                
-    							                               
-                                
-                                
+
+
+
+
 							break;
 						}
 
 						if ( $field->is_filter == 0 && !isset($f['filter']) ) $f['filter'] = false;
-                        
 
-                                
+
+
 						$this->_tableFields[] = $f;
 						unset($f);
 					}
@@ -425,7 +425,7 @@ class Record extends CActiveRecord
 	public function getCategoryFilter($category_id)
 	{
 		if ( $this->_categoryFilter === null ){
-			if( is_numeric($category_id) ){                
+			if( is_numeric($category_id) ){
 				$this->_categoryFilter = Category::model()->findByPk($category_id)->descendants()->findAll();
 			} else {
 				$this->_categoryFilter = Category::model()->findAll();
@@ -516,10 +516,10 @@ class Record extends CActiveRecord
 				),
 			),
 		);
-                
+
 		return new CForm($form,$this);
 	}
-  
+
     public function getFormField($field){
         $return = array($field->alias => TypeField::getFieldFormData($field->field_type) );
 
@@ -604,7 +604,7 @@ class Record extends CActiveRecord
 		}
 
         return $return;
-    }  
+    }
 
     protected function searchForId($id, $array) {
        foreach ($array as $key => $val) {
@@ -616,9 +616,9 @@ class Record extends CActiveRecord
     }
 
     public function getTabsFormElements($isEdit = true){
-        
+
     	$arTabs = array(array("id"=>0,"position"=>0,"name"=>"Общее","content"=>array(),'htmlOptions'=>array('class'=>'active')));
-        $tabs = $this->getProductTab();        
+        $tabs = $this->getProductTab();
         if ( !empty($tabs) ){
             foreach($tabs as $tab){
                 $arTabs[] = array("id"=>$tab->id,"position"=>$tab->position,"name"=>$tab->name,"content"=>array(),'productId'=> $isEdit ? $this->getProductID() : null );
@@ -628,9 +628,9 @@ class Record extends CActiveRecord
         $fields = $this->getProductFields(true);
         if ( $fields ){
             foreach($fields as $field){
-                
+
                 $id = $this->searchForId( $field->fieldTab->tab_id > 0 ? $field->fieldTab->tab_id : 0 , $arTabs);
-                       
+
                 if( isset( $arTabs[$id] ) ){
                     $field = $this->getFormField($field);
                     $arTabs[$id]['content'][key($field)] = $field[key($field)];
@@ -816,7 +816,7 @@ class Record extends CActiveRecord
 									$RecordCategory->record_id = $this->id;
 									$RecordCategory->category_id = $category_id;
 									if ( !$RecordCategory->save() ) {
-                                       
+
                                         throw new CException("ERROR SEVE CATEGORIES ".$RecordCategory->category_id );
 									}
 								}
@@ -916,14 +916,14 @@ class Record extends CActiveRecord
 					break;
     				case TypeField::DOUBLE :
 						$rules[] = array($field->alias, 'numerical', );
-                        
-                        if ( $field->doubleField->decimal ){                            
+
+                        if ( $field->doubleField->decimal ){
             				$rules[] = array($field->alias, 'match', 'pattern'=>'/^\s*[-+]?[0-9]*\.?[0-9]{1,'.$field->doubleField->decimal.'}?\s*$/',
     											'message' => Yii::t("fields",'Price has the wrong format (eg 10.50).')
-    										);                            
-                        }                      
-                        
-					break;                    
+    										);
+                        }
+
+					break;
 					case TypeField::PRICE:
 
 						$rules[] = array($field->alias, 'match', 'pattern'=>'/^\s*[-+]?[0-9]*\.?[0-9]{1,2}?\s*$/',
@@ -1006,7 +1006,7 @@ class Record extends CActiveRecord
 	{
 		$criteria = new CDbCriteria;
 		$criteria->with = $this->getRelationsNameArray();
-        
+
 		foreach ($this->getProductFields() as $field) {
 			if ( $field->is_filter ){
 				switch( $field->field_type ){
@@ -1015,7 +1015,7 @@ class Record extends CActiveRecord
 					break;
     				case TypeField::BOOLEAN:
 						$criteria->compare($field->alias, $this->{$field->alias});
-					break;                    
+					break;
 					case TypeField::PRICE:
 						$criteria->compare($field->alias, $this->{$field->alias});
 					break;
@@ -1065,10 +1065,10 @@ class Record extends CActiveRecord
 		}
 		return true;
 	}
-    
+
     public function getProductTab(){
         $this->getProductFields();
-        
+
         return Tab::model()->findAll(array(
             'order'=>'t.position',
             'condition'=>'product_id = :product_id',

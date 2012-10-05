@@ -12,6 +12,7 @@
  */
 class BooleanField extends CActiveRecord
 {
+
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
@@ -67,6 +68,11 @@ class BooleanField extends CActiveRecord
 		return array(
 			'default' => Yii::t('field','Default'),
 		);
+	}
+
+
+	public static function getValues(){
+		return array( 1 => Yii::t("main","Yes"), 0 => Yii::t("main","No") );
 	}
 
 	// форма в формате CForm

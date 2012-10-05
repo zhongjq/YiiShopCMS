@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Хост: mysql0.db.koding.com
--- Время создания: Окт 02 2012 г., 07:45
+-- Время создания: Окт 03 2012 г., 07:00
 -- Версия сервера: 5.1.61-log
 -- Версия PHP: 5.3.3
 
@@ -107,13 +107,6 @@ CREATE TABLE IF NOT EXISTS `datetime_field` (
   PRIMARY KEY (`field_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Дата время поле';
 
---
--- Дамп данных таблицы `datetime_field`
---
-
-INSERT INTO `datetime_field` (`field_id`, `type`, `format`, `is_multiple_select`) VALUES
-(22, 1, '', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -138,14 +131,14 @@ CREATE TABLE IF NOT EXISTS `disk` (
 --
 
 INSERT INTO `disk` (`id`, `alias`, `title`, `keywords`, `description`, `name`, `price`, `spikes`, `boom`) VALUES
-(1, '', '', '', '', 'Диск 1', '1111.00', 1, NULL),
-(2, '', '', '', '', 'Диск 2', '222.00', 1, NULL),
-(3, '', '', '', '', 'Диск 3', '123123.00', 0, NULL),
-(4, '', '', '', '', 'Диск 4', '123123.00', 0, NULL),
+(1, '', '', '', '', 'Диск 1', '1111.00', 1, 1),
+(2, '', '', '', '', 'Диск 2', '222.00', 1, 2),
+(3, '', '', '', '', 'Диск 3', '123123.00', 0, 5),
+(4, '', '', '', '', 'Диск 4', '123123.00', 0, 6),
 (7, '', '', '', '', 'Диск 2', '222.00', 0, NULL),
-(22, '', '', '', '', 'Диск 2', '1111.00', 0, NULL),
-(23, '', '', '', '', 'Диск тест 123', '3213123.00', 1, NULL),
-(24, '', '', '', '', 'Диск тест 123', '3213123.00', 1, 1.2);
+(22, '', '', '', '', 'Диск 2', '1111.00', 0, 3),
+(23, '', '', '', '', 'Диск тест 1', '3213123.00', 1, NULL),
+(24, '', '', '', '', 'Диск тест 2', '3213123.00', 1, 1.2);
 
 -- --------------------------------------------------------
 
@@ -187,10 +180,7 @@ CREATE TABLE IF NOT EXISTS `field_tab` (
 INSERT INTO `field_tab` (`field_id`, `tab_id`, `position`) VALUES
 (5, NULL, 1),
 (6, NULL, 2),
-(7, NULL, 3),
-(8, 7, 3),
-(21, 7, 2),
-(22, 7, 0);
+(7, NULL, 3);
 
 -- --------------------------------------------------------
 
@@ -511,15 +501,14 @@ CREATE TABLE IF NOT EXISTS `product_field` (
 INSERT INTO `product_field` (`id`, `position`, `product_id`, `field_type`, `name`, `alias`, `is_mandatory`, `is_filter`, `is_column_table`, `unit_name`, `hint`, `is_editing_table_admin`, `is_column_table_admin`) VALUES
 (1, 0, 1, 2, 'Наименование', 'name', 1, 0, 1, '', 'Наименование шины', 1, 1),
 (2, 1, 1, 3, 'Цена', 'price', 1, 1, 1, 'р.', '', 1, 1),
-(3, 3, 1, 7, 'Производитель', 'manufacturer', 1, 1, 1, '', '', 0, 0),
+(3, 3, 1, 7, 'Производитель', 'manufacturer', 1, 1, 1, '', '', 1, 1),
 (4, 2, 1, 6, 'Категория', 'category', 1, 1, 1, '', '', 1, 1),
-(5, 0, 2, 2, 'Наименование', 'name', 1, 1, 1, '', '', 0, 0),
-(6, 1, 2, 3, 'Цена', 'price', 1, 1, 1, '', '', 0, 0),
-(7, 4, 2, 6, 'Категория', 'category', 0, 0, 1, '', '', 0, 0),
-(8, 2, 2, 7, 'Производитель', 'manufacturer', 1, 1, 1, '', '', 0, 0),
-(21, 3, 2, 11, 'Шипы', 'spikes', 0, 1, 1, '', '', 0, 0),
-(22, 5, 2, 12, 'Дата доставки', 'date', 0, 0, 0, '', '', 0, 0),
-(23, 0, 2, 10, 'Вылет', 'boom', 0, 0, 1, '', '', 0, 0),
+(5, 0, 2, 2, 'Наименование', 'name', 1, 1, 1, '', '', 1, 1),
+(6, 1, 2, 3, 'Цена', 'price', 1, 1, 1, '', '', 1, 1),
+(7, 4, 2, 6, 'Категория', 'category', 0, 0, 1, '', '', 1, 1),
+(8, 2, 2, 7, 'Производитель', 'manufacturer', 1, 1, 1, '', '', 1, 1),
+(21, 3, 2, 11, 'Шипы', 'spikes', 0, 1, 1, '', '', 1, 1),
+(23, 0, 2, 10, 'Вылет', 'boom', 0, 0, 1, '', '', 1, 1),
 (28, 0, 1, 1, 'Количество', 'count', 0, 0, 1, '', 'шт.', 1, 1);
 
 -- --------------------------------------------------------
@@ -541,10 +530,9 @@ CREATE TABLE IF NOT EXISTS `record_category` (
 --
 
 INSERT INTO `record_category` (`product_id`, `record_id`, `category_id`) VALUES
+(2, 7, 6),
 (2, 1, 6),
 (2, 2, 5),
-(2, 2, 6),
-(2, 7, 6),
 (2, 22, 6),
 (2, 4, 7),
 (2, 3, 6),
@@ -617,13 +605,10 @@ CREATE TABLE IF NOT EXISTS `record_manufacturer` (
 
 INSERT INTO `record_manufacturer` (`product_id`, `record_id`, `manufacturer_id`) VALUES
 (2, 1, 9),
-(2, 1, 10),
-(2, 1, 11),
 (2, 2, 10),
 (2, 22, 9),
 (2, 4, 10),
 (2, 3, 10),
-(2, 3, 11),
 (2, 23, 10),
 (2, 24, 10);
 
@@ -664,13 +649,6 @@ CREATE TABLE IF NOT EXISTS `tab` (
   KEY `fk_tab_field_tab1_idx` (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=10 ;
 
---
--- Дамп данных таблицы `tab`
---
-
-INSERT INTO `tab` (`id`, `product_id`, `position`, `name`) VALUES
-(7, 2, 2, 'Размеры');
-
 -- --------------------------------------------------------
 
 --
@@ -710,7 +688,7 @@ CREATE TABLE IF NOT EXISTS `tires` (
 --
 
 INSERT INTO `tires` (`id`, `alias`, `title`, `keywords`, `description`, `name`, `price`, `manufacturer`, `category`, `count`) VALUES
-(1, 'asdasd', '', '', '', 'Bridgestone Ice Cruiser 7000 235/70 R16 T', '7202.00', 2, 3, NULL),
+(1, 'asdasd', '', '', '', 'Bridgestone Ice Cruiser 7000 235/70 R16 T', '7202.00', 1, 3, NULL),
 (2, '', '', '', '', 'Bridgestone IC7000 185/65 R15 88T', '3690.00', 1, 3, NULL),
 (3, '', NULL, NULL, NULL, 'Nokian Hakkapeliitta R SUV', '324.00', 2, 2, NULL),
 (4, '', NULL, NULL, NULL, 'шина 2', '4345.00', 3, 2, NULL),
