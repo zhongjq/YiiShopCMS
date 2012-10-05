@@ -54,10 +54,14 @@ $this->widget('zii.widgets.grid.CGridView', array(
 		),
 		'name',
 		'alias',
+        array(
+			"name"=>'field_type',
+            'value'=>'TypeField::getFieldName($data->field_type)'
+		),        
 		array(
 			"name"=>'is_mandatory',
-			'value'=> '$data->is_mandatory ? Yii::t("main","Yes") : Yii::t("main","No")'
-		),
+			'value'=>'$data->is_mandatory ? Yii::t("main","Yes") : Yii::t("main","No")'
+		),        
 		array(
 			"name"=>'is_filter',
 			'value'=> '$data->is_filter ? Yii::t("main","Yes") : Yii::t("main","No")'

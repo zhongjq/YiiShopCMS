@@ -82,24 +82,6 @@ class Product extends CActiveRecord
 		);
 	}
 
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		$criteria=new CDbCriteria;
-
-		$criteria->compare('ID',$this->ID);
-		$criteria->compare('Status',$this->Status);
-		$criteria->compare('Name',$this->Name,true);
-		$criteria->compare('Alias',$this->Alias,true);
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
-	}
-
 	public function saveProductsFields( array $ProductsFields ){
 
 		if ( !empty($ProductsFields) ) {
@@ -204,7 +186,6 @@ class Product extends CActiveRecord
 
 	public function getRecordObject($scenario = "add"){
 		$record = Record::model($this->alias);
-        $record->setProductID($this->id);
         $record->setScenario($scenario);
         return $record;
 	}
