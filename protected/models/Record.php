@@ -316,7 +316,15 @@ class Record extends CActiveRecord
 								if ($field->listField->is_multiple_select)
 									$f['value'] = '$data->getRecordItems("'.$field->alias.'Items")';
 								else
-									$f['value'] = 'isset($data->'.$field->alias.'Item) ? $data->'.$field->alias.'Item->name : null';
+									$f['value'] = 'CHtml::dropDownList(	"'.$name.'",
+																		$data->'.$field->alias.',
+																		CHtml::listData($data->getListFilter('.$field->listField->list_id.') , "id", "name"),
+																		array("empty"=>""));';
+
+								if ( $field->is_filter ) {
+									$f['filter'] = CHtml::listData( $this->getListFilter($field->listField->list_id) , 'id', 'name');
+								}
+
 							break;
 
 							case TypeField::CATEGORIES:
@@ -397,6 +405,20 @@ class Record extends CActiveRecord
 		}
 
 		return $this->_tableFields;
+	}
+
+
+	public function getListFilter($list_id)
+	{
+        $name = "listFilterСache_".$list_id;
+
+        if ( isset(Yii::app()->params[$name]) ) return Yii::app()->params[$name];
+
+		if( is_numeric($list_id) ){
+			Yii::app()->params[$name] = ListItem::model()->findAll('list_id = :list_id', array(":list_id"=>$list_id) );
+		}
+
+		return Yii::app()->params[$name];
 	}
 
 	public function getManufacturerFilter($manufacturer_id)
@@ -655,7 +677,7 @@ class Record extends CActiveRecord
     	if ( $productFields ){
 			foreach( $productFields as $field ){
 				switch( $field->field_type ){
-					case TypeField::LISTS :
+					case TypeField::LISTS && $field->listField:
 
                         if ($field->listField->is_multiple_select) {
                             $name = $field->alias.'Items';

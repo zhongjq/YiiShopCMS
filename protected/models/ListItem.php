@@ -46,7 +46,7 @@ class ListItem extends CActiveRecord
 			array('name', 'length', 'max'=>255, 'on' => 'add, edit'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('ID, list_id, status, priority, name', 'safe', 'on'=>'search'),
+			array('id, list_id, status, priority, name', 'safe', 'on'=>'search'),
 		);
 	}
 
