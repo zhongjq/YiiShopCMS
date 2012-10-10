@@ -15,8 +15,12 @@ class ConstructorController extends Controller
 
 	public function actionIndex()
 	{
-        $products = new CActiveDataProvider('Product',array('pagination'=>array('pageSize'=>'20')));
-
+        //$products = new CActiveDataProvider('Product',array('pagination'=>array('pageSize'=>'20')));
+        
+        $products = Product::model()->findAll();
+        
+        $products = new CArrayDataProvider($products);
+        
 		$this->render('index', array(
 			'products' => $products
 		));
@@ -24,9 +28,8 @@ class ConstructorController extends Controller
 
 	public function actionCreate()
 	{
-
-		$product = new Product('create');
-
+		$product = new Product();
+        
 		$this->performAjaxValidation($product);
 
 		$form = $product->getMotelCForm();

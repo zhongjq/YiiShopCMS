@@ -2,7 +2,7 @@
 
 class Record extends CActiveRecord
 {
-
+    private $_model = array();
     private $_attributes=array();
 	private $_productId = null;
 	private $_product = null;
@@ -17,24 +17,25 @@ class Record extends CActiveRecord
 
     public $productName = null;
     public $data = null;
-
+  
     public static function model($className=__CLASS__)
-	{
-    	eval("class ".$className." extends Record{}");
-		return parent::model($className);
+    {
+        eval("class ".$className." extends Record{}");
+		//return parent::model($className);      
+        return new $className();
 	}
 
     public function __construct($scenario = 'add')
 	{
-		parent::__construct($scenario);
 
-        $this->productName = get_class($this);
-        $this->setProduct();
+        echo $this->productName = get_class($this);        
 
         $this->getProductFields();
 
         Yii::setPathOfAlias('files', Yii::getPathOfAlias('webroot')."/data/".$this->productName."/");
     	Yii::setPathOfAlias('url', Yii::app()->baseUrl."/data/".$this->productName."/");
+        
+        parent::__construct($scenario);
 	}
 
 
@@ -43,7 +44,7 @@ class Record extends CActiveRecord
 		try {
 			return parent::__get($name);
 		} catch (Exception $exc) {
-            $name = strtolower($name);
+            //$name = strtolower($name);
             if( isset($this->_attributes[$name]) )
                 return $this->_attributes[strtolower($name)];
             else
@@ -56,7 +57,8 @@ class Record extends CActiveRecord
 		try {
 			parent::__set($name,$value);
 		} catch (Exception $exc) {
-			return $this->_attributes[strtolower($name)] = $value;
+            //$name = strtolower($name);
+			return $this->_attributes[$name] = $value;
 		}
 	}
 
@@ -83,7 +85,9 @@ class Record extends CActiveRecord
 		if ( isset(Yii::app()->params[$this->tableName()]) && $update === false ) return Yii::app()->params[$this->tableName()];
 
 		if ( $this->_productFields === null || $update === true ) {
-
+            
+            if ( !$this->_product ) $this->setProduct();
+            
 			if ( $this->_product ){
 				$this->_productFields = $this->_product->productFields();
 
@@ -304,7 +308,9 @@ class Record extends CActiveRecord
 
     							if ( $field->is_editing_table_admin ) {
                                     $f['type']='raw';
-                                    $f['value'] = 'CHtml::dropDownList("'.$name.'",$data->'.$field->alias.',array(1=>"Yes",0=>"No"),array("empty"=>""));';
+                                    $htmlOptions = '';
+                                    if ( !$field->is_mandatory ) $htmlOptions = 'array("empty"=>"")';
+                                    $f['value'] = 'CHtml::dropDownList("'.$name.'",$data->'.$field->alias.',array(1=>"Yes",0=>"No"),'.$htmlOptions.');';
                                 }
 
 
@@ -313,14 +319,31 @@ class Record extends CActiveRecord
 								}
 							break;
 							case TypeField::LISTS:
-								if ($field->listField->is_multiple_select)
-									$f['value'] = '$data->getRecordItems("'.$field->alias.'Items")';
-								else
-									$f['value'] = 'CHtml::dropDownList(	"'.$name.'",
-																		$data->'.$field->alias.',
-																		CHtml::listData($data->getListFilter('.$field->listField->list_id.') , "id", "name"),
-																		array("empty"=>""));';
-
+                                
+                                if ( $field->is_editing_table_admin ) {
+                                    $f['type']='raw';
+                                    
+                                    $multiple = 'array()';
+                                    if ($field->listField->is_multiple_select){
+                                        $name = $name.'[]';
+                                        $multiple = 'array("multiple"=>true,"class"=>"chzn-select")';
+                                    }
+    
+                                    $f['value'] = 'CHtml::dropDownList("'.$name.'", $data->'.$field->alias.',
+                                                                            CHtml::listData($data->getListFilter('.$field->listField->list_id.') , "id", "name"),
+                                                                            '.$multiple.'
+                                                                            );';
+                                    
+                                                                        
+                                } else {
+                                    
+        							if ($field->listField->is_multiple_select)
+    									$f['value'] = '$data->getRecordItems("'.$field->alias.'")';
+    								else
+    									$f['value'] = 'isset($data->'.$field->alias.') ? $data->'.$field->alias.'->name : null';                                    
+                                    
+                                }
+                                
 								if ( $field->is_filter ) {
 									$f['filter'] = CHtml::listData( $this->getListFilter($field->listField->list_id) , 'id', 'name');
 								}
@@ -563,7 +586,7 @@ class Record extends CActiveRecord
     			if ( $field->listField->is_multiple_select ){
 
 					$selected = array();
-					if ( $this->{$field->alias."Items"} ) {
+					if ( $this->{$field->alias} ) {
 						foreach( $this->{$field->alias."Items"} as $Item ){
 							$selected[] = $Item->id;
 						}
@@ -680,23 +703,25 @@ class Record extends CActiveRecord
 					case TypeField::LISTS && $field->listField:
 
                         if ($field->listField->is_multiple_select) {
-                            $name = $field->alias.'Items';
+                            $name = $field->alias;
     						$relations[$name] = array(	self::MANY_MANY,
 														'ListItem', 'record_list(record_id, list_item_id)',
+                                                        
 														'condition'=> '`'.$name."_".$name.'`.`product_id` = :product_id',
 														'params' => array(":product_id" => $this->getProductID() ),
-														'together'=>true
+														//'together'=>true
 													);
 						} else
-                            $relations[$field->alias.'Item'] = array( self::BELONGS_TO,'ListItem', $field->alias );
+                            $relations[$field->alias] = array( self::BELONGS_TO,'ListItem', $field->alias );
                     break;
 					case TypeField::CATEGORIES :
                         if ($field->categoryField->is_multiple_select)
     						$relations[$field->alias] = array(	self::MANY_MANY,
 																'Category', 'record_category(record_id, category_id)',
+                                                                'select'=> "`{$field->alias}'_category`.`name`",
 																'condition'=> $field->alias.'_category.`product_id` = :product_id',
 																'params' => array(":product_id" => $this->getProductID() ),
-																'together'=>true
+																'together' => true
 															);
                         else
                             $relations[$field->alias.'Category'] = array( self::BELONGS_TO,'Category', $field->alias, 'select'=> "`{$field->alias}'_category`.`name`" );
@@ -709,7 +734,7 @@ class Record extends CActiveRecord
                                                                 'select'=> "`{$field->alias}'_manufacturer`.`name`",
 																'condition'=> $field->alias.'_manufacturer.`product_id` = :product_id',
 																'params' => array(":product_id" => $this->getProductID() ),
-																'together'=>true
+																'together' => true
 															);
                         else
                             $relations[$field->alias.'Manufacturer'] = array( self::BELONGS_TO,'Manufacturer', $field->alias, 'select'=> "`{$field->alias}'_manufacturer`.`name`" );
@@ -824,7 +849,7 @@ class Record extends CActiveRecord
 									$RecordList->product_id = $this->getProductID();
 									$RecordList->record_id = $this->id;
 									$RecordList->list_item_id = $list_item_id;
-									if ( !$RecordList->save() ) throw new CException("ERROR SEVE LISTS");
+									if ( !$RecordList->save() ) throw new CException("ERROR SAVE LISTS");
 								}
 							}
 						}
@@ -841,7 +866,6 @@ class Record extends CActiveRecord
 									$RecordCategory->record_id = $this->id;
 									$RecordCategory->category_id = $category_id;
 									if ( !$RecordCategory->save() ) {
-
                                         throw new CException("ERROR SEVE CATEGORIES ".$RecordCategory->category_id );
 									}
 								}
@@ -983,7 +1007,9 @@ class Record extends CActiveRecord
 
 					break;
     				case TypeField::BOOLEAN :
-						$rules[] = array($field->alias, 'boolean', 'allowEmpty'=> $field->is_mandatory );
+						$rules[] = array($field->alias, 'boolean', 'falseValue'=> 0, 'trueValue' => 1, 'allowEmpty'=> true );
+                        if ( $field->booleanField->default )
+                            $rules[] = array($field->alias, 'default', 'value'=> $field->booleanField->default );
 					break;
         			case TypeField::DATETIME :
 						if ( $field->dateTimeField->is_multiple_select )

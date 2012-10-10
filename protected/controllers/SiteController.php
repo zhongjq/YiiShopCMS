@@ -15,6 +15,18 @@ class SiteController extends Controller
     }
 
 
+    /**
+	 * Index action is the default action in a controller.
+	 */
+	public function actionTest()
+	{		
+        $model = DynamicActiveRecord::model('tires');
+        
+        //$model::model('tires')->findAll();
+        
+        $this->renderPartial('test', array('model'=> $model ));
+	}
+
 	/**
 	 * Index action is the default action in a controller.
 	 */

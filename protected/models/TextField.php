@@ -12,59 +12,39 @@
  * The followings are the available model relations:
  * @property ProductsFields $field
  */
-class TextField extends CActiveRecord
+class TextField extends Field
 {
-	/**
-	 * Returns the static model of the specified AR class.
-	 * @param string $className active record class name.
-	 * @return TextFields the static model class
-	 */
-	public static function model($className=__CLASS__)
-	{
-		return parent::model($className);
-	}
-
-	/**
-	 * @return string the associated database table name
-	 */
-	public function tableName()
+    public $field_id;
+    public $min_length;
+    public $max_length;
+    public $rows;
+    
+	public static function tableName()
 	{
 		return 'text_field';
 	}
 
-	/**
-	 * @return array validation rules for model attributes.
-	 */
+    public static function selectCol(){
+        $return = array( 
+                self::tableName().'.field_id as '.self::tableName().'_field_id',
+                self::tableName().'.min_length as '.self::tableName().'_min_length',
+                self::tableName().'.max_length as '.self::tableName().'_max_length',
+                self::tableName().'.rows as '.self::tableName().'_rows',
+            );
+        
+        return $return;
+    }
+
 	public function rules()
 	{
-		// NOTE: you should only define rules for those attributes that
-		// will receive user inputs.
 		return array(
 			array('min_length, max_length, rows', 'required', 'on'=>'add'),
 			array('field_id, min_length, max_length, rows', 'required', 'on'=>'edit'),
 			array('field_id, min_length, max_length, rows', 'numerical', 'integerOnly'=>true),
-			// The following rule is used by search().
-			// Please remove those attributes that should not be searched.
-			array('field_id, min_length, max_length, rows', 'safe', 'on'=>'search'),
 		);
 	}
 
-	/**
-	 * @return array relational rules.
-	 */
-	public function relations()
-	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
-		return array(
-			'field' => array(self::BELONGS_TO, 'product_field', 'field_id'),
-		);
-	}
-
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
+	public function attributeNames()
 	{
 		return array(
 			'min_length' => Yii::t('fields','Min length'),
@@ -73,6 +53,14 @@ class TextField extends CActiveRecord
 		);
 	}
 
+    protected function setAttr($params){
+        parent::setAttr($params);
+        
+        $this->field_id = $params[self::tableName().'_field_id'];
+        $this->min_length = $params[self::tableName().'_min_length'];
+        $this->max_length = $params[self::tableName().'_max_length'];
+        $this->rows = $params[self::tableName().'_rows'];
+    }
 
 	// форма в формате CForm
 	public function getElementsMotelCForm(){

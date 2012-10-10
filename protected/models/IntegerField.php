@@ -11,66 +11,52 @@
  * The followings are the available model relations:
  * @property ProductsFields $field
  */
-class IntegerField extends CActiveRecord
+class IntegerField extends Field 
 {
-	/**
-	 * Returns the static model of the specified AR class.
-	 * @param string $className active record class name.
-	 * @return StringFields the static model class
-	 */
-	public static function model($className=__CLASS__)
-	{
-		return parent::model($className);
-	}
+    public $field_id;
+    public $min_value;
+    public $max_value;
 
-	/**
-	 * @return string the associated database table name
-	 */
-	public function tableName()
+	public static function tableName()
 	{
 		return 'integer_field';
 	}
 
-	/**
-	 * @return array validation rules for model attributes.
-	 */
+    public static function selectCol(){
+        $return = array( 
+                self::tableName().'.field_id as '.self::tableName().'_field_id',
+                self::tableName().'.min_value as '.self::tableName().'_min_value',
+                self::tableName().'.max_value as '.self::tableName().'_max_value',
+            );
+        
+        return $return;
+    }
+
 	public function rules()
 	{
-		// NOTE: you should only define rules for those attributes that
-		// will receive user inputs.
 		return array(
 			//array('min_value, max_value', 'required', 'on'=>'add'),
 			array('field_id', 'required', 'on'=>'edit'),
 			array('field_id, min_value, max_value', 'numerical','integerOnly'=>true),
-			array('min_value, max_value', 'numerical','integerOnly'=>true, 'allowEmpty'=>true),
-			// The following rule is used by search().
-			// Please remove those attributes that should not be searched.
-			array('field_id, min_value, max_value', 'safe', 'on'=>'search'),
+			array('min_value, max_value', 'numerical', 'integerOnly'=>true, 'allowEmpty'=>true ),
 		);
 	}
 
-	/**
-	 * @return array relational rules.
-	 */
-	public function relations()
-	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
-		return array(
-			'field' => array(self::BELONGS_TO, 'ProductsFields', 'field_id'),
-		);
-	}
-
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
+	public function attributeNames()
 	{
 		return array(
 			'min_value' => Yii::t('fields','Min value'),
 			'max_value' => Yii::t('fields','Max value'),
 		);
 	}
+
+    protected function setAttr($params){
+        parent::setAttr($params);
+        
+        $this->field_id = $params[self::tableName().'_field_id'];
+        $this->min_value = $params[self::tableName().'_min_value'];
+        $this->max_value = $params[self::tableName().'_max_value'];      
+    }
 
 	// форма в формате CForm
 	public function getElementsMotelCForm(){
@@ -88,5 +74,28 @@ class IntegerField extends CActiveRecord
 			)
 		);
 	}
+
+    public function findByPk($field_id)
+    {
+        $row = Yii::app()->db->createCommand()->from($this->tableName())->where('field_id = :field_id', array(':field_id'=>$field_id))->queryRow();
+        
+        if ( $row ) $this->attributes = $row;
+        
+        return $this;
+    }
+
+    public function save()
+    {
+        $db = Yii::app()->db->createCommand();
+        $db->delete($this->tableName(), 'field_id = :field_id', array(':field_id'=>$field_id));
+        
+        $db->insert($this->tableName(), array(
+            'field_id'=>$this->field_id,
+            'min_value'=>$this->min_value,
+            'max_value'=>$this->max_value
+        ));       
+        
+        return true;
+    }
 
 }

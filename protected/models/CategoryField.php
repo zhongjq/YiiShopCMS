@@ -10,66 +10,51 @@
  * The followings are the available model relations:
  * @property ProductField $field
  */
-class CategoryField extends CActiveRecord
+class CategoryField extends Field
 {
-
-	/**
-	 * Returns the static model of the specified AR class.
-	 * @param string $className active record class name.
-	 * @return CategoryField the static model class
-	 */
-	public static function model($className=__CLASS__)
-	{
-		return parent::model($className);
-	}
-
-	/**
-	 * @return string the associated database table name
-	 */
-	public function tableName()
+    public $field_id;
+    public $category_id;
+    public $is_multiple_select;
+    
+	public static function tableName()
 	{
 		return 'category_field';
 	}
 
-	/**
-	 * @return array validation rules for model attributes.
-	 */
+    public static function selectCol(){
+        $return = array( 
+                self::tableName().'.field_id as '.self::tableName().'_field_id',
+                self::tableName().'.category_id as '.self::tableName().'_category_id',
+                self::tableName().'.is_multiple_select as '.self::tableName().'_is_multiple_select',
+            );
+        
+        return $return;
+    }
+    
 	public function rules()
 	{
-		// NOTE: you should only define rules for those attributes that
-		// will receive user inputs.
 		return array(
 			array('category_id', 'required', 'on'=>'add'),
             array('field_id, category_id', 'required', 'on'=>'edit'),
 			array('field_id, category_id, is_multiple_select', 'numerical', 'integerOnly'=>true),
-			// The following rule is used by search().
-			// Please remove those attributes that should not be searched.
-			array('field_id, category_id', 'safe', 'on'=>'search'),
 		);
 	}
 
-	/**
-	 * @return array relational rules.
-	 */
-	public function relations()
-	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
-		return array(
-			'field' => array(self::BELONGS_TO, 'ProductField', 'field_id'),
-		);
-	}
-
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
+	public function attributeNames()
 	{
 		return array(
 			'category_id' =>  Yii::t('fields',"Category"),
             'is_multiple_select'=> Yii::t('fields',"Is Multiple Select?")
 		);
 	}
+
+    protected function setAttr($params){
+        parent::setAttr($params);
+        
+        $this->field_id = $params[self::tableName().'_field_id'];
+        $this->category_id = $params[self::tableName().'_category_id'];
+        $this->is_multiple_select = $params[self::tableName().'_is_multiple_select'];      
+    }
 
     // форма в формате CForm
     public function getElementsMotelCForm(){

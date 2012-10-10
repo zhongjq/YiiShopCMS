@@ -8,29 +8,27 @@
  * @property integer $ListID
  * @property integer $IsMultipleSelect
  */
-class ListField extends CActiveRecord
+class ListField extends Field
 {
-	/**
-	 * Returns the static model of the specified AR class.
-	 * @param string $className active record class name.
-	 * @return ListFields the static model class
-	 */
-	public static function model($className=__CLASS__)
-	{
-		return parent::model($className);
-	}
-
-	/**
-	 * @return string the associated database table name
-	 */
-	public function tableName()
+    public $field_id;
+    public $list_id;
+    public $is_multiple_select;
+    
+	public static function tableName()
 	{
 		return 'list_field';
 	}
 
-	/**
-	 * @return array validation rules for model attributes.
-	 */
+    public static function selectCol(){
+        $return = array( 
+                self::tableName().'.field_id as '.self::tableName().'_field_id',
+                self::tableName().'.list_id as '.self::tableName().'_list_id',
+                self::tableName().'.is_multiple_select as '.self::tableName().'_is_multiple_select',
+            );
+        
+        return $return;
+    }
+    
 	public function rules()
 	{
 		return array(
@@ -42,26 +40,21 @@ class ListField extends CActiveRecord
 		);
 	}
 
-	/**
-	 * @return array relational rules.
-	 */
-	public function relations()
+	public function attributeNames()
 	{
 		return array(
-            'field' => array(self::BELONGS_TO, 'ProductField', 'field_id'),
+			'list_id' => Yii::t('fields','List'),
+			'is_multiple_select' => Yii::t('fields','Multiple Select'),
 		);
 	}
 
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
-	{
-		return array(
-			'list_id'			=> Yii::t('fields','List'),
-			'is_multiple_select'	=> Yii::t('fields','Multiple Select'),
-		);
-	}
+    protected function setAttr($params){
+        parent::setAttr($params);
+        
+        $this->field_id = $params[self::tableName().'_field_id'];
+        $this->list_id = $params[self::tableName().'_list_id'];
+        $this->is_multiple_select = $params[self::tableName().'_is_multiple_select'];      
+    }
 
     // форма в формате CForm
 	public function getElementsMotelCForm(){

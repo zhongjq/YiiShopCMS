@@ -14,6 +14,8 @@
  */
 class FieldTab extends CActiveRecord
 {
+    const tableName = 'field_tab';
+    
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);

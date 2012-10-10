@@ -17,11 +17,8 @@
  */
 class Product extends CActiveRecord
 {
-	/**
-	 * Returns the static model of the specified AR class.
-	 * @param string $className active record class name.
-	 * @return Products the static model class
-	 */
+    public $fields;
+    
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
@@ -122,7 +119,12 @@ class Product extends CActiveRecord
 		}
 		return $return;
 	}
-
+    
+    public function afterFind(){
+        $this->fields = Field::model()->find('product_id = :product_id',array(":product_id"=>$this->id));
+    }
+    
+    
 	public function beforeDelete(){
 		if( parent::beforeDelete() ) {
 			Yii::app()->db->createCommand()->dropTable($this->alias);
@@ -185,7 +187,8 @@ class Product extends CActiveRecord
 	}
 
 	public function getRecordObject($scenario = "add"){
-		$record = Record::model($this->alias);
+		//$record = Record::model($this->alias);
+        $record = DynamicActiveRecord::model($this->alias);
         $record->setScenario($scenario);
         return $record;
 	}

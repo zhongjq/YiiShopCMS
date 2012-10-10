@@ -14,32 +14,55 @@
  * The followings are the available model relations:
  * @property Products $product
  */
-class ProductField extends CActiveRecord
+class Field extends CModel
 {
+    protected static $instance;  // object instance
+    private function __construct(){ /* ... @return Singleton */ }  // Защищаем от создания через new Singleton
+    private function __clone()    { /* ... @return Singleton */ }  // Защищаем от создания через клонирование
+    private function __wakeup()   { /* ... @return Singleton */ }  // Защищаем от создания через unserialize    
+    
+    
+    public $id;
+    public $product_id;
+    public $field_type;
+    public $position;
+    public $name;
+    public $unit_name;
+    public $hint;
+    public $alias;
+    public $is_filter;    
+    public $is_mandatory;
+    public $is_column_table;
+    public $is_editing_table_admin;
+    public $is_column_table_admin;    
+    
+    public $tab_id;
+    
     public $subClass = null;
     public $subClassName = null;
 
-	/**
-	 * Returns the static model of the specified AR class.
-	 * @param string $className active record class name.
-	 * @return ProductsFields the static model class
-	 */
-	public static function model($className=__CLASS__)
-	{
-		return parent::model($className);
-	}
+    public static function model()
+    {
+        if ( is_null(self::$instance) ) {
+            self::$instance = new self;
+        }
+        return self::$instance;
+    }
 
-	/**
-	 * @return string the associated database table name
-	 */
-	public function tableName()
+	public static function tableName()
 	{
 		return 'product_field';
 	}
 
-	/**
-	 * @return array validation rules for model attributes.
-	 */
+    public static function selectCol(){
+        $return = array( 
+                self::tableName().'.*',
+                'field_tab.tab_id'
+            );
+        
+        return $return;
+    }
+
 	public function rules()
 	{
 		// NOTE: you should only define rules for those attributes that
@@ -62,14 +85,120 @@ class ProductField extends CActiveRecord
 			array('id, product_id, field_type, name, is_mandatory, is_filter', 'safe', 'on'=>'search'),
 		);
 	}
-
-
-    public function getRelationsNameArray(){
-        return array_keys($this->relations());
+    
+    protected function setAttr($params){
+        $this->id = $params['id'];
+        $this->product_id = $params['product_id'];
+        $this->field_type = $params['field_type'];
+        $this->position = $params['position'];
+        $this->name = $params['name'];
+        $this->unit_name = $params['unit_name'];
+        $this->hint = $params['hint'];
+        $this->alias = $params['alias'];
+        $this->is_filter = $params['is_filter'];    
+        $this->is_mandatory = $params['is_mandatory'];
+        $this->is_column_table = $params['is_column_table'];
+        $this->is_editing_table_admin = $params['is_editing_table_admin'];
+        $this->is_column_table_admin = $params['is_column_table_admin'];
+        $this->tab_id = $params['tab_id'];
+        
     }
-	/**
-	 * @return array relational rules.
-	 */
+    
+    private function create($params){
+        $class = null;
+        switch ($params['field_type']) {
+            case TypeField::INTEGER:
+                $class = new IntegerField();
+            break;            
+            case TypeField::STRING:
+                $class = new StringField();
+            break;
+            case TypeField::TEXT:
+                $class = new TextField();
+            break;     
+            case TypeField::PRICE:
+                $class = new PriceField();
+            break;             
+            case TypeField::LISTS:
+                $class = new ListField();
+            break;            
+            case TypeField::BOOLEAN:
+                $class = new BooleanField();
+            break;            
+            case TypeField::DOUBLE:
+                $class = new DoubleField();
+            break;             
+            
+            case TypeField::IMAGE:
+                $class = new ImageField();
+            break;             
+
+            case TypeField::FILE:
+                $class = new DoubleField();
+            break; 
+
+            case TypeField::CATEGORIES:
+                $class = new CategoryField();
+            break;
+            case TypeField::MANUFACTURER:
+                $class = new ManufacturerField();
+            break;            
+        }
+        if ( $class ) {
+            $class->setAttr($params);
+        }
+        return $class;
+    }
+    
+    public function find($condition,$params){        
+        
+        $select = array_merge(  self::selectCol(), 
+                                StringField::selectCol(), 
+                                IntegerField::selectCol(), 
+                                TextField::selectCol(),
+                                PriceField::selectCol(),
+                                ListField::selectCol(),
+                                BooleanField::selectCol(),
+                                DoubleField::selectCol(),
+                                
+                                ImageField::selectCol(),
+                                
+                                CategoryField::selectCol(),
+                                ManufacturerField::selectCol()
+            );
+        
+        $fields = Yii::app()->db->createCommand()
+                    ->select($select)
+                    ->from(self::tableName())
+                    
+                    ->leftJoin( FieldTab::tableName, FieldTab::tableName.'.field_id = id' )                    
+                    
+                    ->leftJoin( StringField::tableName(), StringField::tableName().'.field_id = id' )
+                    ->leftJoin( IntegerField::tableName(), IntegerField::tableName().'.field_id = id' )
+                    ->leftJoin( TextField::tableName(), TextField::tableName().'.field_id = id' )
+                    ->leftJoin( PriceField::tableName(), PriceField::tableName().'.field_id = id' )
+                    ->leftJoin( ListField::tableName(), ListField::tableName().'.field_id = id' )
+                    ->leftJoin( BooleanField::tableName(), BooleanField::tableName().'.field_id = id' )
+                    ->leftJoin( DoubleField::tableName(), DoubleField::tableName().'.field_id = id' )
+                    
+                    ->leftJoin( ImageField::tableName(), ImageField::tableName().'.field_id = id' )
+                    
+                    ->leftJoin( CategoryField::tableName(), CategoryField::tableName().'.field_id = id' )
+                    ->leftJoin( ManufacturerField::tableName(), ManufacturerField::tableName().'.field_id = id' )
+                    
+                    ->where($condition,$params)
+                    ->queryAll();
+        
+        $rows = array();
+        if ( !empty($fields) ){
+            foreach($fields as $field){
+                $rows[$field['id']] = $this->create($field);
+            }
+        }
+        
+        return $rows;
+    }
+
 	public function relations()
 	{
 		return array(
@@ -92,10 +221,8 @@ class ProductField extends CActiveRecord
 		);
 	}
 
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
+
+	public function attributeNames()
 	{
 		return array(
 			'id' =>  Yii::t("fields",'ID'),
@@ -233,10 +360,10 @@ class ProductField extends CActiveRecord
 	}
 
 	public function afterSave(){
-		parent::afterSave();
-
+		parent::afterSave();       
+        
 		${$this->product->alias} = $this->product->getRecordObject();
-
+        
 		if ( $this->subClass ) {
 
             // чтобы сохранять значение

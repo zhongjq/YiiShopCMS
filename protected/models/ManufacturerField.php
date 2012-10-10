@@ -12,59 +12,37 @@
  * @property Manufacturer $manufacturer
  * @property ProductField $field
  */
-class ManufacturerField extends CActiveRecord
+class ManufacturerField extends Field
 {
-	/**
-	 * Returns the static model of the specified AR class.
-	 * @param string $className active record class name.
-	 * @return ManufacturerField the static model class
-	 */
-	public static function model($className=__CLASS__)
-	{
-		return parent::model($className);
-	}
-
-	/**
-	 * @return string the associated database table name
-	 */
-	public function tableName()
+    public $field_id;
+    public $manufacturer_id;
+    public $is_multiple_select;
+    
+	public static function tableName()
 	{
 		return 'manufacturer_field';
 	}
 
-	/**
-	 * @return array validation rules for model attributes.
-	 */
+    public static function selectCol(){
+        $return = array( 
+                self::tableName().'.field_id as '.self::tableName().'_field_id',
+                self::tableName().'.manufacturer_id as '.self::tableName().'_manufacturer_id',
+                self::tableName().'.is_multiple_select as '.self::tableName().'_is_multiple_select',
+            );
+        
+        return $return;
+    }
+    
 	public function rules()
 	{
-		// NOTE: you should only define rules for those attributes that
-		// will receive user inputs.
 		return array(
 			array('field_id', 'required','on'=>'edit'),
-			array('is_multiple_select,manufacturer_id', 'numerical', 'integerOnly'=>true),
+			array('is_multiple_select, manufacturer_id', 'numerical', 'integerOnly'=>true),
 			array('field_id', 'length', 'max'=>11),
-			// The following rule is used by search().
-			// Please remove those attributes that should not be searched.
-			array('field_id, is_multiple_select', 'safe', 'on'=>'search'),
 		);
 	}
 
-	/**
-	 * @return array relational rules.
-	 */
-	public function relations()
-	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
-		return array(
-			'field' => array(self::BELONGS_TO, 'ProductField', 'field_id'),
-		);
-	}
-
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
+	public function attributeNames()
 	{
 		return array(
 			'manufacturer_id'=>Yii::t('manufacturer',"manufacturer"),
@@ -72,6 +50,13 @@ class ManufacturerField extends CActiveRecord
 		);
 	}
 
+    protected function setAttr($params){
+        parent::setAttr($params);
+        
+        $this->field_id = $params[self::tableName().'_field_id'];
+        $this->manufacturer_id = $params[self::tableName().'_manufacturer_id'];
+        $this->is_multiple_select = $params[self::tableName().'_is_multiple_select'];      
+    }
 
     // форма в формате CForm
     public function getElementsMotelCForm(){

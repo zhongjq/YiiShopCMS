@@ -1,7 +1,8 @@
 <?php
 
 return array(
-		         '/'=>'site/index',
+		        '/'=>'site/index',
+                '/test'=>'site/test',
                 
 		         //// ПОЛЬЗОВАТЕЛЬ
 				// просмотр пользователя

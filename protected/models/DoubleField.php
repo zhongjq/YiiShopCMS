@@ -10,64 +10,47 @@
  * The followings are the available model relations:
  * @property ProductField $field
  */
-class DoubleField extends CActiveRecord
+class DoubleField extends Field
 {
-	/**
-	 * Returns the static model of the specified AR class.
-	 * @param string $className active record class name.
-	 * @return DoubleField the static model class
-	 */
-	public static function model($className=__CLASS__)
-	{
-		return parent::model($className);
-	}
-
-	/**
-	 * @return string the associated database table name
-	 */
-	public function tableName()
+    public $field_id;
+    public $decimal;
+    
+	public static function tableName()
 	{
 		return 'double_field';
 	}
 
-	/**
-	 * @return array validation rules for model attributes.
-	 */
+    public static function selectCol(){
+        $return = array( 
+                self::tableName().'.field_id as '.self::tableName().'_field_id',
+                self::tableName().'.decimal as '.self::tableName().'_decimal',
+            );
+        
+        return $return;
+    }
+    
 	public function rules()
 	{
-		// NOTE: you should only define rules for those attributes that
-		// will receive user inputs.
 		return array(
 			array('field_id', 'required'),
 			array('field_id, decimal', 'length', 'max'=>11),
-			// The following rule is used by search().
-			// Please remove those attributes that should not be searched.
-			array('field_id, decimal', 'safe', 'on'=>'search'),
 		);
 	}
 
-	/**
-	 * @return array relational rules.
-	 */
-	public function relations()
-	{
-		// NOTE: you may need to adjust the relation name and the related
-		// class name for the relations automatically generated below.
-		return array(
-			'field' => array(self::BELONGS_TO, 'ProductField', 'field_id'),
-		);
-	}
-
-	/**
-	 * @return array customized attribute labels (name=>label)
-	 */
-	public function attributeLabels()
+	public function attributeNames()
 	{
 		return array(
 			'decimal' => Yii::t('fields','Количество знаков после запятой'),
 		);
 	}
 
+    protected function setAttr($params){
+        parent::setAttr($params);
+        
+        $this->field_id = $params[self::tableName().'_field_id'];
+        $this->decimal = $params[self::tableName().'_decimal'];      
+    }
+    
 	// форма в формате CForm
 	public function getElementsMotelCForm(){
 		return array(

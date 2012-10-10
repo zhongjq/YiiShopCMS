@@ -18,24 +18,30 @@ class ProductController extends Controller
 	public function actionView($id)
 	{
         $product = Product::getProductByPk($id);       
-		$record = Record::model($product->alias);
-
-		if ( isset($_GET[$record->productName]) ){
+		//$record = Record::model($product->alias);
+        $model = DynamicActiveRecord::model($product->alias);
+        
+        //print_r($model->rules());
+        
+		if ( isset($_GET[$model->productName]) ){
 			$record->attributes = $_GET[$record->productName];
 		}
-
-    	if ( isset($_POST[$record->productName]) && is_array($_POST[$record->productName]) && !empty($_POST[$record->productName]) ){
+        
+        if ( isset($_POST[$model->productName]) && is_array($_POST[$model->productName]) && !empty($_POST[$model->productName]) ){
                         
-            $records = $_POST[$record->productName];
-
+            $records = $_POST[$model->productName];
+            
             foreach( $records as $id => $data ){
                 if ( is_numeric($id) ) {
-                    $a = $record->findByPk($id);
+                    $a = $model->findByPk($id);
                     if ( $a ){
                         $a->attributes = $data;
-                        if (!$a->save()) {
-                            
-                            print_r( $a->category );
+                        
+                        echo "<pre>";
+                        print_r($a->category);
+                        
+                        //die;
+                        if (!$a->save()) {                            
                             print_r( $a->getErrors() );
                             die;
                         };
@@ -43,12 +49,12 @@ class ProductController extends Controller
                 }
             }
             
-			$this->redirect($this->createUrl('/admin/product/view',array('id'=>$product->id)));
+			//$this->redirect($this->createUrl('/admin/product/view',array('id'=>$product->id)));
 		}
 
 		$this->render('records/view', array(
 			'product' => $product,
-			'record' => $record
+			'record' => $model
 		));
 	}
 
@@ -64,20 +70,20 @@ class ProductController extends Controller
 	public function actionAdd($id)
 	{
 
-		$product = Product::model()->with('productFields')->findByPk($id);
-		$record = $product->getRecordObject();
-        $record->isNewRecord = true;
-		$this->performAjaxRecordValidation($record);
+		$product = Product::getProductByPk($id); 
+		$model = DynamicActiveRecord::model($product->alias);
+        
+		$this->performAjaxRecordValidation($model);
 
-		$form = $record->getMotelCForm();
+		$form = $model->getMotelCForm();
 
-		if(isset($_POST[$record->tableName()])) {
-			$record->attributes = $_POST[$record->tableName()];
+		if(isset($_POST[$model->tableName()])) {
+			$model->attributes = $_POST[$model->tableName()];
 
 			$transaction = Yii::app()->db->beginTransaction();
 			try
 			{
-				if($form->submitted() && $record->save()){
+				if($form->submitted() && $model->save()){
 					$transaction->commit();
 					$this->redirect($this->createUrl('/admin/product/view',array('id'=>$product->id)));
 				}
@@ -95,9 +101,10 @@ class ProductController extends Controller
     public function actionEditRecord($productId,$recordId)
 	{
 		$product = Product::model()->with('productFields')->findByPk($productId);
-		$record = $product->getRecordObject()->findByPk($recordId);
-        $record->setProductID($productId);
-
+		$record = $product->getRecordObject();
+        
+        $record = $record->findByPk($recordId);
+            
 		$this->performAjaxRecordValidation($record);
 
 		$form = $record->getMotelCForm();
@@ -119,9 +126,6 @@ class ProductController extends Controller
 				$transaction->rollBack();
 			}
 		}
-
-
-
 
 		$this->render('records/edit',array('product'=>$product,'form'=>$form));
 	}
