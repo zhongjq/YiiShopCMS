@@ -17,38 +17,38 @@ class ProductController extends Controller
 
 	public function actionView($id)
 	{
-        $product = Product::getProductByPk($id);       
+        $product = Product::getProductByPk($id);
 		//$record = Record::model($product->alias);
         $model = DynamicActiveRecord::model($product->alias);
-        
+
         //print_r($model->rules());
-        
+
 		if ( isset($_GET[$model->productName]) ){
 			$record->attributes = $_GET[$record->productName];
 		}
-        
+
         if ( isset($_POST[$model->productName]) && is_array($_POST[$model->productName]) && !empty($_POST[$model->productName]) ){
-                        
+
             $records = $_POST[$model->productName];
-            
+
             foreach( $records as $id => $data ){
                 if ( is_numeric($id) ) {
                     $a = $model->findByPk($id);
                     if ( $a ){
                         $a->attributes = $data;
-                        
+
                         echo "<pre>";
                         print_r($a->category);
-                        
+
                         //die;
-                        if (!$a->save()) {                            
+                        if (!$a->save()) {
                             print_r( $a->getErrors() );
                             die;
                         };
                     }
                 }
             }
-            
+
 			//$this->redirect($this->createUrl('/admin/product/view',array('id'=>$product->id)));
 		}
 
@@ -70,9 +70,9 @@ class ProductController extends Controller
 	public function actionAdd($id)
 	{
 
-		$product = Product::getProductByPk($id); 
+		$product = Product::getProductByPk($id);
 		$model = DynamicActiveRecord::model($product->alias);
-        
+
 		$this->performAjaxRecordValidation($model);
 
 		$form = $model->getMotelCForm();
@@ -100,11 +100,13 @@ class ProductController extends Controller
 
     public function actionEditRecord($productId,$recordId)
 	{
-		$product = Product::model()->with('productFields')->findByPk($productId);
-		$record = $product->getRecordObject();
-        
+		$product = Product::model()->findByPk($productId);
+
+		$record = DynamicActiveRecord::model($product->alias);
+
         $record = $record->findByPk($recordId);
-            
+$record->setProduct();
+
 		$this->performAjaxRecordValidation($record);
 
 		$form = $record->getMotelCForm();

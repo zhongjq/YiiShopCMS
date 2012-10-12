@@ -2,27 +2,27 @@
 
 class DynamicActiveRecord extends CActiveRecord
 {
-    
+
     private $_manufacturerFilter = null;
 	private $_categoryFilter = null;
-    private $_productFieldsOrder = null;    
-    
+    private $_productFieldsOrder = null;
+
     public $productName = null;
     private $_product;
-    
+
     public static function table($tableName){
         eval("class ".$tableName." extends DynamicActiveRecord{}");
         return new $tableName();
     }
-    
+
     public static function model($className){
         eval("class ".$className." extends DynamicActiveRecord{}");
         $a = parent::model($className);
-        $a->productName = $className; 
+        $a->productName = $className;
         $a->setProduct();
         $a->addRelations();
         return $a;
-    }    
+    }
 
     public function __construct($scenario='insert')
     {
@@ -30,7 +30,7 @@ class DynamicActiveRecord extends CActiveRecord
         parent::__construct($scenario);
     }
 
-    private function setProduct()    {
+    public function setProduct()    {
         if ( $this->_product === null ) {
             $this->_product = Product::model()->find('alias = :alias',array(':alias'=> $this->productName ));
             //echo "<pre>";
@@ -50,9 +50,9 @@ class DynamicActiveRecord extends CActiveRecord
 		$numerical  = array();
 		$safe       = array('title','keywords','description');
 		$unique     = array("alias");
-        
+
         $this->setProduct();
-                
+
 		if ( $this->_product ){
             foreach( $this->_product->fields as $field ){
 				if ( $field->is_mandatory ) $required[] = $field->alias;
@@ -173,7 +173,7 @@ class DynamicActiveRecord extends CActiveRecord
 						} else
                             $this->metaData->addRelation($field->alias,array( self::BELONGS_TO,'ListItem', $field->alias ));
                     break;
-                    
+
 					case TypeField::CATEGORIES :
                         if ($field->is_multiple_select)
     						$this->metaData->addRelation($field->alias,array(	self::MANY_MANY,
@@ -212,20 +212,20 @@ class DynamicActiveRecord extends CActiveRecord
 					$f['name'] = $field->alias;
 
 					switch( $field->field_type ){
-						case TypeField::STRING:						
+						case TypeField::STRING:
 						    $f['value'] = '$data->'.$field->alias;
 						break;
     					case TypeField::LISTS:
-                            
+
 							if ($field->is_multiple_select){
 								$f['value'] = '$data->getRecordItems('.$field->alias.')';
 							} else
 								$f['value'] = 'isset($data->'.$field->alias.'Item) ? $data->'.$field->alias.'Item->name : null';
-                            
+
                             if ( $field->is_filter ) {
     							$f['filter'] = CHtml::listData( $this->getListFilter($field->list_id) , 'id', 'name');
 							}
-                            
+
 						break;
                         case TypeField::BOOLEAN:
 							if ( $field->is_filter ) {
@@ -236,7 +236,7 @@ class DynamicActiveRecord extends CActiveRecord
                                                                                 );
 							}
 						break;
-                        
+
 
     					case TypeField::CATEGORIES:
                             if ($field->is_multiple_select)
@@ -247,7 +247,7 @@ class DynamicActiveRecord extends CActiveRecord
 							if ( $field->is_filter ) {
 								$f['filter'] = CHtml::listData($this->getCategoryFilter($field) , 'id', 'name');
 							}
-						break;                        
+						break;
     					case TypeField::MANUFACTURER:
 							if ( $field->is_multiple_select )
 								$f['value'] = '$data->getRecordManufacturer("'.$field->alias.'")';
@@ -266,7 +266,7 @@ class DynamicActiveRecord extends CActiveRecord
 
 
 							}
-						break;                        
+						break;
 					}
 
 					if ( $field->is_filter == 0 && !isset($f['filter']) ) $f['filter'] = false;
@@ -274,7 +274,7 @@ class DynamicActiveRecord extends CActiveRecord
 						$fields[] = $f;
 						unset($f);
     			}
-            }            
+            }
         }
         return $fields;
     }
@@ -282,7 +282,7 @@ class DynamicActiveRecord extends CActiveRecord
     public function getAdminTableFields($update = false)
     {
         $tableFields = array();
-        
+
 		if ( $update === false ){
             //$this->setProductFieldsOrder("t.position");
 
@@ -330,31 +330,31 @@ class DynamicActiveRecord extends CActiveRecord
 								}
 							break;
 							case TypeField::LISTS:
-                                
+
                                 if ( $field->is_editing_table_admin ) {
                                     $f['type']='raw';
-                                    
+
                                     $multiple = 'array()';
                                     if ($field->is_multiple_select){
                                         $name = $name.'[]';
                                         $multiple = 'array("multiple"=>true,"class"=>"chzn-select")';
                                     }
-    
+
                                     $f['value'] = 'CHtml::dropDownList("'.$name.'", $data->'.$field->alias.',
                                                                             CHtml::listData($data->getListFilter('.$field->list_id.') , "id", "name"),
                                                                             '.$multiple.'
                                                                             );';
-                                    
-                                                                        
+
+
                                 } else {
-                                    
+
         							if ($field->listField->is_multiple_select)
     									$f['value'] = '$data->getRecordItems("'.$field->alias.'")';
     								else
-    									$f['value'] = 'isset($data->'.$field->alias.') ? $data->'.$field->alias.'->name : null';                                    
-                                    
+    									$f['value'] = 'isset($data->'.$field->alias.') ? $data->'.$field->alias.'->name : null';
+
                                 }
-                                
+
 								if ( $field->is_filter ) {
 									$f['filter'] = CHtml::listData( $this->getListFilter($field->list_id) , 'id', 'name');
 								}
@@ -457,7 +457,7 @@ class DynamicActiveRecord extends CActiveRecord
     public function getRecordItems($name, $sSep = ', ')
 	{
         if ( empty($this->{$name}) ) return;
-        
+
         $aRes = array();
         foreach ($this->{$name} as $item) {
             $aRes[] = $item->name;
@@ -525,9 +525,9 @@ class DynamicActiveRecord extends CActiveRecord
 
     public function search()
 	{
-		$criteria = new CDbCriteria;		
+		$criteria = new CDbCriteria;
         $criteria->with = array_keys($this->getMetaData()->relations);
-        
+
 		return new CActiveDataProvider($this,array(
             'criteria'=>$criteria,
             'pagination'=>array(
@@ -536,7 +536,7 @@ class DynamicActiveRecord extends CActiveRecord
             )
         ));
 	}
-    
+
     public function getMotelCForm()
 	{
 		$form = array(
@@ -566,7 +566,7 @@ class DynamicActiveRecord extends CActiveRecord
 		);
 
 		return new CForm($form,$this);
-	}    
+	}
 
     public function getFormField($field){
         $return = array($field->alias => TypeField::getFieldFormData($field->field_type) );
@@ -675,7 +675,7 @@ class DynamicActiveRecord extends CActiveRecord
         $this->setProductFieldsOrder("fieldTab.position");
         if ( $this->_product ){
             foreach( $this->_product->fields as $field ){
-                
+
                 $id = $this->searchForId( $field->tab_id > 0 ? $field->tab_id : 0 , $arTabs);
 
                 if( isset( $arTabs[$id] ) ){
@@ -694,15 +694,15 @@ class DynamicActiveRecord extends CActiveRecord
             'params'=>array(":product_id"=> $this->getProductID())
         ));
     }
-    
+
     public function setProductFieldsOrder($order){
     	$this->_productFieldsOrder = $order;
 	}
 
     public function getProductFieldsOrder(){
     	return $this->_productFieldsOrder;
-	}  
-    
+	}
+
     public function afterSave()
 	{
         $productFields = $this->_product->fields;
@@ -806,6 +806,6 @@ class DynamicActiveRecord extends CActiveRecord
 			}
 		}
 
-	}    
-    
+	}
+
 }
