@@ -36,11 +36,6 @@ class ProductController extends Controller
                     $a = $model->findByPk($id);
                     if ( $a ){
                         $a->attributes = $data;
-                        
-                        echo "<pre>";
-                        print_r($a->category);
-                        
-                        //die;
                         if (!$a->save()) {                            
                             print_r( $a->getErrors() );
                             die;
