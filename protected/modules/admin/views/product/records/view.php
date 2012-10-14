@@ -19,7 +19,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 	'filter'=>$record,
 	'columns'=>
 		array_merge(
-			$record->getAdminTableFields()
+			$record->getTableFields()
 			,
 			array(
 				array(
@@ -67,7 +67,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
 ));
 
 ?>
- 
+
 <div class="row submit">
 <?php echo CHtml::submitButton('Сохранить',array('class'=>'btn')); ?> <span class="label label-important">Warning</span> поля не прощедшие валидацию будут проигнорированны.
 </div>

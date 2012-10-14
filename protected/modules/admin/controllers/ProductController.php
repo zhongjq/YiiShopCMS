@@ -18,13 +18,11 @@ class ProductController extends Controller
 	public function actionView($id)
 	{
         $product = Product::getProductByPk($id);
-		//$record = Record::model($product->alias);
-        $model = DynamicActiveRecord::model($product->alias);
-
+		$model = DynamicActiveRecord::model($product->alias);
         //print_r($model->rules());
 
 		if ( isset($_GET[$model->productName]) ){
-			$record->attributes = $_GET[$record->productName];
+			$model->attributes = $_GET[$model->productName];
 		}
 
         if ( isset($_POST[$model->productName]) && is_array($_POST[$model->productName]) && !empty($_POST[$model->productName]) ){
@@ -36,7 +34,7 @@ class ProductController extends Controller
                     $a = $model->findByPk($id);
                     if ( $a ){
                         $a->attributes = $data;
-                        if (!$a->save()) {                            
+                        if (!$a->save()) {
                             print_r( $a->getErrors() );
                             die;
                         };
@@ -97,21 +95,20 @@ class ProductController extends Controller
 	{
 		$product = Product::model()->findByPk($productId);
 
-		$record = DynamicActiveRecord::model($product->alias);
+		$model = DynamicActiveRecord::model($product->alias);
 
-        $record = $record->findByPk($recordId);
-$record->setProduct();
+        //$model = $model->findByPk($recordId);
 
-		$this->performAjaxRecordValidation($record);
+		$this->performAjaxRecordValidation($model);
 
-		$form = $record->getMotelCForm();
+		$form = $model->getMotelCForm();
 
-		if(isset($_POST[$record->tableName()])) {
-			$record->attributes = $_POST[$record->tableName()];
+		if(isset($_POST[$model->tableName()])) {
+			$model->attributes = $_POST[$model->tableName()];
 			$transaction = Yii::app()->db->beginTransaction();
 			try
 			{
-				if($form->submitted() && $record->save()){
+				if($form->submitted() && $model->save()){
 
 					$transaction->commit();
 					$this->redirect($this->createUrl('/admin/product/view',array('id'=>$product->id)));

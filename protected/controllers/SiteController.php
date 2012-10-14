@@ -2,6 +2,7 @@
 
 /**
  * SiteController is the default controller to handle user requests.
+ * var @model CustemCActiveRecord
  */
 class SiteController extends Controller
 {
@@ -17,35 +18,49 @@ class SiteController extends Controller
 
     /**
 	 * Index action is the default action in a controller.
+	 * var @model CustemCActiveRecord
 	 */
 	public function actionTest()
-	{		
-        //$model = DynamicModel::model('disk');
-        
-        $model = new DynamicModel('disk');
-        
-        $value = array(
-            'alias'=>"asd",
-            'price'=>"10.50",
-            'category'=>"123",
-            'category'=>array(1),
-            'manufacturer'=>array(1)
-        );
-        
-        $model->setAttributes($value);
-        //$model->validate();        
-        
-        //$model = $model->findByPk(1);
-        
-        $model->save();
-        
-        echo "<pre>";
-        
-        print_r( $model->getAttributes() );
-        
-        print_r( $model->getErrors() );
-        
-        //$this->renderPartial('test', array('model'=> $model ));
+	{
+		$model = DynamicActiveRecord::model('disk');
+
+		if ( isset($_GET['disk']) )
+			$model->attributes = $_GET['disk'];
+
+
+		$model = $model->findByPk(1);
+
+
+		//$model = $model->findAll();
+
+    //$model = DynamicModel::model('disk');
+
+//        $model = new DynamicModel('disk');
+//		$models = $model->findAll('price > 10');
+
+//		exit;
+//
+//        $value = array(
+//            'alias'=>"asd",
+//            'price'=>"10.50",
+//            'name'=>"10.51",
+//            'category'=>array(1),
+//            'manufacturer'=>array(1)
+//        );
+//
+//		$model = $model->findByPk(25);
+//
+//        $model->setAttributes($value);
+//
+//        $model->save();
+//
+//        echo "<pre>";
+//
+//        print_r( $model->getAttributes() );
+//
+//        print_r( $model->getErrors() );
+
+        //$this->render('test', array('model'=> $model ));
 	}
 
 	/**
