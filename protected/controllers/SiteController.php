@@ -20,11 +20,32 @@ class SiteController extends Controller
 	 */
 	public function actionTest()
 	{		
-        $model = DynamicActiveRecord::model('tires');
+        //$model = DynamicModel::model('disk');
         
-        //$model::model('tires')->findAll();
+        $model = new DynamicModel('disk');
         
-        $this->renderPartial('test', array('model'=> $model ));
+        $value = array(
+            'alias'=>"asd",
+            'price'=>"10.50",
+            'category'=>"123",
+            'category'=>array(1),
+            'manufacturer'=>array(1)
+        );
+        
+        $model->setAttributes($value);
+        //$model->validate();        
+        
+        //$model = $model->findByPk(1);
+        
+        $model->save();
+        
+        echo "<pre>";
+        
+        print_r( $model->getAttributes() );
+        
+        print_r( $model->getErrors() );
+        
+        //$this->renderPartial('test', array('model'=> $model ));
 	}
 
 	/**

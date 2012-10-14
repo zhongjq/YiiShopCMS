@@ -27,15 +27,19 @@ class DynamicActiveRecord extends CActiveRecord
     public function __construct($scenario='insert')
     {
         $this->productName = get_class($this);
+        $this->setProduct();
         parent::__construct($scenario);
     }
 
-    public function setProduct()    {
-        if ( $this->_product === null ) {
-            $this->_product = Product::model()->find('alias = :alias',array(':alias'=> $this->productName ));
-            //echo "<pre>";
-            //print_r( $this->_product );
-        }
+    private function setProduct()
+    {        
+        $name = $this->productName."ProductСache";
+
+        if ( isset(Yii::app()->params[$name]) ) return Yii::app()->params[$name];        
+        
+        
+        Yii::app()->params[$name] = $this->_product = Product::model()->find('alias = :alias',array(':alias'=> $this->productName ));
+
     }
 
     public function getProductID()
@@ -165,10 +169,11 @@ class DynamicActiveRecord extends CActiveRecord
                             $name = $field->alias;
     						$this->metaData->addRelation($field->alias,array( self::MANY_MANY,
 														'ListItem', 'record_list(record_id, list_item_id)',
-                                                        'select'=> "`{$field->alias}'`.`name`",
-														'condition'=> '`'.$name."_".$name.'`.`product_id` = :product_id',
-														'params' => array(":product_id" => $this->getProductID() ),
-														//'together' => true
+                                                        'association'=> array('product'),
+                                                        //'select'=> "`{$field->alias}'`.`name`",
+														//'condition'=> '`'.$name."_".$name.'`.`product_id` = :product_id',
+														//'params' => array(":product_id" => $this->getProductID() ),
+														'together' => true
 													));
 						} else
                             $this->metaData->addRelation($field->alias,array( self::BELONGS_TO,'ListItem', $field->alias ));
