@@ -50,14 +50,14 @@ return array(
 
 		'cache1'=>array(
 			'class'=>'system.caching.CApcCache',
-            'class'=>'system.caching.CZendDataCache',
-            'class'=>'system.caching.CDbCache'
+            //'class'=>'system.caching.CZendDataCache',
+            //'class'=>'system.caching.CDbCache'
 
 		),
 		// База
 		'db'=>array(
-			//'connectionString' => 'mysql:host=localhost;dbname=enchikiben_fbfde',
-            'connectionString' => 'mysql:host=mysql0.db.koding.com;dbname=enchikiben_fbfde',
+			'connectionString' => 'mysql:host=localhost;dbname=enchikiben_fbfde',
+            //'connectionString' => 'mysql:host=mysql0.db.koding.com;dbname=enchikiben_fbfde',
 			'emulatePrepare' => true,
 			'username' => 'enchikiben_fbfde',
 			'password' => '754089db',

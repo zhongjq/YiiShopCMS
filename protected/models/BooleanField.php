@@ -66,10 +66,16 @@ class BooleanField extends CActiveRecord
 		);
 	}
 
-    public static function getValues(){
-		return array( 1 => Yii::t("main","Yes"), 0 => Yii::t("main","No") );
+    public static function getValues($value = -1){
+		$v = array( 1 => Yii::t("main","Yes"), 0 => Yii::t("main","No") );
+
+		if ( is_numeric($value) && $value == -1)
+			return $v;
+		elseif ( is_numeric($value) )
+			return $v[$value];
+		
 	}
-    
+
     // форма в формате CForm
 	public function getElementsMotelCForm(){
 		return array(
@@ -79,9 +85,9 @@ class BooleanField extends CActiveRecord
                     'empty' => '',
     		    	'type' => 'dropdownlist',
 				    'items' => self::getValues(),
-			    ),                
+			    ),
 			)
 		);
 	}
-    
+
 }
