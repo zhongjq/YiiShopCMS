@@ -1,67 +1,79 @@
 <?php
 
 /**
- * This is the model class for table "StringFields".
+ * This is the model class for table "string_field".
  *
- * The followings are the available columns in table 'StringFields':
- * @property integer $field_id
- * @property integer $min_length
- * @property integer $max_length
+ * The followings are the available columns in table 'string_field':
+ * @property string $field_id
+ * @property string $min_length
+ * @property string $max_length
  *
  * The followings are the available model relations:
- * @property ProductsFields $field
+ * @property ProductField $field
  */
-class StringField extends Field 
-{    
-	public $field_id;
-    public $min_length;
-    public $max_length;    
+class StringField extends CActiveRecord
+{
+	/**
+	 * Returns the static model of the specified AR class.
+	 * @param string $className active record class name.
+	 * @return StringField the static model class
+	 */
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
 
-	public static function tableName()
+	/**
+	 * @return string the associated database table name
+	 */
+	public function tableName()
 	{
 		return 'string_field';
 	}
-    
-    public static function selectCol(){
-        $return = array( 
-                self::tableName().'.field_id as '.self::tableName().'_field_id',
-                self::tableName().'.min_length as '.self::tableName().'_min_length',
-                self::tableName().'.max_length as '.self::tableName().'_max_length',
-            );
-        
-        return $return;
-    }
-    
+
+	/**
+	 * @return array validation rules for model attributes.
+	 */
 	public function rules()
-    {
+	{
+		// NOTE: you should only define rules for those attributes that
+		// will receive user inputs.
 		return array(
-			array('min_length, max_length', 'required', 'on'=>'add'),
-            array('field_id, min_length, max_length', 'required', 'on'=>'edit'),
-            array('field_id', 'numerical', 'integerOnly'=>true),
+			array('field_id', 'required', 'on'=>'add,edit'),
+			array('field_id', 'length', 'max'=>11),
+            array('field_id', 'numerical',  'integerOnly'=>true,),
+			array('min_length, max_length', 'length', 'max'=>3),
             array('min_length, max_length', 'numerical', 'integerOnly'=>true, 'min'=>0, 'max'=>255 ),
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+			array('field_id, min_length, max_length', 'safe', 'on'=>'search'),
+		);
+	}
+
+	/**
+	 * @return array relational rules.
+	 */
+	public function relations()
+	{
+		// NOTE: you may need to adjust the relation name and the related
+		// class name for the relations automatically generated below.
+		return array(
+			'field' => array(self::BELONGS_TO, 'ProductField', 'field_id'),
 		);
 	}
 
 	/**
 	 * @return array customized attribute labels (name=>label)
 	 */
-	public function attributeNames()
+	public function attributeLabels()
 	{
 		return array(
-			'min_length' => Yii::t('fields','Min length'),
-			'max_length' => Yii::t('fields','Max length'),
+            'min_length' => Yii::t('fields','Min length'),
+    		'max_length' => Yii::t('fields','Max length'),
 		);
 	}
 
-    protected function setAttr($params){
-        parent::setAttr($params);
-        
-        $this->field_id = $params[self::tableName().'_field_id'];
-        $this->min_length = $params[self::tableName().'_min_length'];
-        $this->max_length = $params[self::tableName().'_max_length'];      
-    }
-
-	// форма в формате CForm
+    // форма в формате CForm
 	public function getElementsMotelCForm(){
 		return array(
 				'type'=>'form',
@@ -77,32 +89,4 @@ class StringField extends Field
 				)
 			);
 	}
-    public function relations(){return array();}
-    public function getDbConnection(){
-        return Yii::app()->db;
-    }
-    
-    public function findByPk($field_id)
-    {
-        $row = Yii::app()->db->createCommand()->from($this->tableName())->where('field_id = :field_id', array(':field_id'=>$field_id))->queryRow();
-        
-        if ( $row ) $this->attributes = $row;
-        
-        return $this;
-    }
-
-    public function save()
-    {
-        $db = Yii::app()->db->createCommand();
-        $db->delete($this->tableName(), 'field_id = :field_id', array(':field_id'=>$field_id));
-        
-        $db->insert($this->tableName(), array(
-            'field_id'=>$this->field_id,
-            'min_length'=>$this->min_length,
-            'max_length'=>$this->max_length
-        ));       
-        
-        return true;
-    }
-
 }

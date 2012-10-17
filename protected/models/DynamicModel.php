@@ -3,7 +3,10 @@
 class DynamicModel extends CModel
 {
     protected static $_instance;
-
+    
+    const BELONGS_TO = 1;
+    const MANY_MANY = 2;
+    
     public $productName;
     public $product;
     public $isNewRecord = false;
@@ -62,8 +65,9 @@ class DynamicModel extends CModel
     }
 
     public function tableName(){return $this->productName;}
+    public function tableAlias(){return $this->tableName()." t";}
     public function getDbConnection(){return Yii::app()->db;}
-
+    public function getProductID(){return $this->product->id;}
     protected function addRule($field){
         if ( $field->is_mandatory ) {
             $requiredValidator = CValidator::createValidator('required',$this,$field->alias);
@@ -77,7 +81,7 @@ class DynamicModel extends CModel
 
         switch( $field->field_type ){
             case TypeField::STRING :
-    		case TypeField::TEXT :
+        	case TypeField::TEXT :
 				$safe = true;
                 $types[] = 'length';
 				$params['length'] = array(
@@ -179,9 +183,25 @@ class DynamicModel extends CModel
     	switch( $field->field_type ){
 			case TypeField::LISTS:
                 if ($field->is_multiple_select) {
-                    $this->join[$field->alias] = array();
+                    $this->join[$field->alias] = array( self::MANY_MANY,
+                                                        'tableName' => 'list_item',
+                                                        'on' => 'list_item.id = record_list.list_item_id',
+                                                        'tableAliasFields'=> array('list_item_id'=>'id', 'list_item_name'=>'name'),
+                                                        'select'=> array('list_item.id as list_item_id', 'list_item.name as list_item_name'),
+                                                        'class'=> 'ListItem',
+                                                        'relation' => array(
+                                                            'tableName' => 'record_list',
+                                                            'on'=>"( record_list.record_id = t.id AND record_list.product_id = {$this->getProductID()} )"
+                                                            )
+                                                        );
 				} else
-                    $this->join[$field->alias] = array();
+                    $this->join[$field->alias] = array( self::BELONGS_TO, 
+                                                        'tableName' => 'list_item',
+                                                        'on' => 'list_item.id = t.'.$field->alias,
+                                                        'tableAliasFields'=> array('list_item_id'=>'id', 'list_item_name'=>'name'),
+                                                        'select'=> array('list_item.id as list_item_id', 'list_item.name as list_item_name'),
+                                                        'class'=> 'ListItem'
+                                                        );
             break;
 
 			case TypeField::CATEGORIES :
@@ -257,13 +277,79 @@ class DynamicModel extends CModel
         return $this;
     }
 
-    public function findAll($conditions, $params=array()){
-        $rows = Yii::app()->db->createCommand()->from($this->tableName())->where($conditions,$params)->queryAll();
+    public function findAll($conditions='', $params=array(), $query = array()){
+        $rows = Yii::app()->db->createCommand()->from($this->tableName().' t');
+
+        
+        $select = array('t.*');       
+        
+        if( !empty($this->join) )
+            foreach( $this->join as $name => $join ) {
+                switch( $join[0] ){
+    		        case self::BELONGS_TO :                        
+                        $rows = $rows->leftJoin( $join['tableName'] , $join['on'] );
+                    break;
+        	        case self::MANY_MANY :
+                        $rows = $rows->leftJoin( $join['relation']['tableName'] , $join['relation']['on'] );
+                        $rows = $rows->leftJoin( $join['tableName'] , $join['on'] );
+                    break;                    
+                }  
+                
+                if ( isset( $join['select'] )  ) $select = array_merge($select,$join['select']);                
+            }
+        
+        if ( isset($query['limit']) ){
+            $rows = $rows->limit($query['limit'], isset($query['offset']) ? $query['offset'] : null );
+        }
+        
+        $rows = $rows->select($select)->where($conditions,$params)->queryAll();
 
 		$return = array();
 		if ( is_array($rows) && !empty($rows) ) {
+        
+
+            $tmp = array();
+            foreach ($rows as $row){
+                $join = $this->join;
+                
+                if ( !empty($join) ){
+                    foreach ($join as $name => $j){
+                        $row[$name] = array();
+                        switch( $j[0] ){
+    			            case self::BELONGS_TO :                                
+                                foreach ($j['tableAliasFields'] as $k => $fieldAlias){
+                                    $row[$name][$fieldAlias] = $row[$k];
+                                    unset($row[$k]);
+                                }                               
+                            break;
+        		            case self::MANY_MANY :
+                                $tmpList = array();
+                                
+                                foreach ($j['tableAliasFields'] as $k => $fieldAlias){
+                                    if( !empty($row[$k]) ) $tmpList[$fieldAlias] = $row[$k];
+                                    unset($row[$k]);
+                                }
+                                
+                                if ( isset($tmp[$row['id']]) ){
+                                    $row[$name][$row['id']] = array_merge($tmpList,$row[$name]) ;
+                                    $row[$name] = array_merge($tmp[$row['id']][$name],$row[$name]) ;
+                                } else {
+                                    $row[$name][$row['id']] = array_merge($tmpList,$row[$name]) ;
+                                }                                
+                                
+                            break;                        
+                        }
+                    }
+                   
+                }
+                
+                $tmp[$row['id']] = $row;
+			}
+            unset($row);
+            $rows = $tmp;            
+            
 			foreach ($rows as $row) {
-				$obj = clone $this;
+				$obj = clone $this;                
 				$obj->setAttributes($row);
 				$return[] = $obj;
 			}
@@ -303,6 +389,78 @@ class DynamicModel extends CModel
             $transaction->rollback();
         }
 
+    }
+
+    public function search()
+	{
+        $pageSize = 20;
+        $page = 1;
+        if ( isset($_GET['page']) && is_numeric($_GET['page']) ) 
+            $page = ($_GET['page'] - 1) * $pageSize;
+        
+        
+		return  new CArrayDataProvider($this->findAll('',array(),array('limit'=>$pageSize,'offset'=>$page)), array(
+            'pagination'=>array(
+                'pageSize'=>$pageSize,
+                'pageVar'=>'page',                
+            ),
+           'totalItemCount'=> Yii::app()->db->createCommand()->from($this->tableName())->select('COUNT(*)')->queryScalar(),
+            
+            //'itemCount'=>20
+            //'sort'=>array('attributes'=>array('id', 'name'))
+            )
+        );
+	}
+
+    public function getTableFields(){
+        $fields = array();
+        if ( $this->product ){
+            foreach( $this->product->fields as $field ){
+    			if( $field->is_column_table ){
+					$f['name'] = $field->alias;
+					//$f['header'] = $field->name;
+                    
+                    switch( $field->field_type ){
+            			case TypeField::LISTS:
+                            if ($field->is_multiple_select) {
+                                $f['value'] = '$data->getLists('.$field->alias.')';
+            				} else {
+                                $f['value'] = '$data->'.$field->alias.'["name"]';
+            				}
+                        break;
+                		case TypeField::CATEGORIES:
+                            if ($field->is_multiple_select) {
+                                $f['value'] = "";
+            				} else {
+                                $f['value'] = '$data->'.$field->alias.'["name"]';
+            				}
+                        break;
+                		case TypeField::MANUFACTURER:
+                            if ($field->is_multiple_select) {
+                                $f['value'] = "";
+            				} else {
+                                $f['value'] = '$data->'.$field->alias.'["name"]';
+            				}
+                        break;                        
+            		}                    
+                    
+                    $fields[] = $f;
+    			}
+            }
+        }
+        return $fields;
+    }    
+
+    public function getLists($name, $sSep = ', ')
+    {
+        if ( empty($this->{$name}) ) return;
+
+        $aRes = array();
+        foreach ($this->{$name} as $item) {
+            $aRes[] = $item['name'];
+        }
+
+        return implode($sSep, $aRes);
     }
 
 }

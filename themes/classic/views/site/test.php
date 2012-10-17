@@ -4,8 +4,8 @@
             'ajaxUpdate'=>false,
             'enablePagination' => true,
             'dataProvider'=>$model->search(),
-        	'filter'=>$model,
-        	'columns' =>$model->getTableFields(),
+        	//'filter'=>$model,
+            'columns' =>$model->getTableFields(),
 
         	'htmlOptions'=>array('class'=>false),
         	'itemsCssClass'=>'table table-bordered table-striped',

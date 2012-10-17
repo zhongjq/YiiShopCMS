@@ -21,45 +21,133 @@ class SiteController extends Controller
 	 * var @model CustemCActiveRecord
 	 */
 	public function actionTest()
-	{
-		$model = DynamicActiveRecord::model('disk');
+	{   
+        $connection=Yii::app()->db;
+        
+        
+        
+        $sql="
+SELECT 
+`product_field`.*,
+`field_tab`.`position` as `position_tab`,
+`min_length`,`max_length`,
+NULL as `min_value`, NULL as `max_value`,NULL as `rows`,NULL as `decimal`,NULL as `default`,NULL as list_id,NULL as is_multiple_select
+FROM `product_field`
+-- min_length, max_length
+JOIN `string_field` ON string_field.field_id = id
+LEFT JOIN `field_tab` ON `field_tab`.field_id = id
+WHERE `product_id` = :product_id
 
-		if ( isset($_GET['disk']) )
-			$model->attributes = $_GET['disk'];
+UNION  
 
+SELECT 
+`product_field`.*,
+`field_tab`.`position` as `position_tab`,
+NULL,NULL,`min_value`,`max_value`,NULL,NULL,NULL,NULL,NULL
+FROM `product_field`
+-- min_value, max_value
+JOIN `integer_field` ON integer_field.field_id = id
+LEFT JOIN `field_tab` ON `field_tab`.field_id = id
+WHERE `product_id` = :product_id
 
-		$model = $model->findByPk(1);
+UNION  
 
+SELECT 
+`product_field`.*,
+`field_tab`.`position` as `position_tab`,
+`min_length`,`max_length`,
+NULL as `min_value`, NULL as `max_value`, 
+`rows`,
+NULL as `decimal`,
+NULL as `default`,
+NULL as list_id,
+NULL as is_multiple_select
+FROM `product_field`
+-- row, min_length, max_length
+JOIN `text_field` ON text_field.field_id = id
+LEFT JOIN `field_tab` ON `field_tab`.field_id = id
+WHERE `product_id` = :product_id
 
-		//$model = $model->findAll();
+UNION 
 
-    //$model = DynamicModel::model('disk');
+SELECT `product_field`.*,
+`field_tab`.`position` as `position_tab`,
+NULL as `min_length`, NULL as `max_length`,
+NULL as `min_value`, `max_value`, 
+NULL as `rows`,
+NULL as `decimal`,
+NULL as `default`,
+NULL as list_id,
+NULL as is_multiple_select
+FROM `product_field`
+-- max_value
+JOIN `price_field` ON price_field.field_id = id
+LEFT JOIN `field_tab` ON `field_tab`.field_id = id
+WHERE `product_id` = :product_id
 
-//        $model = new DynamicModel('disk');
-//		$models = $model->findAll('price > 10');
+UNION 
 
-//		exit;
-//
-//        $value = array(
-//            'alias'=>"asd",
-//            'price'=>"10.50",
-//            'name'=>"10.51",
-//            'category'=>array(1),
-//            'manufacturer'=>array(1)
-//        );
-//
-//		$model = $model->findByPk(25);
-//
-//        $model->setAttributes($value);
-//
-//        $model->save();
-//
-//        echo "<pre>";
-//
-//        print_r( $model->getAttributes() );
-//
-//        print_r( $model->getErrors() );
+SELECT `product_field`.*,
+`field_tab`.`position` as `position_tab`,
+NULL as `min_length`, NULL as `max_length`,
+NULL as `min_value`, NULL as `max_value`, 
+NULL as `rows`,
+`decimal`,
+NULL as `default`,
+NULL as list_id,
+NULL as is_multiple_select
+FROM `product_field`
+-- decimal
+JOIN `double_field` ON double_field.field_id = id
+LEFT JOIN `field_tab` ON `field_tab`.field_id = id
+WHERE `product_id` = :product_id
 
+UNION 
+
+SELECT `product_field`.*,
+`field_tab`.`position` as `position_tab`,
+NULL as `min_length`, NULL as `max_length`,
+NULL as `min_value`, NULL as `max_value`, 
+NULL as `rows`,
+NULL as `decimal`,
+`default`,
+NULL as list_id,
+NULL as is_multiple_select
+FROM `product_field`
+-- default
+JOIN `boolean_field` ON boolean_field.field_id = id
+LEFT JOIN `field_tab` ON `field_tab`.field_id = id
+WHERE `product_id` = :product_id
+
+UNION 
+
+SELECT `product_field`.*,
+`field_tab`.`position` as `position_tab`,
+NULL as `min_length`, NULL as `max_length`,
+NULL as `min_value`, NULL as `max_value`, 
+NULL as `rows`,
+NULL as `decimal`,
+NULL as `default`,
+list_id,
+is_multiple_select
+FROM `product_field`
+-- list_id, is_multiple_select
+JOIN `list_field` ON list_field.field_id = id
+LEFT JOIN `field_tab` ON `field_tab`.field_id = id
+WHERE `product_id` = :product_id
+        
+";
+        
+        
+        $command = $connection->createCommand($sql);
+        $command->bindValue(":product_id",1,PDO::PARAM_STR);
+       
+        $users = $command->setFetchMode(PDO::FETCH_OBJ)->queryAll();     
+        
+        echo "<pre>";
+        print_r($users);
+        
+        
         //$this->render('test', array('model'=> $model ));
 	}
 

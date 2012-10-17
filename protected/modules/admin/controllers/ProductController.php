@@ -19,7 +19,6 @@ class ProductController extends Controller
 	{
         $product = Product::getProductByPk($id);
 		$model = DynamicActiveRecord::model($product->alias);
-        //print_r($model->rules());
 
 		if ( isset($_GET[$model->productName]) ){
 			$model->attributes = $_GET[$model->productName];
@@ -42,7 +41,7 @@ class ProductController extends Controller
                 }
             }
 
-			//$this->redirect($this->createUrl('/admin/product/view',array('id'=>$product->id)));
+			$this->redirect($this->createUrl('/admin/product/view',array('id'=>$product->id)));
 		}
 
 		$this->render('records/view', array(
@@ -71,6 +70,7 @@ class ProductController extends Controller
 		$form = $model->getMotelCForm();
 
 		if(isset($_POST[$model->tableName()])) {
+            
 			$model->attributes = $_POST[$model->tableName()];
 
 			$transaction = Yii::app()->db->beginTransaction();
@@ -97,15 +97,17 @@ class ProductController extends Controller
 
 		$model = DynamicActiveRecord::model($product->alias);
 
-        //$model = $model->findByPk($recordId);
+        $model = $model->findByPk($recordId);
 
 		$this->performAjaxRecordValidation($model);
 
 		$form = $model->getMotelCForm();
 
 		if(isset($_POST[$model->tableName()])) {
-			$model->attributes = $_POST[$model->tableName()];
-			$transaction = Yii::app()->db->beginTransaction();
+			
+            $model->attributes = $_POST[$model->tableName()];
+            
+            $transaction = Yii::app()->db->beginTransaction();
 			try
 			{
 				if($form->submitted() && $model->save()){
@@ -230,7 +232,7 @@ class ProductController extends Controller
 
 	public function actionFields($id)
 	{
-		$product = Product::model()->with('productFields')->findByPk($id);
+		$product = Product::model()->findByPk($id);
 
         $criteria=new CDbCriteria;
     	$criteria->compare('product_id',$id);

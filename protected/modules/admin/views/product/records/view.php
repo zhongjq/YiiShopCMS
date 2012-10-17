@@ -19,30 +19,32 @@ $this->widget('zii.widgets.grid.CGridView', array(
 	'filter'=>$record,
 	'columns'=>
 		array_merge(
-			$record->getTableFields()
+			$record->getAdminTableFields()
 			,
 			array(
 				array(
-					'htmlOptions'=>array('width'=>'10'),
+					'htmlOptions'=>array('class'=>'edit'),
 					'class'=>'CButtonColumn',
 					'template'=>'{update}',
 					'buttons'=> array(
 						'update' => array(
 							'url'=> 'Yii::app()->createUrl("admin/product/editrecord",array("productId"=>'.$product->id.',"recordId"=>$data->id) )',
 							'imageUrl'=>null,
-							'label'=>'<span class="icon-pencil pointer" title="'.Yii::t('AdminModule.main','Редактировать').'"></span>'
+							'label'=>'<span class="icon-pencil pointer" title="'.Yii::t('AdminModule.main','Edit').'"></span>',
+                            'htmlOptions'=>array('title'=>Yii::t('AdminModule.main','Edit')),
 						)
 					)
 				),
 				array(
-					'htmlOptions'=>array('width'=>'10'),
+					'htmlOptions'=>array('class'=>'delele'),
 					'class'=>'CButtonColumn',
 					'template'=>'{delete}',
 					'buttons'=> array(
 						'delete' => array(
 							'url'=> 'Yii::app()->createUrl("admin/product/deleterecord",array("productId"=>'.$product->id.',"recordId"=>$data->id) )',
 							'imageUrl'=>null,
-							'label'=>'<span class="close" title="'.Yii::t('AdminModule.main','Удалить').'">&times;</span>'
+							'label'=>'<span class="close" title="'.Yii::t('AdminModule.main','Delete').'">&times;</span>',
+                            'htmlOptions'=>array('title'=>Yii::t('AdminModule.main','Delete')),
 						)
 					)
 				),

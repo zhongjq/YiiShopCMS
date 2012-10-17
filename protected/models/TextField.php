@@ -1,85 +1,96 @@
 <?php
 
 /**
- * This is the model class for table "TextFields".
+ * This is the model class for table "text_field".
  *
- * The followings are the available columns in table 'TextFields':
- * @property integer $field_id
- * @property integer $min_length
- * @property integer $max_length
- * @property integer $rows
+ * The followings are the available columns in table 'text_field':
+ * @property string $field_id
+ * @property string $min_length
+ * @property string $max_length
+ * @property string $rows
  *
  * The followings are the available model relations:
- * @property ProductsFields $field
+ * @property ProductField $field
  */
-class TextField extends Field
+class TextField extends CActiveRecord
 {
-    public $field_id;
-    public $min_length;
-    public $max_length;
-    public $rows;
-    
-	public static function tableName()
+	/**
+	 * Returns the static model of the specified AR class.
+	 * @param string $className active record class name.
+	 * @return TextField the static model class
+	 */
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+
+	/**
+	 * @return string the associated database table name
+	 */
+	public function tableName()
 	{
 		return 'text_field';
 	}
 
-    public static function selectCol(){
-        $return = array( 
-                self::tableName().'.field_id as '.self::tableName().'_field_id',
-                self::tableName().'.min_length as '.self::tableName().'_min_length',
-                self::tableName().'.max_length as '.self::tableName().'_max_length',
-                self::tableName().'.rows as '.self::tableName().'_rows',
-            );
-        
-        return $return;
-    }
-
+	/**
+	 * @return array validation rules for model attributes.
+	 */
 	public function rules()
 	{
+		// NOTE: you should only define rules for those attributes that
+		// will receive user inputs.
 		return array(
-			array('min_length, max_length, rows', 'required', 'on'=>'add'),
-			array('field_id, min_length, max_length, rows', 'required', 'on'=>'edit'),
-			array('field_id, min_length, max_length, rows', 'numerical', 'integerOnly'=>true),
+			array('field_id', 'required'),
+			array('field_id, min_length, max_length, rows', 'length', 'max'=>11),
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+			array('field_id, min_length, max_length, rows', 'safe', 'on'=>'search'),
 		);
 	}
 
-	public function attributeNames()
+	/**
+	 * @return array relational rules.
+	 */
+	public function relations()
+	{
+		// NOTE: you may need to adjust the relation name and the related
+		// class name for the relations automatically generated below.
+		return array(
+			'field' => array(self::BELONGS_TO, 'ProductField', 'field_id'),
+		);
+	}
+
+	/**
+	 * @return array customized attribute labels (name=>label)
+	 */
+	public function attributeLabels()
 	{
 		return array(
-			'min_length' => Yii::t('fields','Min length'),
-			'max_length' => Yii::t('fields','Max length'),
-			'rows' => Yii::t('fields','Rows'),
+			'field_id' => 'Field',
+			'min_length' => 'Min Length',
+			'max_length' => 'Max Length',
+			'rows' => 'Rows',
 		);
 	}
 
-    protected function setAttr($params){
-        parent::setAttr($params);
-        
-        $this->field_id = $params[self::tableName().'_field_id'];
-        $this->min_length = $params[self::tableName().'_min_length'];
-        $this->max_length = $params[self::tableName().'_max_length'];
-        $this->rows = $params[self::tableName().'_rows'];
-    }
+	/**
+	 * Retrieves a list of models based on the current search/filter conditions.
+	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
+	 */
+	public function search()
+	{
+		// Warning: Please modify the following code to remove attributes that
+		// should not be searched.
 
-	// форма в формате CForm
-	public function getElementsMotelCForm(){
-		return array(
-			'type'=>'form',
-			'elements'=>array(
-				'min_length'=>array(
-					'type'=>'text',
-					'maxlength'=>255
-				),
-				'max_length'=>array(
-					'type'=>'text',
-					'maxlength'=>255
-				),
-				'rows'=>array(
-					'type'=>'text',
-					'maxlength'=>255
-				),
-			)
-		);
+		$criteria=new CDbCriteria;
+
+		$criteria->compare('field_id',$this->field_id,true);
+		$criteria->compare('min_length',$this->min_length,true);
+		$criteria->compare('max_length',$this->max_length,true);
+		$criteria->compare('rows',$this->rows,true);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
 	}
 }

@@ -17,9 +17,6 @@
 class Field extends CModel
 {
     protected static $instance;  // object instance
-    private function __construct(){ /* ... @return Singleton */ }  // Защищаем от создания через new Singleton
-    private function __clone()    { /* ... @return Singleton */ }  // Защищаем от создания через клонирование
-    private function __wakeup()   { /* ... @return Singleton */ }  // Защищаем от создания через unserialize    
     
     
     public $id;
@@ -86,7 +83,8 @@ class Field extends CModel
 		);
 	}
     
-    protected function setAttr($params){
+    protected function setAttr($params)
+    {
         $this->id = $params['id'];
         $this->product_id = $params['product_id'];
         $this->field_type = $params['field_type'];
@@ -241,174 +239,5 @@ class Field extends CModel
 		);
 	}
 
-	// форма в формате CForm
-	public function getCForm(){
 
-        $tab = '<ul class="nav nav-tabs">
-                    <li class="active"><a href="#field" data-toggle="tab">Поле</a></li>
-                    <li><a href="#admin" data-toggle="tab">Администрирование</a></li>
-                </ul>';
-
-    	if ( $this->isNewRecord && $this->field_type ){
-			$this->subClassName = TypeField::$Fields[$this->field_type]['class'];
-			$this->subClass = $this->CreateField($this->field_type);
-		}
-
-		$arForm = array(
-			'attributes' => array(
-				'enctype' => 'application/form-data',
-				'class' => 'well',
-				'id'=>'fieldForm'
-			),
-			'activeForm' => array(
-				'class' => 'CActiveForm',
-				'enableAjaxValidation' => true,
-				'enableClientValidation' => false,
-				'id' => "fieldForm",
-				'clientOptions' => array(
-					'validateOnSubmit' => true,
-					'validateOnChange' => false,
-				),
-			),
-
-			'elements'=>array(
-                $tab,
-                '<div class="tab-content">',
-                    '<div id="field" class="tab-pane active">',
-
-        				'field_type'=>array(
-        					'type' => 'dropdownlist',
-        					'items' => TypeField::getFieldsList(),
-        					'empty'=> '',
-        					'ajax' => array(
-                                'url' => "",
-        						'type' => 'POST',
-        						'replace'=>  '#fieldForm',
-        					),
-                            'disabled' => !$this->isNewRecord ? true : false,
-        				),
-        				'name'=>array(
-        					'type'=>'text',
-        					'maxlength'=>255
-        				),
-        				'alias'=>array(
-        					'type' => 'text',
-        					'maxlength' => 255,
-                            'disabled' => !$this->isNewRecord ? true : false,
-        				),
-        				'is_mandatory'=>array(
-        					'type'=>'checkbox',
-        					'layout'=>'{input}{label}{error}{hint}',
-        				),
-        				'is_filter'=>array(
-        					'type'=>'checkbox',
-        					'layout'=>'{input}{label}{error}{hint}',
-        				),
-        				'is_column_table'=>array(
-        					'type'=>'checkbox',
-        					'layout'=>'{input}{label}{error}{hint}',
-        				),
-            			'unit_name'=>array(
-        					'type'=>'text',
-        					'maxlength'=>255
-        				),
-            			'hint'=>array(
-        					'type'=>'text',
-        					'maxlength'=>255
-        				),
-
-                        $this->subClassName => ( $this->subClass ? $this->subClass->getElementsMotelCForm() : null ),
-                    '</div>',
-
-                    '<div id="admin" class="tab-pane">',
-                        'is_editing_table_admin'=>array(
-                    		'type'=>'checkbox',
-        					'layout'=>'{input}{label}{error}{hint}',
-        				),
-                        'is_column_table_admin'=>array(
-            				'type'=>'checkbox',
-        					'layout'=>'{input}{label}{error}{hint}',
-        				),
-                    '</div>',
-
-                '</div>'
-			),
-
-			'buttons'=>array(
-				'<br/>',
-				'submit'=>array(
-					'type'  =>  'submit',
-					'label' =>  $this->isNewRecord ? Yii::t('main','Create') : Yii::t('main','Save'),
-					'class' =>  "btn"
-				),
-			),
-		);
-
-        $form = new CForm($arForm,$this);
-
-        if ( $this->subClass ) $form[$this->subClassName]->model = $this->subClass;
-
-        return $form;
-	}
-
-	public static function CreateField($FieldType){
-		if ( !isset(TypeField::$Fields[$FieldType]['class']) ){
-			throw new CException("NOT NUMERIC");
-		}
-
-		return new TypeField::$Fields[$FieldType]['class']('add');
-	}
-
-	public function afterSave(){
-		parent::afterSave();       
-        
-		${$this->product->alias} = $this->product->getRecordObject();
-        
-		if ( $this->subClass ) {
-
-            // чтобы сохранять значение
-            if( $this->subClass && isset($_POST[$this->subClassName]) )
-                $this->subClass->attributes = $_POST[$this->subClassName];
-
-			$this->subClass->field_id = $this->id;
-			if ( $this->subClass->save() ){
-
-				if( isset($this->subClass->is_multiple_select) ){
-					if ($this->isNewRecord && $this->subClass->is_multiple_select == 0){
-						Yii::app()->db->createCommand()->addColumn( $this->product->alias,
-							$this->alias,
-							TypeField::$Fields[$this->field_type]['dbType']
-						);
-					} elseif ( $this->subClass->is_multiple_select && isset(${$this->product->alias}->tableSchema->columns[$this->alias]) ){
-						Yii::app()->db->createCommand()->dropColumn( $this->product->alias, $this->alias );
-					} elseif ( !$this->subClass->is_multiple_select && !isset(${$this->product->alias}->tableSchema->columns[$this->alias]) ){
-						Yii::app()->db->createCommand()->addColumn( $this->product->alias,$this->alias,TypeField::$Fields[$this->field_type]['dbType']);
-					}
-
-				} elseif( !isset(${$this->product->alias}->tableSchema->columns[$this->alias]) ) {
-					Yii::app()->db->createCommand()->addColumn( $this->product->alias,
-						$this->alias,
-						TypeField::$Fields[$this->field_type]['dbType']
-					);
-				}
-
-				return true;
-			}
-		}
-	}
-
-	public function afterDelete(){
-		parent::afterDelete();
-		Yii::app()->db->createCommand()->dropColumn( $this->product->alias, $this->alias );
-	}
-
-    public function afterFind(){
-        parent::afterFind();
-
-        if ( $this->field_type ){
-			$this->subClassName = TypeField::$Fields[$this->field_type]['class'];
-			$class = $this->CreateField($this->field_type);
-            $this->subClass = $class::model()->findByPk($this->id);
-		}
-    }
 }

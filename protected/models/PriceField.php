@@ -1,60 +1,72 @@
 <?php
 
 /**
- * This is the model class for table "IntegerFields".
+ * This is the model class for table "price_field".
  *
- * The followings are the available columns in table 'IntegerFields':
- * @property integer $field_id
- * @property integer $MinLength
- * @property integer $MaxLength
+ * The followings are the available columns in table 'price_field':
+ * @property string $field_id
+ * @property string $max_value
  *
  * The followings are the available model relations:
- * @property ProductsFields $field
+ * @property ProductField $field
  */
-class PriceField extends Field
+class PriceField extends CActiveRecord
 {
-    public $field_id;
-    public $min_value;
-    public $max_value;
-    
-	public static function tableName()
+	/**
+	 * Returns the static model of the specified AR class.
+	 * @param string $className active record class name.
+	 * @return PriceField the static model class
+	 */
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+
+	/**
+	 * @return string the associated database table name
+	 */
+	public function tableName()
 	{
 		return 'price_field';
 	}
 
-    public static function selectCol(){
-        $return = array( 
-                self::tableName().'.field_id as '.self::tableName().'_field_id',
-                self::tableName().'.max_value as '.self::tableName().'_max_value',
-            );
-        
-        return $return;
-    }
-    
+	/**
+	 * @return array validation rules for model attributes.
+	 */
 	public function rules()
 	{
+		// NOTE: you should only define rules for those attributes that
+		// will receive user inputs.
 		return array(
-			array('field_id', 'required', 'on'=>'edit'),
-			array('field_id, max_value', 'numerical', 'integerOnly'=>true),
+    		array('field_id', 'required'),
+			array('field_id', 'numerical', 'integerOnly'=>true),
 			array('max_value', 'numerical', 'integerOnly'=>true, 'allowEmpty'=>true),
 		);
 	}
 
-	public function attributeNames()
+	/**
+	 * @return array relational rules.
+	 */
+	public function relations()
+	{
+		// NOTE: you may need to adjust the relation name and the related
+		// class name for the relations automatically generated below.
+		return array(
+			'field' => array(self::BELONGS_TO, 'ProductField', 'field_id'),
+		);
+	}
+
+	/**
+	 * @return array customized attribute labels (name=>label)
+	 */
+	public function attributeLabels()
 	{
 		return array(
 			'max_value' => Yii::t('fields','Max value'),
 		);
 	}
 
-    protected function setAttr($params){
-        parent::setAttr($params);
-        
-        $this->field_id = $params[self::tableName().'_field_id'];
-        $this->max_value = $params[self::tableName().'_max_value'];      
-    }
-
-	// форма в формате CForm
+    // форма в формате CForm
 	public function getElementsMotelCForm(){
 		return array(
 			'type'=>'form',
@@ -70,5 +82,4 @@ class PriceField extends Field
 			)
 		);
 	}
-
 }

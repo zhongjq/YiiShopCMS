@@ -4,72 +4,93 @@
  * This is the model class for table "image_field".
  *
  * The followings are the available columns in table 'image_field':
- * @property integer $field_id
+ * @property string $field_id
  * @property integer $is_multiple_select
- * @property integer $quantity
+ * @property string $quantity
  *
  * The followings are the available model relations:
  * @property ProductField $field
  * @property ImageFieldParameter[] $imageFieldParameters
  */
-class ImageField extends Field 
+class ImageField extends CActiveRecord
 {
-    public $field_id;
-    public $quantity;
-    
-	public static function tableName()
+	/**
+	 * Returns the static model of the specified AR class.
+	 * @param string $className active record class name.
+	 * @return ImageField the static model class
+	 */
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+
+	/**
+	 * @return string the associated database table name
+	 */
+	public function tableName()
 	{
 		return 'image_field';
 	}
 
-    public static function selectCol(){
-        $return = array( 
-                self::tableName().'.field_id as '.self::tableName().'_field_id',
-                self::tableName().'.quantity as '.self::tableName().'_quantity',
-            );
-        
-        return $return;
-    }
-    
-	public function rules(){
+	/**
+	 * @return array validation rules for model attributes.
+	 */
+	public function rules()
+	{
+		// NOTE: you should only define rules for those attributes that
+		// will receive user inputs.
 		return array(
-			array('field_id', 'required', 'on'=>'edit'),
-			array('field_id, quantity', 'numerical', 'integerOnly'=>true),
-			array('quantity', 'numerical', 'integerOnly'=>true, 'allowEmpty'=>true),
+			array('field_id, quantity', 'required'),
+			array('is_multiple_select', 'numerical', 'integerOnly'=>true),
+			array('field_id, quantity', 'length', 'max'=>11),
+			// The following rule is used by search().
+			// Please remove those attributes that should not be searched.
+			array('field_id, is_multiple_select, quantity', 'safe', 'on'=>'search'),
 		);
 	}
 
-	public function attributeNames()
+	/**
+	 * @return array relational rules.
+	 */
+	public function relations()
+	{
+		// NOTE: you may need to adjust the relation name and the related
+		// class name for the relations automatically generated below.
+		return array(
+			'field' => array(self::BELONGS_TO, 'ProductField', 'field_id'),
+			'imageFieldParameters' => array(self::HAS_MANY, 'ImageFieldParameter', 'field_id'),
+		);
+	}
+
+	/**
+	 * @return array customized attribute labels (name=>label)
+	 */
+	public function attributeLabels()
 	{
 		return array(
+			'field_id' => 'Field',
+			'is_multiple_select' => 'Is Multiple Select',
 			'quantity' => 'Quantity',
 		);
 	}
 
-    protected function setAttr($params){
-        parent::setAttr($params);
-        
-        $this->field_id = $params[self::tableName().'_field_id'];
-        $this->quantity = $params[self::tableName().'_quantity'];      
-    }
+	/**
+	 * Retrieves a list of models based on the current search/filter conditions.
+	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
+	 */
+	public function search()
+	{
+		// Warning: Please modify the following code to remove attributes that
+		// should not be searched.
 
-    public function getElementCForm(){
-	    return array(
-    		'type' => 'Files',
-            'accept'=>'jpg|gif|png',
-        );
-    }
+		$criteria=new CDbCriteria;
 
-	// форма в формате CForm
-	public function getElementsMotelCForm(){        
-		return array(
-				'type'=>'form',
-				'elements'=>array(
-					'quantity'=>array(
-						'type'=>'text',
-						'maxlength'=>255
-					),
-				)
-			);
+		$criteria->compare('field_id',$this->field_id,true);
+		$criteria->compare('is_multiple_select',$this->is_multiple_select);
+		$criteria->compare('quantity',$this->quantity,true);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
 	}
 }

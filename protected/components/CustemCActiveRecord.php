@@ -6,37 +6,68 @@ class CustemCActiveRecord extends CActiveRecord {
 	private $_categoryFilter = null;
     private $productFieldsOrder = null;
 
-
 	public $productName;
 	public $product;
 	public $attributeLabels = array();
-
-	public function getProductID(){
-		return $this->product->id;
-	}
+    private $_attributes=array();
+    
+	public function getProductID(){return $this->product->id;}
 
 	public function attributeLabels(){
-		return $this->attributeLabels;
-	}
+        $this->attributeLabels = array_merge($this->attributeLabels,
+            array(
+                'alias'=>Yii::t('record','Alias'),
+                'title'=>Yii::t('record','Title'), 
+                'keywords'=>Yii::t('record','Keywords'), 
+                'description'=>Yii::t('record','Description'), 
+            )
+        );
+        return $this->attributeLabels;
+    }
 
-	public function setAttributeLabels($params){
-		$this->attributeLabels = $params;
+    protected function instantiate($attributes)
+    {
+		$class=get_class($this);
+		$model=new $class(null);
+        $model->product = $this->product;
+        $model->productName = $this->productName;
+		return $model;
+	}    
+    
+    public function init()
+    {        
+        if ( $this->product && $this->product->fields ){
+            $fields = $this->product->fields;
+            foreach( $fields as $field_id => $field ){
+				$this->attributeLabels[$field->alias] = $field->name;
+                $this->addRule($field);
+            }
+        }
+		$this->addRelations();    
 	}
-
+    
+    public function rules()
+    {
+        return array(
+            array('alias', 'length', 'max'=>255),
+            array('alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u', 'message' => Yii::t("products",'Field contains invalid characters.') ),
+    		
+            array('title, keywords, description', 'length', 'max'=>500), 
+        );
+    }
+    
 	public function search()
 	{
 		$criteria = new CDbCriteria;
         $criteria->with = array_keys($this->getMetaData()->relations);
 
-		print_r($criteria->with);
-
-        if ( $this->product ){
+	    if ( $this->product ){
             foreach( $this->product->fields as $field ){
 
 				switch( $field->field_type ){
 					case TypeField::LISTS:
 						if ($field->is_multiple_select){
-							$criteria->compare($field->alias, $this->{$field->alias} );
+							$criteria->compare("list_item_id", $this->{$field->alias} );
 						} else
 							$criteria->compare($field->alias, $this->{$field->alias} );
 					break;
@@ -63,7 +94,8 @@ class CustemCActiveRecord extends CActiveRecord {
         ));
 	}
 
-	public function getTableFields(){
+	public function getTableFields()
+    {
         $fields = array();
         if ( $this->product ){
             foreach( $this->product->fields as $field ){
@@ -136,19 +168,20 @@ class CustemCActiveRecord extends CActiveRecord {
         return $fields;
     }
 
-   public function getAdminTableFields($update = false)
+    public function getAdminTableFields($update = false)
     {
         $tableFields = array();
 
 		if ( $update === false ){
-            //$this->setProductFieldsOrder("t.position");
+            $this->setProductFieldsOrder("t.position");
 
             if ( $this->product ){
                 foreach( $this->product->fields as $field ){
 
 					if( $field->is_column_table_admin ){
 						$f['name'] = $field->alias;
-
+                        $f['header'] = $field->name;
+                        
                         if ( $field->is_editing_table_admin ) {
                             $name = $this->productName.'[$data->id]['.$field->alias.']';
 
@@ -196,8 +229,9 @@ class CustemCActiveRecord extends CActiveRecord {
                                         $name = $name.'[]';
                                         $multiple = 'array("multiple"=>true,"class"=>"chzn-select")';
                                     }
-
-                                    $f['value'] = 'CHtml::dropDownList("'.$name.'", $data->'.$field->alias.',
+                                    
+                                    
+                                    $f['value'] = 'CHtml::hiddenField("'.str_replace("[]",'',$name).'").CHtml::dropDownList("'.$name.'", $data->'.$field->alias.',
                                                                             CHtml::listData($data->getListFilter('.$field->list_id.') , "id", "name"),
                                                                             '.$multiple.'
                                                                             );';
@@ -205,7 +239,7 @@ class CustemCActiveRecord extends CActiveRecord {
 
                                 } else {
 
-        							if ($field->listField->is_multiple_select)
+        							if ($field->is_multiple_select)
     									$f['value'] = '$data->getRecordItems("'.$field->alias.'")';
     								else
     									$f['value'] = 'isset($data->'.$field->alias.') ? $data->'.$field->alias.'->name : null';
@@ -228,8 +262,9 @@ class CustemCActiveRecord extends CActiveRecord {
                                         $name = $name.'[]';
                                         $multiple = 'array("multiple"=>true,"class"=>"chzn-select")';
                                     }
-
-                                    $f['value'] = 'CHtml::dropDownList("'.$name.'",
+                                    $h = CHtml::hiddenField($name);
+                    
+                                    $f['value'] = $h.'.CHtml::dropDownList("'.$name.'",
                                                                         $data->'.$field->alias.',
                                                                         CHtml::listData($data->getCategoryFilter('.$field->category_id.') , "id", "name"),
                                                                         '.$multiple.'
@@ -298,7 +333,7 @@ class CustemCActiveRecord extends CActiveRecord {
 		return $tableFields;
 	}
 
-   public function getListFilter($list_id)
+    public function getListFilter($list_id)
 	{
         $name = "listFilterСache_".$list_id;
 
@@ -313,8 +348,8 @@ class CustemCActiveRecord extends CActiveRecord {
 
     public function getRecordItems($name, $sSep = ', ')
 	{
-        if ( empty($this->{$name}) ) return;
-
+        if ( empty($this->{$name}) ) return;    
+        
         $aRes = array();
         foreach ($this->{$name} as $item) {
             $aRes[] = $item->name;
@@ -387,7 +422,7 @@ class CustemCActiveRecord extends CActiveRecord {
 			'attributes' => array(
                 'id' => "recordForm",
                 'class' => 'well',
-				'enctype' => 'multipart/form-data',
+				//'enctype' => 'multipart/form-data',
 			),
 			'activeForm' => array(
 				'class' => 'CActiveForm',
@@ -412,7 +447,8 @@ class CustemCActiveRecord extends CActiveRecord {
 		return new CForm($form,$this);
 	}
 
-    public function getFormField($field){
+    public function getFormField($field)
+    {
         $return = array($field->alias => TypeField::getFieldFormData($field->field_type) );
 
         switch( $field->field_type ){
@@ -429,12 +465,13 @@ class CustemCActiveRecord extends CActiveRecord {
 			break;
 
             case TypeField::LISTS :
+                
 				$return[$field->alias]['items'] = CHtml::listData(ListItem::model()->findAll('list_id = :list_id',array(':list_id'=>$field->list_id)), 'id', 'name');
     			if ( $field->is_multiple_select ){
 
 					$selected = array();
 					if ( $this->{$field->alias} ) {
-						foreach( $this->{$field->alias."Items"} as $Item ){
+						foreach( $this->{$field->alias} as $Item ){
 							$selected[] = $Item->id;
 						}
 					}
@@ -443,6 +480,8 @@ class CustemCActiveRecord extends CActiveRecord {
 
 					$return[$field->alias]['multiple'] = true;
 					$return[$field->alias]['class'] = 'chzn-select';
+                    $h = CHtml::hiddenField("{$this->productName}[{$field->alias}]");
+                    $return[$field->alias]['layout'] = "{label}{$h}{input}{error}{hint}";
 				}
 			break;
 
@@ -498,7 +537,8 @@ class CustemCActiveRecord extends CActiveRecord {
         return $return;
     }
 
-    protected function searchForId($id, $array) {
+    protected function searchForId($id, $array)
+    {
        foreach ($array as $key => $val) {
            if ($val['id'] === $id) {
                return $key;
@@ -507,7 +547,8 @@ class CustemCActiveRecord extends CActiveRecord {
        return null;
     }
 
-    public function getTabsFormElements($isEdit = true){
+    public function getTabsFormElements($isEdit = true)
+    {
 
     	$arTabs = array(array("id"=>0,"position"=>0,"name"=>"Общее","content"=>array(),'htmlOptions'=>array('class'=>'active')));
         $tabs = $this->getProductTab();
@@ -523,7 +564,7 @@ class CustemCActiveRecord extends CActiveRecord {
                 $id = $this->searchForId( $field->tab_id > 0 ? $field->tab_id : 0 , $arTabs);
 
                 if( isset( $arTabs[$id] ) ){
-                    $field = $this->getFormField($field);
+                    $field = $this->getFormField($field);                    
                     $arTabs[$id]['content'][key($field)] = $field[key($field)];
                 }
             }
@@ -531,7 +572,9 @@ class CustemCActiveRecord extends CActiveRecord {
 
         return Tab::Tabs($arTabs);
     }
-    public function getProductTab(){
+    
+    public function getProductTab()
+    {
         return Tab::model()->findAll(array(
             'order'=>'t.position',
             'condition'=>'product_id = :product_id',
@@ -539,11 +582,13 @@ class CustemCActiveRecord extends CActiveRecord {
         ));
     }
 
-    public function setProductFieldsOrder($order){
+    public function setProductFieldsOrder($order)
+    {
     	$this->productFieldsOrder = $order;
 	}
 
-    public function getProductFieldsOrder(){
+    public function getProductFieldsOrder()
+    {
     	return $this->productFieldsOrder;
 	}
 
@@ -557,14 +602,18 @@ class CustemCActiveRecord extends CActiveRecord {
                         if ($field->is_multiple_select){
 
 							RecordList::model()->deleteAll('product_id = :product_id AND record_id = :record_id',array(":product_id"=> $this->getProductID(),':record_id'=> $this->id));
-
+                            
 							if ( isset($this->{$field->alias}) && !empty($this->{$field->alias}) ){
 								foreach ($this->{$field->alias} as $list_item_id) {
 									$RecordList = new RecordList();
 									$RecordList->product_id = $this->getProductID();
 									$RecordList->record_id = $this->id;
 									$RecordList->list_item_id = $list_item_id;
-									if ( !$RecordList->save() ) throw new CException("ERROR SAVE LISTS");
+									if ( !$RecordList->save() ) {
+                                        print_r($RecordList->getErrors());
+                                        die;
+                                        throw new CException("ERROR SAVE LISTS".implode(': ',$RecordList->getErrors()));
+									}
 								}
 							}
 						}
@@ -573,7 +622,7 @@ class CustemCActiveRecord extends CActiveRecord {
 					case TypeField::CATEGORIES :
 						if ($field->is_multiple_select){
 							RecordCategory::model()->deleteAll('product_id = :product_id AND record_id = :record_id',array(":product_id"=> $this->getProductID(),':record_id'=> $this->id));
-
+                            
 							if ( isset($this->{$field->alias}) && !empty($this->{$field->alias}) ){
 								foreach ($this->{$field->alias} as $category_id) {
 									$RecordCategory = new RecordCategory();
@@ -613,6 +662,7 @@ class CustemCActiveRecord extends CActiveRecord {
 								foreach ($this->{$field->alias} as $datetime) {
 									$RecordDateTime = new RecordDateTime();
 									$RecordDateTime->product_id = $this->getProductID();
+                                    
 									$RecordDateTime->record_id = $this->id;
 									$RecordDateTime->datetime = $datetime;
 									if ( !$RecordDateTime->save() ) throw new CException("ERROR SAVE DATETIME");
@@ -650,31 +700,214 @@ class CustemCActiveRecord extends CActiveRecord {
 			}
 		}
 
+	}    
+
+    protected function addRule($field)
+    {
+        if ( $field->is_mandatory ) {
+            $requiredValidator = CValidator::createValidator('required',$this,$field->alias);
+            $this->getValidatorList()->add($requiredValidator);
+        }
+
+        $safe = false;
+
+        $types = array();
+        $params = array();
+
+        switch( $field->field_type ){
+            case TypeField::STRING :
+    		case TypeField::TEXT :
+				$safe = true;
+                $types[] = 'length';
+				$params['length'] = array(
+												'min'=> isset($field->min_length) ? $field->min_length : null ,
+												'max'=> isset($field->max_length) ? $field->max_length : null ,
+												'allowEmpty'=>true );
+			break;
+
+			case TypeField::INTEGER :
+                $types[] = 'numerical';
+				$params['numerical'] = array(	'integerOnly'=>true,
+												'min'=> isset($field->min_value) ? $field->min_value : null ,
+												'max'=> isset($field->max_value) ? $field->max_value : null ,
+												'allowEmpty'=>true );
+			break;
+
+    		case TypeField::DOUBLE :
+				$types[] = 'numerical';
+
+                if ( $field->decimal ){
+                    $types[] = 'match';
+            	    $params['match'] = array('pattern'=>'/^\s*[-+]?[0-9]*\.?[0-9]{1,'.$field->decimal.'}?\s*$/','message' => Yii::t("fields",'Price has the wrong format (eg 10.50).'));
+                }
+
+			break;
+
+            case TypeField::PRICE:
+                $types[] = 'match';
+                $params['match'] = array('pattern'=>'/^\s*[-+]?[0-9]*\.?[0-9]{1,2}?\s*$/', 'message' => Yii::t("products",'Price has the wrong format (eg 10.50).') );
+
+                $types[] = 'numerical';
+                $price = array('allowEmpty'=>$field->is_mandatory);
+				if ( $field->max_value ) $price['max'] = $field->max_value;
+				$params['numerical'] = $price;
+
+			break;
+
+            case TypeField::LISTS :
+                
+				if ($field->is_multiple_select){
+                    $types[] = 'ArrayValidator';
+					$params['ArrayValidator'] = array('validator'=>'numerical', 'params'=>array('integerOnly'=>true, 'allowEmpty'=>false));
+				} else {
+    			    $types[] = 'numerical';
+    			    $params['numerical'] = array('integerOnly'=>true,'allowEmpty'=>true);
+				}
+			break;
+
+            case TypeField::CATEGORIES :
+				if ($field->is_multiple_select){
+                    $types[] = 'ArrayValidator';
+    				$params['ArrayValidator'] = array('validator'=>'numerical', 'params'=>array('integerOnly'=>true));
+				} else {
+        		    $types[] = 'numerical';
+    			    $params['numerical'] = array('integerOnly'=>true,'allowEmpty'=>true);
+				}
+			break;
+
+            case TypeField::IMAGE :
+                $types[] = 'ArrayValidator';
+        		$params['ArrayValidator'] = array('validator'=>'file', 'params'=>array('types'=>'jpg, gif, png', 'maxSize' => 1048576, 'allowEmpty'=>false));
+			break;
+
+            case TypeField::BOOLEAN :
+                $types[] = 'boolean';
+				$params['boolean'] = array('falseValue'=> 0, 'trueValue' => 1, 'allowEmpty'=> true );
+
+                if ( $field->default ){
+                    $types[] = 'default';
+                    $params['default'] = array('value'=> $field->default );
+                }
+
+			break;
+
+		}
+
+        if ( !empty($types) ){
+            foreach( $types as $type ){
+                $param = isset($params[$type]) ? $params[$type] : array();
+                $validator = CValidator::createValidator($type,$this,$field->alias,$param);
+                $this->getValidatorList()->add($validator);
+            }
+        }
+
+        if ( $safe ) {
+            $safeValidator = CValidator::createValidator('safe',$this,$field->alias);
+            $this->getValidatorList()->add($safeValidator);
+        }
+
+        if ( isset($field->rules) ){
+             foreach( $field->rules as $type => $param ){
+                $validator = CValidator::createValidator($type,$this,$field->alias,$param);
+                $this->getValidatorList()->add($validator);
+            }
+        }
+
+    }
+
+	public function addRelations()
+	{
+    	if ( $this->product ){
+            foreach( $this->product->fields as $field ){
+				$name = $field->alias;
+				switch( $field->field_type ){
+					case TypeField::LISTS:
+                        if ($field->is_multiple_select) {
+                            $name = $field->alias;
+    						$this->metaData->addRelation($field->alias,array( CActiveRecord::MANY_MANY,
+														'ListItem', 'record_list(record_id, list_item_id)',
+														'on'=> '`'.$name."_".$name.'`.`product_id` = :product_id',
+														'params' => array(":product_id" => $this->getProductID() ),
+														'together' => true
+													));
+						} else
+                            $this->metaData->addRelation($field->alias,array( CActiveRecord::BELONGS_TO,'ListItem', $field->alias ));
+                    break;
+
+					case TypeField::CATEGORIES :
+                        if ($field->is_multiple_select)
+    						$this->metaData->addRelation($field->alias,array(	CActiveRecord::MANY_MANY,
+																'Category', 'record_category(record_id, category_id)',
+																'on'=> '`'.$name."_".$name.'`.`product_id` = :product_id',
+																'params' => array(":product_id" => $this->getProductID() ),
+																'together' => true
+															));
+                        else
+                            $this->metaData->addRelation($field->alias,array( CActiveRecord::BELONGS_TO,'Category', $field->alias ));
+                    break;
+
+					case TypeField::MANUFACTURER :
+                        if ($field->is_multiple_select)
+                            $this->metaData->addRelation($field->alias,array(CActiveRecord::MANY_MANY,
+																'Manufacturer', 'record_manufacturer(record_id, manufacturer_id)',
+																'on'=> '`'.$name."_".$name.'`.`product_id` = :product_id',
+																'params' => array(":product_id" => $this->getProductID() ),
+																'together' => true
+														));
+                        else
+                            $this->metaData->addRelation($field->alias,array( CActiveRecord::BELONGS_TO,'Manufacturer', $field->alias, 'select'=> "`{$field->alias}'_manufacturer`.`name`" ));
+                    break;
+				}
+			}
+		}
 	}
-
-	public function behaviors() {
-		return array(
-			'xyz' => array(
-				'class' => 'CustemCARB'
-			),
-		);
-	}
-
-
-
-}
-
-class CustemCARB extends CActiveRecordBehavior {
-	public $p;
-	public function beforeFind($event) {
-		$owner = $this->getOwner();
-		$this->p = $owner->productName;
-		var_dump($this->p );
-	}
-
-	public function afterFind($event) {
-		$owner = $this->getOwner();
-		var_dump($owner->p );
-	}
-
+    
+    public function beforeValidate()
+    {
+        if (parent::beforeValidate()){
+        
+            if ( $this->product ){
+                $fields = $this->product->fields;
+                foreach( $fields as $field ){
+        			switch( $field->field_type ){
+                        
+                        case TypeField::LISTS :
+    					case TypeField::CATEGORIES :
+                            if ($field->is_multiple_select && !empty($this->{$field->alias}) ){
+                                $tmp = array();
+        					    foreach( $this->{$field->alias} as $obj ){
+            				        if ( $obj instanceof Category || $obj instanceof ListItem ){
+                			            $tmp[] = $obj->id;
+            				        } else {
+                    		            $tmp[] = $obj;
+            				        }   
+        					    }
+                                $this->{$field->alias} = $tmp;
+                            }
+                        break;
+    
+    					case TypeField::MANUFACTURER :
+                            
+                        break;
+    				}                
+                
+                }
+            }
+            
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }

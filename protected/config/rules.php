@@ -1,8 +1,8 @@
 <?php
 
 return array(
-		        '/'=>'site/index',
-                '/test'=>'site/test',
+		        '/<action:(index|test)>'=>'site/<action>',
+                
                 
 		         //// ПОЛЬЗОВАТЕЛЬ
 				// просмотр пользователя
@@ -59,9 +59,6 @@ return array(
                 
                 
 		         // своё правило для URL вида '/Производитель/Модель'
-		         array(
-			         'class' => 'application.components.UrlRule',
-			         'connectionID' => 'db',
-		         ),
+		         //array('class' => 'application.components.UrlRule','connectionID' => 'db'),
 
 	        );
