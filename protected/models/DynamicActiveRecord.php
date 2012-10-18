@@ -3,8 +3,6 @@
 class DynamicActiveRecord
 {
     protected static $_instance;
-    public $productName;
-    public $product;
 
 	private $class;
 
@@ -27,13 +25,11 @@ class DynamicActiveRecord
 
     public function __construct($class)
     {
-		// if ( !class_exists($className, false) ) eval("class ".$className." extends CActiveRecord {}");
+		//if ( class_exists($className, false) ) eval("class ".$className." extends CustemCActiveRecord {}");
 		$this->class = $class;
-        $this->productName = $this->class->productName = get_class($class);
-		$this->product = $this->class->product = Product::model()->find('alias = :alias', array(':alias'=> $this->productName ));
-
+        $this->class->productName = get_class($class);
+		$this->class->product = Product::model()->find('alias = :alias', array(':alias'=> $this->class->productName ));
 		$this->class->init();
     }
-
 
 }

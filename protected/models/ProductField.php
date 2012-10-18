@@ -164,12 +164,22 @@ class ProductField extends CActiveRecord
                     <li class="active"><a href="#field" data-toggle="tab">Поле</a></li>
                     <li><a href="#admin" data-toggle="tab">Администрирование</a></li>
                 </ul>';
-
+        
+        $isDisableFilter = false;
     	if ( $this->isNewRecord && $this->field_type ){
 			$this->subClassName = TypeField::$Fields[$this->field_type]['class'];
 			$this->subClass = $this->CreateField($this->field_type);
+            
+            switch( $this->field_type ){
+                case TypeField::FILE:
+                    $isDisableFilter = true;
+                break;
+            }
+            
 		}
-  
+        
+        
+        
                 
 		$arForm = array(
 			'attributes' => array(
@@ -219,7 +229,9 @@ class ProductField extends CActiveRecord
         				),
         				'is_filter'=>array(
         					'type'=>'checkbox',
-        					'layout'=>'{input}{label}{error}{hint}',
+        					'layout'=>'{input}{label}{error}{hint}',                            
+                            'disabled' => $isDisableFilter ? true : false,
+                            'checked' => $isDisableFilter  ? false : $this->is_filter,
         				),
         				'is_column_table'=>array(
         					'type'=>'checkbox',

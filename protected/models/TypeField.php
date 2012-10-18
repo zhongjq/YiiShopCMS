@@ -99,7 +99,32 @@ class TypeField
 				'empty' =>  '',
             ),
 		),
-    	self::CATEGORIES     => array(
+        
+        self::DATETIME  => array(
+    		'name'      =>  "Дата/время",
+			'type'      =>  "datetime",
+            'class'     =>  "DateTimeField",
+			'dbType'    =>  "datetime",
+			'form'      =>  array(
+				'type'		=> 'zii.widgets.jui.CJuiDatePicker',
+				'language'	=> '',
+             ),
+		),        
+        
+    	self::FILE      => array(
+			'name'      =>  "Файл(ы)",
+			'type'      =>  "file",
+            'class'     =>  "FileField",
+			'dbType'    =>  "int(11)",
+			'form'      =>  array(
+                'type'  =>  'CMultiFileUpload',
+            ),
+		),
+
+        
+        
+
+        self::CATEGORIES     => array(
 			'name'      =>  "Категория(и)",
 			'type'      =>  "categories",
             'class'     =>  "CategoryField",
@@ -118,35 +143,9 @@ class TypeField
                 'type'  =>  'dropdownlist',
 				'empty' =>  '',
             ),
-		),
-    	self::IMAGE     => array(
-			'name'      =>  "Изображения(и)",
-			'type'      =>  "image",
-            'class'     =>  "ImageField",
-			'dbType'    =>  "int(11)",
-			'form'      =>  array(
-                'type'  =>  'CMultiFileUpload',
-            ),
-		),
-    	self::FILE      => array(
-			'name'      =>  "Файл(ы)",
-			'type'      =>  "file",
-            'class'     =>  "FileField",
-			'dbType'    =>  "int(11)",
-			'form'      =>  array(
-                'type'  =>  'file',
-            ),
-		),
-        self::DATETIME  => array(
-			'name'      =>  "Дата/время",
-			'type'      =>  "datetime",
-            'class'     =>  "DateTimeField",
-			'dbType'    =>  "datetime",
-			'form'      =>  array(
-				'type'		=> 'zii.widgets.jui.CJuiDatePicker',
-				'language'	=> '',
-             ),
-		),
+		),        
+        
+        
 	);
 
 

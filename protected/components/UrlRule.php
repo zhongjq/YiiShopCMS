@@ -34,7 +34,7 @@ class UrlRule extends CBaseUrlRule
 	}
 
 	public function parseUrl($manager,$request,$pathInfo,$rawPathInfo)
-	{
+	{        
 		if (preg_match('%^(\w+)(/(\d+))?$%', $pathInfo, $matches)){
 		    // просмотр единицы товара по id
 			if ( isset($matches[1],$matches[3]) ){
@@ -43,7 +43,7 @@ class UrlRule extends CBaseUrlRule
 				return 'product/viewId';
 			}
 		}
-
+        
 		if (preg_match('%^(\w+)(/(\w+))?$%', $pathInfo, $matches)){
 			// просмотр единицы товара по alias
 			if ( isset($matches[1],$matches[3]) ){

@@ -9,7 +9,7 @@ class CustemCActiveRecord extends CActiveRecord {
 	public $productName;
 	public $product;
 	public $attributeLabels = array();
-    private $_attributes=array();
+    public $isAdminEdit = false;
 
 	public function getProductID(){return $this->product->id;}
 
@@ -41,6 +41,8 @@ class CustemCActiveRecord extends CActiveRecord {
             foreach( $fields as $field_id => $field ){
 				$this->attributeLabels[$field->alias] = $field->name;
                 $this->addRule($field);
+                
+                if ( $field->is_editing_table_admin ) $this->isAdminEdit = true;
             }
         }
 		$this->addRelations();
@@ -59,28 +61,34 @@ class CustemCActiveRecord extends CActiveRecord {
 	public function search()
 	{
 		$criteria = new CDbCriteria;
-        $criteria->with = array_keys($this->getMetaData()->relations);
-
+        $criteria->with = array_keys($this->getMetaData()->relations);       
+        
 	    if ( $this->product ){
             foreach( $this->product->fields as $field ){
-
-				switch( $field->field_type ){
-					case TypeField::LISTS:
-						if ($field->is_multiple_select){
-							$criteria->compare("list_item_id", $this->{$field->alias} );
-						} else
-							$criteria->compare($field->alias, $this->{$field->alias} );
-					break;
-
-					case TypeField::MANUFACTURER:
-						if ($field->is_multiple_select){
-							$criteria->compare("manufacturer_id", $this->{$field->alias} );
-						} else
-							$criteria->compare($field->alias, $this->{$field->alias} );
-					break;
-					default :
-						$criteria->compare($field->alias, $this->{$field->alias} );
-				}
+                if ( !empty($this->{$field->alias}) )
+    				switch( $field->field_type ){
+    					case TypeField::LISTS:
+    						if ($field->is_multiple_select){
+                                $criteria->condition = " (SELECT COUNT(*) FROM `record_list` WHERE 
+                                                            `record_list`.`record_id` = t.id AND 
+                                                            `record_list`.`product_id` = :product_id AND  
+                                                            `list_item_id` = :list_item_id
+                                                            ) > 0 ";
+                                                            
+                                $criteria->params = array(":product_id"=> $this->getProductID() , ":list_item_id"=> $this->{$field->alias} );    							
+    						} else
+    							$criteria->compare($field->alias, $this->{$field->alias} );
+    					break;
+    
+    					case TypeField::MANUFACTURER:
+    						if ($field->is_multiple_select){
+    							$criteria->compare("manufacturer_id", $this->{$field->alias} );
+    						} else
+    							$criteria->compare($field->alias, $this->{$field->alias} );
+    					break;
+    					default :
+    						$criteria->compare($field->alias, $this->{$field->alias} );
+    				}
 
             }
         }
@@ -559,7 +567,7 @@ class CustemCActiveRecord extends CActiveRecord {
                 $arTabs[] = array("id"=>$tab->id,"position"=>$tab->position,"name"=>$tab->name,"content"=>array(),'productId'=> $isEdit ? $this->getProductID() : null );
             }
         }
-        $this->setProductFieldsOrder("fieldTab.position");
+        $this->product->setFields('position_tab');
         if ( $this->product ){
             foreach( $this->product->fields as $field ){
 
@@ -572,7 +580,7 @@ class CustemCActiveRecord extends CActiveRecord {
             }
         }
 
-        return Tab::Tabs($arTabs);
+        return Tab::Tabs($arTabs,$isEdit);
     }
 
     public function getProductTab()
@@ -777,7 +785,7 @@ class CustemCActiveRecord extends CActiveRecord {
 				}
 			break;
 
-            case TypeField::IMAGE :
+            case TypeField::FILE :
                 $types[] = 'ArrayValidator';
         		$params['ArrayValidator'] = array('validator'=>'file', 'params'=>array('types'=>'jpg, gif, png', 'maxSize' => 1048576, 'allowEmpty'=>false));
 			break;
@@ -830,7 +838,7 @@ class CustemCActiveRecord extends CActiveRecord {
 														'ListItem', 'record_list(record_id, list_item_id)',
 														'on'=> '`'.$name."_".$name.'`.`product_id` = :product_id',
 														'params' => array(":product_id" => $this->getProductID() ),
-														'together' => true
+														//'together' => true
 													));
 						} else
                             $this->metaData->addRelation($field->alias,array( CActiveRecord::BELONGS_TO,'ListItem', $field->alias ));

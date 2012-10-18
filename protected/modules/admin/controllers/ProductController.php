@@ -128,17 +128,16 @@ class ProductController extends Controller
 
     public function actionDeleteRecord($productId,$recordId)
     {
-		$product = Product::model()->with('productFields')->findByPk($ProductID);
-		$record = $product->getRecordObject();
-        $record = $record->findByPk($RecordID);
-        $record->setProductID($ProductID);
+		$product = Product::model()->findByPk($productId);
+		$record = $product->getRecordObject('delete');
+        $record = $record->findByPk($recordId);
 
 		$transaction = Yii::app()->db->beginTransaction();
 		try
 		{
 			if( $record->delete() ){
 				$transaction->commit();
-				$this->redirect($this->createUrl('/admin/product/view',array('ProductID'=>$product->ID)));
+				$this->redirect($this->createUrl('/admin/product/view',array('id'=>$product->id)));
 			}
 		}
 		catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение

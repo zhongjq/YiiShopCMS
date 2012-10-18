@@ -91,7 +91,7 @@ class Tab extends CActiveRecord
 		));
 	}
 
-	public static function Tabs($arTabs){
+	public static function Tabs($arTabs,$isEdit = false){
 		
         // сортировка
         $positions = array();
@@ -107,7 +107,7 @@ class Tab extends CActiveRecord
         if ( !empty($arTabs) ){
             foreach($arTabs as $tab){
                 $l = null;
-                if ( isset($tab['productId']) )
+                if ( isset($tab['productId']) && is_numeric($tab['productId']) )
                     $l = CHtml::ajaxButton('×', Yii::app()->createUrl('/admin/constructor/deletetab', array('productId'=>$tab['productId'],"tabId"=>$tab['id'])),
                                                 array('type'=>'POST','success' => 'function(){ $("#tab_'.$tab['id'].'").remove(); }'),
                                                 array("class"=>"close")
@@ -121,11 +121,13 @@ class Tab extends CActiveRecord
             }
         }
         
-        $ul .= '    <li class="exclude"><a href="#seoTab" data-toggle="tab">SEO</a></li>
-                    <li class="exclude"><a id="addTab" href="javascript:void(0);"><i class="icon-plus"></i></a></li>
-                </ul>';
-                
-                
+        $ul .= '<li class="exclude"><a href="#seoTab" data-toggle="tab">SEO</a></li>';
+        
+        if ( $isEdit )
+            $ul .= '<li class="exclude"><a id="addTab" href="javascript:void(0);"><i class="icon-plus"></i></a></li>';        
+        
+        $ul .= '</ul>';
+        
         $content[] = '<div class="tab-content">';
         
         $content[] = '<div id="seoTab" class="tab-pane exclude">';

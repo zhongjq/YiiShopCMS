@@ -166,9 +166,6 @@
 
 		<hr>
 		<footer id="footer">
-			<ul class="nav nav-pills">
-				<li><?=CHtml::link('О проекте',$this->createUrl('/page/about'))?></li>
-			</ul>
 			<?php
 				if ( !Yii::app()->user->isGuest && YII_DEBUG && Yii::app()->user->role == "Administrator" ) {
 					echo '<br/>Отработало за ' . sprintf('%0.5f', Yii::getLogger()->getExecutionTime()) . ' с. ';
@@ -177,7 +174,7 @@
 					echo $sql_stats[0] . ' запросов к БД, время выполнения запросов - ' . sprintf('%0.5f', $sql_stats[1]) . ' c.';
 				}
 			 ?>
-			<p>&copy; 2011</p>
+			<p>&copy; <?=date("Y")?></p>
 		</footer><!-- #footer -->
 
     </div> <!-- /container -->

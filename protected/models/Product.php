@@ -121,10 +121,12 @@ class Product extends CActiveRecord
 	}
 
     public function afterFind(){
+        $this->setFields();
+    }
+    
+    public function setFields($order = "position"){
 
         $connection=Yii::app()->db;
-
-
 
         $sql="
 SELECT
@@ -133,7 +135,8 @@ SELECT
 `min_length`,`max_length`,
 NULL as `min_value`, NULL as `max_value`,NULL as `rows`,NULL as `decimal`,NULL as `default`,NULL as list_id,
 NULL as is_multiple_select,
-`tab_id`
+`tab_id`,
+NULL as `file_type`
 FROM `product_field`
 -- min_length, max_length
 JOIN `string_field` ON string_field.field_id = id
@@ -146,7 +149,8 @@ SELECT
 `product_field`.*,
 `field_tab`.`position` as `position_tab`,
 NULL,NULL,`min_value`,`max_value`,NULL,NULL,NULL,NULL,NULL,
-`tab_id`
+`tab_id`,
+NULL as `file_type`
 FROM `product_field`
 -- min_value, max_value
 JOIN `integer_field` ON integer_field.field_id = id
@@ -165,7 +169,8 @@ NULL as `decimal`,
 NULL as `default`,
 NULL as list_id,
 NULL as is_multiple_select,
-`tab_id`
+`tab_id`,
+NULL as `file_type`
 FROM `product_field`
 -- row, min_length, max_length
 JOIN `text_field` ON text_field.field_id = id
@@ -183,7 +188,8 @@ NULL as `decimal`,
 NULL as `default`,
 NULL as list_id,
 NULL as is_multiple_select,
-`tab_id`
+`tab_id`,
+NULL as `file_type`
 FROM `product_field`
 -- max_value
 JOIN `price_field` ON price_field.field_id = id
@@ -201,7 +207,8 @@ NULL as `rows`,
 NULL as `default`,
 NULL as list_id,
 NULL as is_multiple_select,
-`tab_id`
+`tab_id`,
+NULL as `file_type`
 FROM `product_field`
 -- decimal
 JOIN `double_field` ON double_field.field_id = id
@@ -219,7 +226,8 @@ NULL as `decimal`,
 `default`,
 NULL as list_id,
 NULL as is_multiple_select,
-`tab_id`
+`tab_id`,
+NULL as `file_type`
 FROM `product_field`
 -- default
 JOIN `boolean_field` ON boolean_field.field_id = id
@@ -237,25 +245,42 @@ NULL as `decimal`,
 NULL as `default`,
 list_id,
 is_multiple_select,
-`tab_id`
+`tab_id`,
+NULL as `file_type`
 FROM `product_field`
 -- list_id, is_multiple_select
 JOIN `list_field` ON list_field.field_id = id
 LEFT JOIN `field_tab` ON `field_tab`.field_id = id
 WHERE `product_id` = :product_id
 
-";
+UNION
+
+SELECT `product_field`.*,
+`field_tab`.`position` as `position_tab`,
+NULL as `min_length`, NULL as `max_length`,
+NULL as `min_value`, NULL as `max_value`,
+NULL as `rows`,
+NULL as `decimal`,
+NULL as `default`,
+NULL as list_id,
+NULL as is_multiple_select,
+`tab_id`,
+`file_type`
+FROM `product_field`
+-- type_file
+JOIN `file_field` ON file_field.field_id = id
+LEFT JOIN `field_tab` ON `field_tab`.field_id = id
+WHERE `product_id` = :product_id
+
+ORDER BY ".$order  ;
 
 
         $command = $connection->cache(1000)->createCommand($sql);
         $command->bindValue(":product_id",$this->id,PDO::PARAM_STR);
 
-        $this->fields = $command->setFetchMode(PDO::FETCH_OBJ)->queryAll();
-
-
-        //$this->fields = Field::model()->find('product_id = :product_id',array(":product_id"=>$this->id));
+        $this->fields = $command->setFetchMode(PDO::FETCH_OBJ)->queryAll();        
     }
-
+    
 
 	public function beforeDelete(){
 		if( parent::beforeDelete() ) {

@@ -11,7 +11,7 @@ $this->breadcrumbs=array($product->name);
 
 $this->renderPartial('records/secondMenu',array('product'=>$product));
 
-echo CHtml::beginForm();
+if ( $record->isAdminEdit ) echo CHtml::beginForm();
 
 $this->widget('zii.widgets.grid.CGridView', array(
     'afterAjaxUpdate'=>'function(id, data){ '.$js.' }',
@@ -70,10 +70,12 @@ $this->widget('zii.widgets.grid.CGridView', array(
 
 ?>
 
+<?php if ( $record->isAdminEdit ) : ?>
 <div class="row submit">
 <?php echo CHtml::submitButton('Сохранить',array('class'=>'btn')); ?> <span class="label label-important">Warning</span> поля не прощедшие валидацию будут проигнорированны.
 </div>
 <?php echo CHtml::endForm(); ?>
+<?php endif ?>
 
 
 

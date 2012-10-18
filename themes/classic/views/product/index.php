@@ -2,7 +2,8 @@
 $this->pageTitle = $product->name;
 $alias = $product->alias;
 
-        $this->widget('zii.widgets.grid.CGridView', array(
+    $this->widget('zii.widgets.grid.CGridView', array(
+            'filterPosition'=>'body',
             'ajaxUpdate'=>false,
             'enablePagination' => true,
             'dataProvider'=>$records->search(),
@@ -24,6 +25,6 @@ $alias = $product->alias;
         		'htmlOptions'	=> array("class"=>false),
         	),
         ));
-
+    
 
 ?>
