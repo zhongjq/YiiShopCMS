@@ -4,7 +4,7 @@
 defined('YII_DEBUG') or define('YII_DEBUG',true);
 
 // include Yii bootstrap file
-require_once(dirname(__FILE__).'/yii/framework/yiilite.php');
+require_once(dirname(__FILE__).'/yii/framework/yii.php');
 
 // подключаем конфигурацию
 $config=dirname(__FILE__).'/protected/config/main.php';

@@ -41,7 +41,7 @@ class CustemCActiveRecord extends CActiveRecord {
             foreach( $fields as $field_id => $field ){
 				$this->attributeLabels[$field->alias] = $field->name;
                 $this->addRule($field);
-                
+
                 if ( $field->is_editing_table_admin ) $this->isAdminEdit = true;
             }
         }
@@ -61,25 +61,25 @@ class CustemCActiveRecord extends CActiveRecord {
 	public function search()
 	{
 		$criteria = new CDbCriteria;
-        $criteria->with = array_keys($this->getMetaData()->relations);       
-        
+        $criteria->with = array_keys($this->getMetaData()->relations);
+
 	    if ( $this->product ){
             foreach( $this->product->fields as $field ){
                 if ( !empty($this->{$field->alias}) )
     				switch( $field->field_type ){
     					case TypeField::LISTS:
     						if ($field->is_multiple_select){
-                                $criteria->condition = " (SELECT COUNT(*) FROM `record_list` WHERE 
-                                                            `record_list`.`record_id` = t.id AND 
-                                                            `record_list`.`product_id` = :product_id AND  
+                                $criteria->condition = " (SELECT COUNT(*) FROM `record_list` WHERE
+                                                            `record_list`.`record_id` = t.id AND
+                                                            `record_list`.`product_id` = :product_id AND
                                                             `list_item_id` = :list_item_id
                                                             ) > 0 ";
-                                                            
-                                $criteria->params = array(":product_id"=> $this->getProductID() , ":list_item_id"=> $this->{$field->alias} );    							
+
+                                $criteria->params = array(":product_id"=> $this->getProductID() , ":list_item_id"=> $this->{$field->alias} );
     						} else
     							$criteria->compare($field->alias, $this->{$field->alias} );
     					break;
-    
+
     					case TypeField::MANUFACTURER:
     						if ($field->is_multiple_select){
     							$criteria->compare("manufacturer_id", $this->{$field->alias} );
@@ -490,8 +490,9 @@ class CustemCActiveRecord extends CActiveRecord {
 
 					$return[$field->alias]['multiple'] = true;
 					$return[$field->alias]['class'] = 'chzn-select';
-                    $h = CHtml::hiddenField("{$this->productName}[{$field->alias}]");
-                    $return[$field->alias]['layout'] = "{label}{$h}{input}{error}{hint}";
+					$return[$field->alias]['unselectValue'] = '';
+                    //$h = CHtml::hiddenField("{$this->productName}[{$field->alias}]");
+                    //$return[$field->alias]['layout'] = "{label}{$h}{input}{error}{hint}";
 				}
 			break;
 
