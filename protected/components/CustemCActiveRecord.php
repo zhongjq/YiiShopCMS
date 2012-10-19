@@ -432,7 +432,7 @@ class CustemCActiveRecord extends CActiveRecord {
 			'attributes' => array(
                 'id' => "recordForm",
                 'class' => 'well',
-				//'enctype' => 'multipart/form-data',
+				'enctype' => 'multipart/form-data',
 			),
 			'activeForm' => array(
 				'class' => 'CActiveForm',
@@ -884,6 +884,7 @@ class CustemCActiveRecord extends CActiveRecord {
 
                         case TypeField::LISTS :
     					case TypeField::CATEGORIES :
+                        case TypeField::MANUFACTURER :
                             if ($field->is_multiple_select && !empty($this->{$field->alias}) ){
                                 $tmp = array();
         					    foreach( $this->{$field->alias} as $obj ){
@@ -896,10 +897,11 @@ class CustemCActiveRecord extends CActiveRecord {
                                 $this->{$field->alias} = $tmp;
                             }
                         break;
-
-    					case TypeField::MANUFACTURER :
-
-                        break;
+                        
+                        case TypeField::FILE:
+                            $this->{$field->alias} = CUploadedFile::getInstances($this,$field->alias);
+                        break;                        
+                        
     				}
 
                 }
