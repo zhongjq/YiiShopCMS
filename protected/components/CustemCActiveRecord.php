@@ -897,7 +897,16 @@ class CustemCActiveRecord extends CActiveRecord {
                         break;
 
                         case TypeField::FILE:
+							echo "<pre>";
+							print_r($this->{$field->alias});
+
+
                             $this->{$field->alias} = CUploadedFile::getInstances($this,$field->alias);
+
+							echo "<pre>";
+							print_r($this->{$field->alias});
+
+							die;
                         break;
 
     				}
