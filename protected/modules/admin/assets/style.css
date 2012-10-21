@@ -177,6 +177,11 @@ div.summary{
     vertical-align: middle;
 }
 
+td input[type="text"] {
+    margin: 0;
+    width: 100%;
+}
+
 .table td input, .filters input {
     margin: 0;
     width: 100%;
@@ -249,8 +254,8 @@ td.edit,td.delele {
     padding: 0;
     text-align: center;
     vertical-align: middle;
-    width: 10px;    
+    width: 10px;
 }
 td.delele {
-    padding-right: 10px;   
+    padding-right: 10px;
 }

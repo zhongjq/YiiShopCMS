@@ -241,7 +241,7 @@ class CustemCActiveRecord extends CActiveRecord {
                                     }
 
 
-                                    $f['value'] = 'CHtml::hiddenField("'.str_replace("[]",'',$name).'").CHtml::dropDownList("'.$name.'", $data->'.$field->alias.',
+                                    $f['value'] = 'CHtml::dropDownList("'.$name.'", $data->'.$field->alias.',
                                                                             CHtml::listData($data->getListFilter('.$field->list_id.') , "id", "name"),
                                                                             '.$multiple.'
                                                                             );';
@@ -491,8 +491,6 @@ class CustemCActiveRecord extends CActiveRecord {
 					$return[$field->alias]['multiple'] = true;
 					$return[$field->alias]['class'] = 'chzn-select';
 					$return[$field->alias]['unselectValue'] = '';
-                    //$h = CHtml::hiddenField("{$this->productName}[{$field->alias}]");
-                    //$return[$field->alias]['layout'] = "{label}{$h}{input}{error}{hint}";
 				}
 			break;
 
@@ -897,11 +895,11 @@ class CustemCActiveRecord extends CActiveRecord {
                                 $this->{$field->alias} = $tmp;
                             }
                         break;
-                        
+
                         case TypeField::FILE:
                             $this->{$field->alias} = CUploadedFile::getInstances($this,$field->alias);
-                        break;                        
-                        
+                        break;
+
     				}
 
                 }

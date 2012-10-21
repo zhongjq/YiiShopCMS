@@ -99,7 +99,7 @@ class TypeField
 				'empty' =>  '',
             ),
 		),
-        
+
         self::DATETIME  => array(
     		'name'      =>  "Дата/время",
 			'type'      =>  "datetime",
@@ -109,20 +109,20 @@ class TypeField
 				'type'		=> 'zii.widgets.jui.CJuiDatePicker',
 				'language'	=> '',
              ),
-		),        
-        
+		),
+
     	self::FILE      => array(
 			'name'      =>  "Файл(ы)",
 			'type'      =>  "file",
             'class'     =>  "FileField",
 			'dbType'    =>  "int(11)",
 			'form'      =>  array(
-                'type'  =>  'CMultiFileUpload',
+                'type'  =>  'Files',
             ),
 		),
 
-        
-        
+
+
 
         self::CATEGORIES     => array(
 			'name'      =>  "Категория(и)",
@@ -143,9 +143,9 @@ class TypeField
                 'type'  =>  'dropdownlist',
 				'empty' =>  '',
             ),
-		),        
-        
-        
+		),
+
+
 	);
 
 
@@ -169,7 +169,7 @@ class TypeField
 		}
 		return $return;
 	}
-    public static function getFieldName($fieldId){		
+    public static function getFieldName($fieldId){
 		return self::$Fields[$fieldId]['name'];
-	}    
+	}
 }
