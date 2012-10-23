@@ -12,7 +12,7 @@
  */
 class FileField extends CActiveRecord
 {
-	/**
+    /**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
 	 * @return FileField the static model class

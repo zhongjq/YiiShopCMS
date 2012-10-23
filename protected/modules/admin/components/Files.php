@@ -7,9 +7,11 @@ class Files extends CInputWidget
 
 	public function run()
 	{
+        
 		list($name,$id)=$this->resolveNameID();
-		if(substr($name,-2)!=='[]')
-			$name.='[0]';
+		
+        //if(substr($name,-2)!=='[]') $name.='[0]';
+            
 		if(isset($this->htmlOptions['id']))
 			$id=$this->htmlOptions['id'];
 		else
@@ -18,8 +20,29 @@ class Files extends CInputWidget
 		$this->registerClientScript();
 
 		echo CHtml::openTag('table',array('class'=>"table"));
-
 			echo CHtml::openTag('tbody',array());
+                
+                $nameField = $this->attribute;                
+        		if( isset($this->model->{$nameField})  ){
+                    // получаем имеющиеся файлы
+                    $files = File::model()->findAll('product_id = :product_id AND record_id = :record_id',array(":product_id"=> $this->model->getProductID(),':record_id'=> $this->model->id));
+                        
+        			foreach ($files as $file) {
+            			echo CHtml::openTag('tr',array());
+        					echo CHtml::openTag('td',array());
+        						echo CHtml::link($file->name, $file->getUrl() );
+        					echo CHtml::closeTag('td');
+        					echo CHtml::openTag('td',array());
+        						echo CHtml::textField($name.'[existing]['.$file->id.'][description]',$file->description,array('placeholder'=>Yii::t('fields', 'Описание')));
+        					echo CHtml::closeTag('td');
+        					echo CHtml::openTag('td',array());
+        						echo CHtml::link('<span class="close deletetr" title="'.Yii::t('main','Delete').'">&times;</span>',"#", array('onclick'=>"$(this).closest('tr').remove();"));
+        					echo CHtml::closeTag('td');
+        				echo CHtml::closeTag('tr');        			
+        			}
+        		}
+                
+                if(substr($name,-2)!=='[]') $name.='[0]';
 				echo CHtml::openTag('tr',array());
 					echo CHtml::openTag('td',array());
 						echo CHtml::fileField($name,'',$this->htmlOptions);

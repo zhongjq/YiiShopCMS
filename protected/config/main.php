@@ -36,7 +36,7 @@ return array(
             'newDirMode'    =>  0777,
         )
     ),
-	//'preload'=>array('log'),
+	'preload'=>array('log'),
 	// Компоненты
 	'components'=>array(
 
@@ -56,8 +56,8 @@ return array(
 		),
 		// База
 		'db'=>array(
-			'connectionString' => 'mysql:host=localhost;dbname=enchikiben_fbfde',
-            //'connectionString' => 'mysql:host=mysql0.db.koding.com;dbname=enchikiben_fbfde',
+			//'connectionString' => 'mysql:host=localhost;dbname=enchikiben_fbfde',
+            'connectionString' => 'mysql:host=mysql0.db.koding.com;dbname=enchikiben_fbfde',
 			'emulatePrepare' => true,
 			'username' => 'enchikiben_fbfde',
 			'password' => '754089db',

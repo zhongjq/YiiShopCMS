@@ -301,7 +301,9 @@ class ProductField extends CActiveRecord
 
 			$this->subClass->field_id = $this->id;
 			if ( $this->subClass->save() ){
-
+                
+                if( !isset(TypeField::$Fields[$this->field_type]['dbType']) ) return true;
+                
 				if( isset($this->subClass->is_multiple_select) ){
 					if ($this->isNewRecord && $this->subClass->is_multiple_select == 0){
 						Yii::app()->db->createCommand()->addColumn( $this->product->alias,
