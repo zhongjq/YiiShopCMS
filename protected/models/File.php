@@ -42,7 +42,7 @@ class File extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('product_id, record_id, name, disc_name, description', 'required'),
+			array('product_id, record_id, name, disc_name', 'required'),
 			array('product_id, record_id', 'length', 'max'=>10),
 			array('name, disc_name', 'length', 'max'=>255),
 			// The following rule is used by search().
@@ -59,10 +59,10 @@ class File extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'product' => array(self::BELONGS_TO, 'Product', 'product_id'),
+			'product' => array(self::BELONGS_TO, 'Product', 'product_id', 'together'=>true ),
 		);
 	}
-
+    
 	/**
 	 * @return array customized attribute labels (name=>label)
 	 */
@@ -78,26 +78,16 @@ class File extends CActiveRecord
 		);
 	}
 
-	/**
-	 * Retrieves a list of models based on the current search/filter conditions.
-	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
-	 */
-	public function search()
-	{
-		// Warning: Please modify the following code to remove attributes that
-		// should not be searched.
-
-		$criteria=new CDbCriteria;
-
-		$criteria->compare('id',$this->id,true);
-		$criteria->compare('product_id',$this->product_id,true);
-		$criteria->compare('record_id',$this->record_id,true);
-		$criteria->compare('name',$this->name,true);
-		$criteria->compare('disc_name',$this->disc_name,true);
-		$criteria->compare('description',$this->description,true);
-
-		return new CActiveDataProvider($this, array(
-			'criteria'=>$criteria,
-		));
+	public function getFolder(){
+        return Yii::getPathOfAlias('webroot').DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR.$this->product_id.DIRECTORY_SEPARATOR.$this->record_id.DIRECTORY_SEPARATOR;
 	}
+    
+    public function getUrl(){
+        return Yii::app()->baseUrl.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR.$this->product_id.DIRECTORY_SEPARATOR.$this->record_id.DIRECTORY_SEPARATOR.$this->disc_name ;
+	}
+    
+    public function afterDelete(){        
+        @unlink( $this->getFolder().DIRECTORY_SEPARATOR.$this->disc_name );
+        return true;
+    }
 }

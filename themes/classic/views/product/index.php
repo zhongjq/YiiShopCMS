@@ -8,8 +8,16 @@ $alias = $product->alias;
             'enablePagination' => true,
             'dataProvider'=>$records->search(),
     		'filter'=>$records,
-        	'columns' =>$records->getTableFields(),
-            
+        	'columns' => 
+                
+                    array(
+                        'name'=> array(
+                            'value'=>' $data->getLink( $data->name ) ',
+                            'type'=>'raw'
+                        )
+                    ) 
+                    + $records->getTableFields()
+                ,
         	'htmlOptions'=>array('class'=>false),
         	'itemsCssClass'=>'table table-bordered table-striped',
         	'template'=>'{summary} {items} {pager}',

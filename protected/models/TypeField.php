@@ -115,7 +115,6 @@ class TypeField
 			'name'      =>  "Файл(ы)",
 			'type'      =>  "file",
             'class'     =>  "FileField",
-			'dbType'    =>  "int(11)",
 			'form'      =>  array(
                 'type'  =>  'Files',
             ),

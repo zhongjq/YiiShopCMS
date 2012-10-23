@@ -61,7 +61,6 @@ class DynamicModel extends CModel
                 $this->addJoin($field);
             }
         }
-
     }
 
     public function tableName(){return $this->productName;}
