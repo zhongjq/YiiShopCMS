@@ -6,13 +6,13 @@ class CustemCActiveRecord extends CActiveRecord {
 	private $_categoryFilter = null;
     private $_productFieldsOrder = null;
     private $_with = array();
-    
-    
+
+
 	public $productName;
 	public $product;
 	public $attributeLabels = array();
     public $isAdminEdit = false;
-    
+
 	public function getProductID(){return $this->product->id;}
 
 	public function attributeLabels(){
@@ -45,25 +45,26 @@ class CustemCActiveRecord extends CActiveRecord {
                 $this->addRule($field);
 
                 if ( $field->is_editing_table_admin ) {
-                    $this->isAdminEdit = true;  			    
+                    $this->isAdminEdit = true;
                 }
-                
+
                 if ( $field->is_column_table_admin ) {
                     switch( $field->field_type ){
-            			case TypeField::LISTS :    
-    					case TypeField::CATEGORIES :    
-    					case TypeField::MANUFACTURER :                        
+            			case TypeField::LISTS :
+    					case TypeField::CATEGORIES :
+    					case TypeField::MANUFACTURER :
         				case TypeField::FILE :
-                            $this->_with[] = $field->alias;                            
-                        break;                   
-				    }    			    
-                }                
+                            $this->_with[] = $field->alias;
+                        break;
+				    }
+                }
             }
+
+			Yii::setPathOfAlias('files', Yii::getPathOfAlias('webroot').DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR.$this->getProductID().DIRECTORY_SEPARATOR );
+			Yii::setPathOfAlias('url', Yii::app()->baseUrl.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR.$this->getProductID().DIRECTORY_SEPARATOR );
+
+			$this->addRelations();
         }
-		$this->addRelations();
-        
-        Yii::setPathOfAlias('files', Yii::getPathOfAlias('webroot').DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR.$this->getProductID().DIRECTORY_SEPARATOR );
-        Yii::setPathOfAlias('url', Yii::app()->baseUrl.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR.$this->getProductID().DIRECTORY_SEPARATOR );        
 	}
 
     public function rules()
@@ -79,14 +80,14 @@ class CustemCActiveRecord extends CActiveRecord {
 	public function search($type = 'admin')
 	{
 		$criteria = new CDbCriteria;
-        
+
         if ( $type == 'admin' )
             $criteria->with = $this->_with;
         else
             $criteria->with = array_keys($this->getMetaData()->relations);
-        
+
 	    if ( $this->product ){
-            foreach( $this->product->fields as $field ){                
+            foreach( $this->product->fields as $field ){
     			switch( $field->field_type ){
     				case TypeField::LISTS:
                         if ( !empty($this->{$field->alias} ) )
@@ -96,7 +97,7 @@ class CustemCActiveRecord extends CActiveRecord {
     						} else
     							$criteria->compare($field->alias, $this->{$field->alias} );
     				break;
-                  
+
     				default :
     					$criteria->compare($field->alias, $this->{$field->alias} );
     			}
@@ -111,7 +112,7 @@ class CustemCActiveRecord extends CActiveRecord {
             )
         ));
 	}
-    
+
     public function getLink($text){
         $out = null;
         if ( $this->alias ){
@@ -119,12 +120,12 @@ class CustemCActiveRecord extends CActiveRecord {
         } else {
             $url = Yii::app()->createUrl('product/view',array('product'=>$this->productName,'id'=>$this->id));
         }
-        
-        
+
+
         $out = CHtml::link($text,$url);
         return $out;
     }
-    
+
 	public function getTableFields()
     {
         $fields = array();
@@ -187,7 +188,7 @@ class CustemCActiveRecord extends CActiveRecord {
 
 							}
 						break;
-                        
+
                         case TypeField::FILE:
                             $f['value'] = "";
                         break;
@@ -709,31 +710,33 @@ class CustemCActiveRecord extends CActiveRecord {
 
         			case TypeField::FILE :
                         // получаем описание имеющихся файлов
-                        $existing = $_POST[$this->productName][$field->alias]['existing'];                        
-                                                
+						$existing = array();
+						if ( isset($_POST[$this->productName][$field->alias]['existing']) )
+							$existing = $_POST[$this->productName][$field->alias]['existing'];
+
                         // получаем имеющиеся файлы
                         $existingFiles = File::model()->findAll('product_id = :product_id AND record_id = :record_id',array(":product_id"=> $this->getProductID(),':record_id'=> $this->id));
-                        
+
                         // удаляем которых нет
                         if ( !empty($existingFiles) ){
                             foreach($existingFiles as $file){
                                 if( isset($existing[$file->id]) ){
                                     $file->description = $existing[$file->id]['description'];
-                                    $file->save();   
+                                    $file->save();
                                 } else {
                                     $file->delete();
-                                }               
+                                }
                             }
                             unset($file,$existing);
-                        }                      
-                        
-                        
+                        }
+
+
 						// новые файлы
 						if ( is_array($this->{$field->alias}) && !empty($this->{$field->alias}) ){
                             $folder = $this->getRecordFolder();
                             // получаем описание имеющихся файлов
-                            $description = $_POST[$this->productName][$field->alias];                        
-                        
+                            $description = $_POST[$this->productName][$field->alias];
+
                             if(!is_dir($folder)) mkdir($folder,0777,true);
     					    foreach($this->{$field->alias} as $key => $file){
                                 $fileDB = new File('add');
@@ -741,11 +744,11 @@ class CustemCActiveRecord extends CActiveRecord {
                                 $fileDB->record_id = $this->id;
                                 $fileDB->name = $file->getName();
                                 $fileDB->disc_name = $file->getName();
-                                
+
                                 if ( $description[$key]['description'] )
                                     $fileDB->description = $description[$key]['description'];
-                                    
-                                if ( $fileDB->save() ){                                
+
+                                if ( $fileDB->save() ){
 			                        $file->saveAs($folder.$file->getName());
                                 } else {
                                     throw new CException("ERROR SAVE FILE");
@@ -759,12 +762,12 @@ class CustemCActiveRecord extends CActiveRecord {
 		}
 
 	}
-    
+
     protected function getRecordFolder()
     {
         return Yii::getPathOfAlias('files').DIRECTORY_SEPARATOR.$this->id.DIRECTORY_SEPARATOR;
     }
-    
+
     protected function addRule($field)
     {
         if ( $field->is_mandatory ) {
@@ -826,7 +829,7 @@ class CustemCActiveRecord extends CActiveRecord {
     			    $types[] = 'numerical';
     			    $params['numerical'] = array('integerOnly'=>true,'allowEmpty'=>true);
 				}
-                
+
                 $params['default'] = array('value'=> null );
 			break;
 
@@ -923,14 +926,14 @@ class CustemCActiveRecord extends CActiveRecord {
                         else
                             $this->metaData->addRelation($field->alias,array( CActiveRecord::BELONGS_TO,'Manufacturer', $field->alias, 'select'=> "`{$field->alias}'_manufacturer`.`name`" ));
                     break;
-                    
-    				case TypeField::FILE :                        
+
+    				case TypeField::FILE :
                         $this->metaData->addRelation($field->alias,array(CActiveRecord::HAS_MANY, 'File', 'record_id',
 															'on'=> '`'.$name.'`.`product_id` = :product_id',
 															'params' => array(":product_id" => $this->getProductID() ),
 															'together' => true
 														));
-                    break;                    
+                    break;
 				}
 			}
 		}
