@@ -343,9 +343,16 @@ ORDER BY ".$order  ;
 		), $this);
 	}
 
-	public function getRecordObject($scenario = "add"){
-		//$record = Record::model($this->alias);
-        $record = DynamicActiveRecord::model($this->alias);
+	public function getRecordObject($scenario = "insert"){
+		//$record = DynamicActiveRecord::model($this->alias);
+        
+        if ( !class_exists($this->alias, false) ) eval("class ".$this->alias." extends CustemCActiveRecord {}");
+    	
+        $record = new $this->alias($scenario);
+        $record->productName = $this->alias;
+		$record->product = $this;
+		$record->init();        
+        
         $record->setScenario($scenario);
         return $record;
 	}

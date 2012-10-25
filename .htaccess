@@ -18,6 +18,6 @@ AddCharset utf-8 *
 </IfModule>
 
 #кэширование css, javascript файлов на неделю
-<FilesMatch ".(js|css)$">
+<FilesMatch ".(js|css|jpg)$">
 	Header set Cache-Control "max-age=604800"
 </FilesMatch>

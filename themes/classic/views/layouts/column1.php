@@ -2,12 +2,10 @@
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span3">
-                    <?php // $this->widget('Products', array("title"=>"Продуксты") ) ?>
-    			    <?php // $this->widget('Categories', array('title'=>"Категории",'id'=>1) ) ?>
-					<?php // $this->widget('Manufacturers', array("title"=>"Производители") ) ?>
+        <?php echo $this->clips['sidebar'] ?>
     </div>
     <div class="span9">
-      <?php echo $content; ?>    
+        <?php echo $content; ?>    
     </div>
   </div>
 </div>

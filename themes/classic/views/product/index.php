@@ -35,4 +35,8 @@ $alias = $product->alias;
         ));
     
 
+$this->beginClip('sidebar');
+  echo $records->getFilterForm();
+$this->endClip();
+
 ?>

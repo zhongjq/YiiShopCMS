@@ -5,7 +5,7 @@ class CustemCActiveRecord extends CActiveRecord {
     private $_manufacturerFilter = null;
 	private $_categoryFilter = null;
     private $_productFieldsOrder = null;
-    private $_with = array();
+    public $with = array();
 
 
 	public $productName;
@@ -54,7 +54,7 @@ class CustemCActiveRecord extends CActiveRecord {
     					case TypeField::CATEGORIES :
     					case TypeField::MANUFACTURER :
         				case TypeField::FILE :
-                            $this->_with[] = $field->alias;
+                            $this->with[] = $field->alias;
                         break;
 				    }
                 }
@@ -82,7 +82,7 @@ class CustemCActiveRecord extends CActiveRecord {
 		$criteria = new CDbCriteria;
 
         if ( $type == 'admin' )
-            $criteria->with = $this->_with;
+            $criteria->with = $this->with;
         else
             $criteria->with = array_keys($this->getMetaData()->relations);
 
@@ -92,8 +92,9 @@ class CustemCActiveRecord extends CActiveRecord {
     				case TypeField::LISTS:
                         if ( !empty($this->{$field->alias} ) )
         					if ($field->is_multiple_select){
-                                $criteria->condition = " (SELECT COUNT(*) FROM `record_list` WHERE `record_id` = t.id AND `product_id` = :product_id AND `list_item_id` = :list_item_id ) > 0 ";
-                                $criteria->params = array(":product_id"=> $this->getProductID() , ":list_item_id"=> $this->{$field->alias} );
+                                $criteria->addCondition(" (SELECT COUNT(*) FROM `record_list` WHERE `record_id` = t.id AND `product_id` = :product_id AND `list_item_id` = :list_item_id ) > 0 ");
+                                $criteria->params[":product_id"] = $this->getProductID();
+                                $criteria->params[':list_item_id'] = $this->{$field->alias} ;
     						} else
     							$criteria->compare($field->alias, $this->{$field->alias} );
     				break;
@@ -370,6 +371,52 @@ class CustemCActiveRecord extends CActiveRecord {
 
 		return $tableFields;
 	}
+
+    public function getFieldFilter($field)
+    {
+        $filter = array();
+		switch( $field->field_type ){
+			case TypeField::PRICE:
+                $filter = array(
+        			'type'=>'text',
+					'maxlength'=>255
+				);
+			break;
+    		case TypeField::STRING:
+                $filter = array(
+    				'type'=>'text',
+					'maxlength'=>255
+				);
+            break;
+    		case TypeField::BOOLEAN:
+                $filter = array(
+                	'type' => 'dropdownlist',
+				    'items' =>  BooleanField::getValues(),
+				    'empty'=> '',
+			    );
+			break;
+			case TypeField::LISTS:
+                $filter = array(
+        	    	'type' => 'dropdownlist',
+				    'items' => CHtml::listData( $this->getListFilter($field->list_id) , 'id', 'name'),
+				    'empty'=> '',
+			    );
+			break;
+            case TypeField::CATEGORIES:
+                $filter = CHtml::listData($this->getCategoryFilter($field->category_id) , 'id', 'name');
+			break;
+            case TypeField::MANUFACTURER:
+                $listData = CHtml::listData($this->getManufacturerFilter($field) , 'id', 'name') ;
+                $htmlOptions = $field->is_multiple_select ? array("multiple"=>true,"class"=>"chzn-select","data-placeholder"=>" ") : null;
+                $htmlOptions['empty'] = "";
+				$filter = CHtml::activeDropDownList($this,$field->alias,$listData,$htmlOptions);
+			break;
+            case TypeField::DATETIME:
+            break;
+		}
+		return $filter;
+	}
+
 
     public function getListFilter($list_id)
 	{
@@ -771,7 +818,7 @@ class CustemCActiveRecord extends CActiveRecord {
     protected function addRule($field)
     {
         if ( $field->is_mandatory ) {
-            $requiredValidator = CValidator::createValidator('required',$this,$field->alias);
+            $requiredValidator = CValidator::createValidator('required',$this,$field->alias,array('on'=>'insert,update'));
             $this->getValidatorList()->add($requiredValidator);
         }
 
@@ -845,7 +892,7 @@ class CustemCActiveRecord extends CActiveRecord {
 
             case TypeField::FILE :
                 $types[] = 'ArrayValidator';
-        		$params['ArrayValidator'] = array('validator'=>'file', 'params'=>array('types'=>'jpg, gif, png', 'maxSize' => 1048576, 'allowEmpty'=>false));
+        		$params['ArrayValidator'] = array('validator'=>'file', 'params'=>array('types'=>FileField::getTypesFilesValidate($field->file_type), 'maxSize' => 1048576, 'allowEmpty'=>false));
 			break;
 
             case TypeField::BOOLEAN :
@@ -980,7 +1027,46 @@ class CustemCActiveRecord extends CActiveRecord {
     }
 
 
+    public function getFilterForm($attributes = array()){
+    	        
+        $form = array(
+            'action' => array('product/index','alias'=>$this->productName),
+            'method' => 'get',
+			'attributes' => array(
+                'id' => "searchForm",
+                'class' => 'well'
+			),
+			'activeForm' => array(
+				'class' => 'CActiveForm',
+				'enableAjaxValidation' => false,
+				'enableClientValidation' => false,
+				'clientOptions' => array(
+					'validateOnSubmit' => false,
+					'validateOnChange' => false,
+				),                
+			),
+			'elements' => array(),
+			'buttons' => array(
+				'<br/>',
+				'submit'=>array(
+					'type' => 'submit',
+					'label' => Yii::t('product','Search'),
+					'class' => "btn"
+				),
+			),
+		);
 
+        if ( $this->product ){
+            $fields = $this->product->fields;
+            foreach( $fields as $field ){
+                if( $field->is_filter ){
+                    $form['elements'][$field->alias] = $this->getFieldFilter($field);                    
+                }
+            }
+        }
+        
+		return new CForm($form,$this);        
+    }
 
 
 

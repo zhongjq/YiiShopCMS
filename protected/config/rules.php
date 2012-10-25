@@ -46,8 +46,8 @@ return array(
 
                 // записи
                 '/admin/product/<id:\d+>' => 'admin/product/view',
-                '/admin/product/<id:\d+>/add' => 'admin/product/add',
-                '/admin/product/<productId:\d+>/record/<action:(edit|delete)>/<recordId:\d+>' => 'admin/product/<action>record',
+                'admin/product/<id:\d+>/<action:(add|export|import)>' => 'admin/product/<action>',
+                '/admin/product/<productId:\d+>/record/' => 'admin/product/<action>record',
 
 				// Списки
                 '/admin/lists/add' => 'admin/lists/add',

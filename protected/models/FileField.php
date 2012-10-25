@@ -80,6 +80,14 @@ class FileField extends CActiveRecord
 		
 	}
 
+    public static function getTypesFilesValidate($id){
+        $v = array( 0 => 'jpg, jpeg, gif, png, bmp', 
+                    1 => '',
+                    );
+
+		return $v[$id];		
+	}
+
     // форма в формате CForm
     public function getElementsMotelCForm(){
     	return array(

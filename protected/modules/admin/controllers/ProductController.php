@@ -17,8 +17,9 @@ class ProductController extends Controller
 
 	public function actionView($id)
 	{
-        $product = Product::getProductByPk($id);
-		$model = DynamicActiveRecord::model($product->alias);
+        $product = Product::model()->findByPk($id);
+    	$model = $product->getRecordObject();
+		//$model = DynamicActiveRecord::model($product->alias);
 
 		if ( isset($_GET[$model->productName]) ){
 			$model->attributes = $_GET[$model->productName];
