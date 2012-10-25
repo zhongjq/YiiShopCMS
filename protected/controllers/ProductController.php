@@ -3,7 +3,7 @@
 class ProductController extends Controller
 {
     public $layout='//layouts/column1';
-    
+
 	public function filters()
 	{
 		return array(
@@ -28,17 +28,18 @@ class ProductController extends Controller
 			),
 		);
 	}
-    
+
 	public function actionIndex($alias)
 	{
 		$product = Product::model()->find('alias LIKE :alias', array(':alias'=>$alias));
-        
+
         if ( $product ) {
-        
+
             $records = $product->getRecordObject('search');
-            
-            $records->attributes = $_GET[get_class($records)];  
-            
+
+			if( isset($_GET[get_class($records)]) )
+				$records->attributes = $_GET[get_class($records)];
+
     		$this->render('index',array(
                 "product"=> $product,
                 "records"=> $records,
@@ -65,7 +66,7 @@ class ProductController extends Controller
 
 		$record = $product->getRecordObject();
         $record = $record->with($record->with)->find('alias = :alias', array(':alias'=>$alias));
-    
+
 		$this->render('view',array(
 			"product"=>$product,
 			"record"=>$record,

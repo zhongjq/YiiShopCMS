@@ -8,15 +8,21 @@ $alias = $product->alias;
             'enablePagination' => true,
             'dataProvider'=>$records->search(),
     		'filter'=>$records,
-        	'columns' => 
-                
+        	'columns' =>
+
                     array(
                         'name'=> array(
                             'value'=>' $data->getLink( $data->name ) ',
                             'type'=>'raw'
                         )
-                    ) 
-                    + $records->getTableFields()
+                    )
+                    + $records->getTableFields() +
+                    array(
+                        array(
+                            'value'=>' $data->getAddToCartLink( "add" ) ',
+                            'type'=>'raw'
+                        )
+                    )
                 ,
         	'htmlOptions'=>array('class'=>false),
         	'itemsCssClass'=>'table table-bordered table-striped',
@@ -25,7 +31,7 @@ $alias = $product->alias;
         	'pager'=>array(
         		'class' => 'myLinkPager',
         		'cssFile' => false,
-        		'header' => '',                
+        		'header' => '',
         		'firstPageLabel'=> '&laquo;',
         		'prevPageLabel'	=> '&larr;',
         		'nextPageLabel'	=> '&rarr;',
@@ -33,7 +39,7 @@ $alias = $product->alias;
         		'htmlOptions'	=> array("class"=>false),
         	),
         ));
-    
+
 
 $this->beginClip('sidebar');
   echo $records->getFilterForm();

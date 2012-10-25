@@ -127,6 +127,19 @@ class CustemCActiveRecord extends CActiveRecord {
         return $out;
     }
 
+    public function getAddToCartLink($text){
+        $out = null;
+        if ( $this->alias ){
+            $url = Yii::app()->createUrl('product/addtocart',array('product'=>$this->productName,'alias'=>$this->alias));
+        } else {
+            $url = Yii::app()->createUrl('product/addtocart',array('product'=>$this->productName,'id'=>$this->id));
+        }
+
+
+        $out = CHtml::link($text,$url);
+        return $out;
+    }
+
 	public function getTableFields()
     {
         $fields = array();
@@ -140,7 +153,7 @@ class CustemCActiveRecord extends CActiveRecord {
     					case TypeField::LISTS:
 
 							if ($field->is_multiple_select){
-								$f['value'] = '$data->getRecordItems('.$field->alias.')';
+								$f['value'] = '  $data->getRecordItems("'.$field->alias.'")';
 							} else
 								$f['value'] = 'isset($data->'.$field->alias.'Item) ? $data->'.$field->alias.'Item->name : null';
 
@@ -1028,7 +1041,7 @@ class CustemCActiveRecord extends CActiveRecord {
 
 
     public function getFilterForm($attributes = array()){
-    	        
+
         $form = array(
             'action' => array('product/index','alias'=>$this->productName),
             'method' => 'get',
@@ -1043,7 +1056,7 @@ class CustemCActiveRecord extends CActiveRecord {
 				'clientOptions' => array(
 					'validateOnSubmit' => false,
 					'validateOnChange' => false,
-				),                
+				),
 			),
 			'elements' => array(),
 			'buttons' => array(
@@ -1060,12 +1073,12 @@ class CustemCActiveRecord extends CActiveRecord {
             $fields = $this->product->fields;
             foreach( $fields as $field ){
                 if( $field->is_filter ){
-                    $form['elements'][$field->alias] = $this->getFieldFilter($field);                    
+                    $form['elements'][$field->alias] = $this->getFieldFilter($field);
                 }
             }
         }
-        
-		return new CForm($form,$this);        
+
+		return new CForm($form,$this);
     }
 
 

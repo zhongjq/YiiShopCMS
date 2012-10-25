@@ -10,10 +10,10 @@ class UrlRule extends CBaseUrlRule
 			case "product/index":
                 $alias = $params['alias'];
 				$url = $alias.$manager->urlSuffix;
-                
+
                 if ( isset( $params['page'] ) )
                     $url .= '?page='.$params['page'];
-                
+
                 return $url;
 			break;
 			case "product/view":
@@ -22,6 +22,15 @@ class UrlRule extends CBaseUrlRule
 					return $params['product'] . '/' . $params['id'].$manager->urlSuffix;
 				else if (isset($params['product'], $params['alias']))
 					return $params['product'] . '/' . $params['alias'].$manager->urlSuffix;
+
+			break;
+
+			case "product/addtocart":
+
+				if (isset($params['product'], $params['id']))
+					return $params['product'] . '/' . $params['id'].'/addtocart'.$manager->urlSuffix;
+				else if (isset($params['product'], $params['alias']))
+					return $params['product'] . '/' . $params['alias'].'/addtocart'.$manager->urlSuffix;
 
 			break;
 
@@ -34,7 +43,7 @@ class UrlRule extends CBaseUrlRule
 	}
 
 	public function parseUrl($manager,$request,$pathInfo,$rawPathInfo)
-	{        
+	{
 		if (preg_match('%^(\w+)(/(\d+))?$%', $pathInfo, $matches)){
 		    // просмотр единицы товара по id
 			if ( isset($matches[1],$matches[3]) ){
@@ -43,7 +52,7 @@ class UrlRule extends CBaseUrlRule
 				return 'product/viewId';
 			}
 		}
-        
+
 		if (preg_match('%^(\w+)(/(\w+))?$%', $pathInfo, $matches)){
 			// просмотр единицы товара по alias
 			if ( isset($matches[1],$matches[3]) ){
@@ -52,15 +61,15 @@ class UrlRule extends CBaseUrlRule
 				return 'product/viewAlias';
 			}
 		}
-        
+
     	if (preg_match('%^(\w+)?$%', $pathInfo, $matches)){
 			// просмотр товара
 			if ( isset($matches[1]) && $matches[1] != 'admin' ){
 				$_GET['alias'] = $matches[1];
 				return 'product/index';
 			}
-		}        
-        
+		}
+
 		return false;  // не применяем правило
 	}
 }
