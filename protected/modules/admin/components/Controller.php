@@ -7,6 +7,17 @@ class Controller extends CController
 	public function __construct($id, $module = null) {
 		parent::__construct($id, $module);
 
+        // описание пакета
+        Yii::app()->clientScript->packages['chosen'] = array(
+            'baseUrl'=>$this->assetsBase,
+            // список js-файлов
+            'js'=>array('chosen/chosen.jquery.min.js'),
+            // список css-файлов
+            'css'=>array('chosen/chosen.css'),
+            // Зависимость от другого пакета
+            'depends'=>array('jquery'),
+        );
+
 		if(isset(Yii::app()->request->cookies['language']))
 			Yii::app()->language = Yii::app()->request->cookies['language']->value;
 	}

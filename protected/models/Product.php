@@ -17,6 +17,8 @@
  */
 class Product extends CActiveRecord
 {
+    public static $exceptions = array('admin','cart','my','baner');
+    
     public $fields;
 
 	public static function model($className=__CLASS__)
@@ -47,6 +49,7 @@ class Product extends CActiveRecord
 			array('name, alias', 'unique'),
 			array('title, keywords, description', 'safe'),
 			array('alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u', 'message' => Yii::t("products",'Field contains invalid characters.') ),
+            array('alias', 'in', 'range'=> self::$exceptions, 'not'=> true, 'message' => Yii::t("products",'Be exceptional ('.implode(', ',self::$exceptions).').') ),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, status, name, alias', 'safe', 'on'=>'search'),

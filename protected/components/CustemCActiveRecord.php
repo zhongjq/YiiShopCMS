@@ -73,7 +73,7 @@ class CustemCActiveRecord extends CActiveRecord {
             array('alias', 'length', 'max'=>255),
             array('alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u', 'message' => Yii::t("products",'Field contains invalid characters.') ),
 
-            array('title, keywords, description', 'length', 'max'=>500),
+            array('title, keywords, description', 'length', 'max'=>500)
         );
     }
 
@@ -89,6 +89,10 @@ class CustemCActiveRecord extends CActiveRecord {
 	    if ( $this->product ){
             foreach( $this->product->fields as $field ){
     			switch( $field->field_type ){
+        			case TypeField::STRING:
+                    case TypeField::TEXT:
+                        $criteria->compare($field->alias, $this->{$field->alias}, true );
+    				break;                    
     				case TypeField::LISTS:
                         if ( !empty($this->{$field->alias} ) )
         					if ($field->is_multiple_select){
@@ -1080,12 +1084,5 @@ class CustemCActiveRecord extends CActiveRecord {
 
 		return new CForm($form,$this);
     }
-
-
-
-
-
-
-
 
 }

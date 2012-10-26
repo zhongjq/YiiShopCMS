@@ -395,6 +395,41 @@ class ProductController extends Controller
 		}
 	}
 
+    public function actionExport($id){
+        $product = Product::model()->findByPk($id);
+        
+        $model = $product->getRecordObject();
+        
+        
+       
+        
+        /*
+        $model = new Export();
+        $model->fields = $product->fields;
+        
+        $form = $model->getExportMotelCForm();
+        
+        $this->performAjaxValidation($model);
+        
+        if( $form->submitted() ){
+            $form->validate();
+        }
+        */
+        $form = null;
+    	$this->render('records/export', array(
+			'product' => $product,
+            'form' => $form,
+            'model' => $model,
+		));        
+    }
 
+    public function actionImport($id){
+        $product = Product::model()->findByPk($id);        
+        
+        
+        $this->render('records/export', array(
+			'product' => $product
+		));        
+    }
 
 }
