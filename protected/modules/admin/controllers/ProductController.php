@@ -461,9 +461,17 @@ class ProductController extends Controller
     public function actionImport($id){
         $product = Product::model()->findByPk($id);
 
+        $import = new Import();
+        $import->fields = $product->fields;
 
-        $this->render('records/export', array(
-			'product' => $product
+        $form = $import->getStepOneCForm();
+
+        $this->performAjaxValidation($import);
+
+
+    	$this->render('records/import', array(
+			'product' => $product,
+            'form' => $form,
 		));
     }
 

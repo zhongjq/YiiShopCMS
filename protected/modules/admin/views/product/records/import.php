@@ -6,4 +6,6 @@ $this->breadcrumbs=array(
 
 $this->renderPartial('records/secondMenu',array('product'=>$product));
 
+echo $form;
+
 ?>

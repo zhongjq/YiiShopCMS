@@ -552,13 +552,6 @@ class CustemCActiveRecord extends CActiveRecord {
         $return = array($field->alias => TypeField::getFieldFormData($field->field_type) );
 
         switch( $field->field_type ){
-            case TypeField::IMAGE :
-				$return[$field->alias] = $field->getElementCForm();
-			break;
-
-            case TypeField::DATETIME :
-				$return[$field->alias] = $field->getElementCForm();
-			break;
 
             case TypeField::TEXT :
 				$return[$field->alias]['rows'] = $field->rows;
