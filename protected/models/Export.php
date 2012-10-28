@@ -1,18 +1,18 @@
 <?php
 
-class Export extends CModel {   
-    
+class Export extends CModel {
+
     public $exportType = null;
     public static $exportTypes = array(0=>'xls',1=>'csv');
-    
-    
+
+
     public $fields = null;
     public $exportFields = null;
-    
+
     public function rules()
     {
-        return array(            
-            array('exportType', 'required'),
+        return array(
+            array('exportType,exportFields', 'required'),
             array('exportFields', 'ArrayValidator', 'validator'=>'numerical', 'params'=>array('integerOnly'=>true) ),
         );
     }
@@ -21,13 +21,13 @@ class Export extends CModel {
         return array(
             'exportType',
             'exportFields',
-        );        
+        );
     }
     public function attributeLabels(){
         return array(
             'exportType' => Yii::t('record','Export type'),
             'exportFields' => Yii::t('record','Export fields'),
-        );        
+        );
     }
 
     public function getExportMotelCForm()
@@ -57,7 +57,7 @@ class Export extends CModel {
 				    'items' => CHtml::listData($this->fields, 'id', 'name'),
                     'multiple' => true,
 				    'empty'=> '',
-			    ),                
+			    ),
             ),
 			'buttons' => array(
 				'<br/>',

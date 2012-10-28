@@ -64,7 +64,7 @@ class UrlRule extends CBaseUrlRule
 
     	if (preg_match('%^(\w+)?$%', $pathInfo, $matches)){
 			// просмотр товара
-			if ( isset($matches[1]) && $matches[1] != 'admin' ){
+			if ( isset($matches[1]) && !in_array($matches[1],array('admin','importcsv'))  ){
 				$_GET['alias'] = $matches[1];
 				return 'product/index';
 			}

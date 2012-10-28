@@ -71,7 +71,7 @@ class ProductController extends Controller
 		$form = $model->getMotelCForm();
 
 		if(isset($_POST[$model->tableName()])) {
-            
+
 			$model->attributes = $_POST[$model->tableName()];
 
 			$transaction = Yii::app()->db->beginTransaction();
@@ -105,9 +105,9 @@ class ProductController extends Controller
 		$form = $model->getMotelCForm();
 
 		if(isset($_POST[$model->tableName()])) {
-			
+
             $model->attributes = $_POST[$model->tableName()];
-            
+
             $transaction = Yii::app()->db->beginTransaction();
 			try
 			{
@@ -397,39 +397,74 @@ class ProductController extends Controller
 
     public function actionExport($id){
         $product = Product::model()->findByPk($id);
-        
-        $model = $product->getRecordObject();
-        
-        
-       
-        
-        /*
-        $model = new Export();
-        $model->fields = $product->fields;
-        
-        $form = $model->getExportMotelCForm();
-        
-        $this->performAjaxValidation($model);
-        
-        if( $form->submitted() ){
-            $form->validate();
+
+        $export = new Export();
+        $export->fields = $product->fields;
+
+        $form = $export->getExportMotelCForm();
+
+        $this->performAjaxValidation($export);
+
+        if( $form->submitted() && $form->validate() ){
+			$model = $product->getRecordObject();
+
+			if ( in_array($export->exportType,array(0,1))  ) {
+
+				$columns = array();
+				foreach ($export->exportFields as $fieldId) {
+					$field = $product->fields[$fieldId];
+					$columns[$fieldId]['name']=$field->alias;
+					$columns[$fieldId]['type']='text';
+					switch( $field->field_type ){
+						case TypeField::STRING:
+						case TypeField::PRICE:
+						case TypeField::TEXT:
+						case TypeField::INTEGER:
+						case TypeField::DOUBLE:
+							$columns[$fieldId]['value'] = '$data->'.$field->alias;
+						break;
+						case TypeField::BOOLEAN:
+							$columns[$fieldId]['value'] = 'BooleanField::getValues($data->'.$field->alias.')';
+						break;
+						case TypeField::LISTS:
+							if ($field->is_multiple_select)
+								$columns[$fieldId]['value'] = '$data->getRecordItems("'.$field->alias.'")';
+							else
+								$columns[$fieldId]['value'] = 'isset($data->'.$field->alias.') ? $data->'.$field->alias.' : null';
+						break;
+						default :
+							$columns[$fieldId]['value'] = '';
+
+					}
+				}
+
+				$type = array('Excel5','CSV');
+				$this->widget('ext.EExcelView.EExcelView', array(
+								'dataProvider'=> $model->search(),
+								'grid_mode'=>'export',
+								'title'=> $product->name ,
+								'filename'=> $product->alias ,
+								'stream'=>true,
+								'exportType'=>$type[$export->exportType],
+								'columns'=> $columns,
+				));
+			}
         }
-        */
-        $form = null;
+
+
     	$this->render('records/export', array(
 			'product' => $product,
             'form' => $form,
-            'model' => $model,
-		));        
+		));
     }
 
     public function actionImport($id){
-        $product = Product::model()->findByPk($id);        
-        
-        
+        $product = Product::model()->findByPk($id);
+
+
         $this->render('records/export', array(
 			'product' => $product
-		));        
+		));
     }
 
 }

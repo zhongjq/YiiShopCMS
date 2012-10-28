@@ -92,7 +92,7 @@ class CustemCActiveRecord extends CActiveRecord {
         			case TypeField::STRING:
                     case TypeField::TEXT:
                         $criteria->compare($field->alias, $this->{$field->alias}, true );
-    				break;                    
+    				break;
     				case TypeField::LISTS:
                         if ( !empty($this->{$field->alias} ) )
         					if ($field->is_multiple_select){
@@ -118,30 +118,28 @@ class CustemCActiveRecord extends CActiveRecord {
         ));
 	}
 
-    public function getLink($text){
-        $out = null;
+    public function getLink($text)
+	{
+
         if ( $this->alias ){
             $url = Yii::app()->createUrl('product/view',array('product'=>$this->productName,'alias'=>$this->alias));
         } else {
             $url = Yii::app()->createUrl('product/view',array('product'=>$this->productName,'id'=>$this->id));
         }
 
-
-        $out = CHtml::link($text,$url);
-        return $out;
+        return CHtml::link($text,$url);
     }
 
-    public function getAddToCartLink($text){
-        $out = null;
+    public function getAddToCartLink($text)
+	{
+
         if ( $this->alias ){
             $url = Yii::app()->createUrl('product/addtocart',array('product'=>$this->productName,'alias'=>$this->alias));
         } else {
             $url = Yii::app()->createUrl('product/addtocart',array('product'=>$this->productName,'id'=>$this->id));
         }
 
-
-        $out = CHtml::link($text,$url);
-        return $out;
+        return CHtml::link($text,$url);
     }
 
 	public function getTableFields()
@@ -230,7 +228,7 @@ class CustemCActiveRecord extends CActiveRecord {
             $this->setProductFieldsOrder("t.position");
 
             if ( $this->product ){
-                foreach( $this->product->fields as $field ){
+                foreach( $this->product->fields as &$field ){
 
 					if( $field->is_column_table_admin ){
 						$f['name'] = $field->alias;
@@ -448,13 +446,13 @@ class CustemCActiveRecord extends CActiveRecord {
 		return Yii::app()->params[$name];
 	}
 
-    public function getRecordItems($name, $sSep = ', ')
+    public function getRecordItems($name, $sSep = ", ")
 	{
         if ( empty($this->{$name}) ) return;
 
         $aRes = array();
         foreach ($this->{$name} as $item) {
-            $aRes[] = $item->name;
+            $aRes[] = trim($item->name);
         }
 
         return implode($sSep, $aRes);

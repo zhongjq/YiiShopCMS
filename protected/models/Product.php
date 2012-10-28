@@ -18,7 +18,7 @@
 class Product extends CActiveRecord
 {
     public static $exceptions = array('admin','cart','my','baner');
-    
+
     public $fields;
 
 	public static function model($className=__CLASS__)
@@ -126,7 +126,7 @@ class Product extends CActiveRecord
     public function afterFind(){
         $this->setFields();
     }
-    
+
     public function setFields($order = "position"){
 
         $connection=Yii::app()->db;
@@ -281,9 +281,14 @@ ORDER BY ".$order  ;
         $command = $connection->cache(1000)->createCommand($sql);
         $command->bindValue(":product_id",$this->id,PDO::PARAM_STR);
 
-        $this->fields = $command->setFetchMode(PDO::FETCH_OBJ)->queryAll();        
+        $fields = $command->setFetchMode(PDO::FETCH_OBJ)->queryAll();
+
+		if( !empty($fields) )
+		foreach ($fields as &$value) {
+			$this->fields[$value->id] = $value;
+		}unset($value);
     }
-    
+
 
 	public function beforeDelete(){
 		if( parent::beforeDelete() ) {
@@ -348,14 +353,14 @@ ORDER BY ".$order  ;
 
 	public function getRecordObject($scenario = "insert"){
 		//$record = DynamicActiveRecord::model($this->alias);
-        
+
         if ( !class_exists($this->alias, false) ) eval("class ".$this->alias." extends CustemCActiveRecord {}");
-    	
+
         $record = new $this->alias($scenario);
         $record->productName = $this->alias;
 		$record->product = $this;
-		$record->init();        
-        
+		$record->init();
+
         $record->setScenario($scenario);
         return $record;
 	}

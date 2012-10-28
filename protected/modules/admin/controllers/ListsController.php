@@ -171,7 +171,7 @@ class ListsController extends Controller
 					foreach( $items as $item_name ){
 						$IL = new ListItem('add');
 						$IL->list_id = $id;
-						$IL->name = $item_name;
+						$IL->name = trim($item_name);
 						if ( !$IL->save() ){
 							throw new CException("Error save");
 						}
