@@ -3,6 +3,7 @@
 class Import extends CModel {
 
 	public $file = null;
+	public $step = 1;
 	public $importType = null;
     public static $importTypes = array(0=>'xls',1=>'csv');
 
@@ -13,15 +14,17 @@ class Import extends CModel {
     public function rules()
     {
         return array(
-			array('file', 'required'),
-			array('file', 'file', 'types'=>'xls, csv'),
+			array('step', 'required'),
 
-            array('importFields', 'ArrayValidator', 'validator'=>'numerical', 'params'=>array('integerOnly'=>true) ),
+			array('file', 'required', 'on'=>'step_1'),
+			array('file', 'file', 'types'=>'xls, csv','safe'=>true,'on'=>'step_1'),
+
         );
     }
 
     public function attributeNames(){
         return array(
+			'step',
             'file',
             'importType',
             'importFields',
@@ -45,14 +48,17 @@ class Import extends CModel {
 			),
 			'activeForm' => array(
 				'class' => 'CActiveForm',
-				'enableAjaxValidation' => true,
+				'enableAjaxValidation' => false,
 				'enableClientValidation' => false,
 				'clientOptions' => array(
-					'validateOnSubmit' => true,
+					'validateOnSubmit' => false,
 					'validateOnChange' => false,
 				),
 			),
 			'elements' => array(
+                'step' => array(
+        	    	'type' => 'hidden'
+			    ),
                 'file' => array(
         	    	'type' => 'file'
 			    )

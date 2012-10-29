@@ -462,11 +462,31 @@ class ProductController extends Controller
         $product = Product::model()->findByPk($id);
 
         $import = new Import();
+		$import->scenario='step_1';
         $import->fields = $product->fields;
 
         $form = $import->getStepOneCForm();
 
-        $this->performAjaxValidation($import);
+		if( isset($_POST['Import']) ){
+			$import->setAttributes($_POST['Import']);
+
+			switch ($import->step){
+				case 1:
+					$import->file = CUploadedFile::getInstance($import,'file');
+					if( $import->validate() ){
+						$import->file->saveAs(Yii::getPathOfAlias('webroot').DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR.$product->id.".".$import->file->getExtensionName() );
+					}
+				break;
+			}
+
+
+
+
+		}
+
+
+
+
 
 
     	$this->render('records/import', array(
