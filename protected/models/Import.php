@@ -14,7 +14,7 @@ class Import extends CModel {
     public function rules()
     {
         return array(
-			array('step', 'required'),
+			array('step, importType', 'required'),
 
 			array('file', 'required', 'on'=>'step_1'),
 			array('file', 'file', 'types'=>'xls, csv','safe'=>true,'on'=>'step_1'),
@@ -59,6 +59,11 @@ class Import extends CModel {
                 'step' => array(
         	    	'type' => 'hidden'
 			    ),
+                'importType' => array(
+        	    	'type' => 'dropdownlist',
+				    'items' => self::$importTypes,
+				    'empty'=> '',
+			    ),
                 'file' => array(
         	    	'type' => 'file'
 			    )
@@ -68,6 +73,51 @@ class Import extends CModel {
 				'submit'=>array(
 					'type' => 'submit',
 					'label' => Yii::t("product","Step 1"),
+					'class' => "btn"
+				),
+			),
+		);
+
+
+		return new CForm($form,$this);
+	}
+
+
+    public function getStepTwoCForm()
+    {
+    	$form = array(
+			'attributes' => array(
+                'id' => "importForm",
+                'class' => 'well',
+				'enctype' => 'multipart/form-data',
+			),
+			'activeForm' => array(
+				'class' => 'CActiveForm',
+				'enableAjaxValidation' => false,
+				'enableClientValidation' => false,
+				'clientOptions' => array(
+					'validateOnSubmit' => false,
+					'validateOnChange' => false,
+				),
+			),
+			'elements' => array(
+                'step' => array(
+        	    	'type' => 'hidden'
+			    ),
+                'importType' => array(
+        	    	'type' => 'dropdownlist',
+				    'items' => self::$importTypes,
+				    'empty'=> '',
+			    ),
+                'file' => array(
+        	    	'type' => 'text',
+			    )
+            ),
+			'buttons' => array(
+				'<br/>',
+				'submit'=>array(
+					'type' => 'submit',
+					'label' => Yii::t("product","Step 2"),
 					'class' => "btn"
 				),
 			),

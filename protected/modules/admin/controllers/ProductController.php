@@ -474,7 +474,36 @@ class ProductController extends Controller
 				case 1:
 					$import->file = CUploadedFile::getInstance($import,'file');
 					if( $import->validate() ){
-						$import->file->saveAs(Yii::getPathOfAlias('webroot').DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR.$product->id.".".$import->file->getExtensionName() );
+						$file = Yii::getPathOfAlias('webroot').DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR.$product->id.".".$import->file->getExtensionName();
+
+						$import->file->saveAs($file );
+						$import->step = 2;
+						$form = $import->getStepTwoCForm();
+
+						//Autoload fix
+						spl_autoload_unregister(array('YiiBase','autoload'));
+						Yii::import('ext.phpexcel.Classes.PHPExcel', true);
+						$objReader = new PHPExcel_Reader_Excel5;
+
+						spl_autoload_register(array('YiiBase','autoload'));
+
+
+						$objPHPExcel = $objReader->load($file);
+						$objWorksheet = $objPHPExcel->getActiveSheet();
+						$highestRow = $objWorksheet->getHighestRow(); // e.g. 10
+						$highestColumn = $objWorksheet->getHighestColumn(); // e.g 'F'
+						$highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn); // e.g. 5
+						echo '<table>' . "\n";
+						for ($row = 2; $row <= $highestRow; ++$row) {
+						  echo '<tr>' . "\n";
+						  for ($col = 0; $col <= $highestColumnIndex; ++$col) {
+							echo '<td>' . $objWorksheet->getCellByColumnAndRow($col, $row)->getValue() . '</td>' . "\n";
+						  }
+						  echo '</tr>' . "\n";
+						}
+						echo '</table>' . "\n";
+
+
 					}
 				break;
 			}

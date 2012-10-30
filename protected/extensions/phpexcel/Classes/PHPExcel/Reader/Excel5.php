@@ -697,7 +697,7 @@ class PHPExcel_Reader_Excel5 implements PHPExcel_Reader_IReader
 		}
 
 		// Read the summary information stream (containing meta data)
-		$this->_readSummaryInformation();
+		//$this->_readSummaryInformation();
 
 		// Read the Additional document summary information stream (containing application-specific meta data)
 		$this->_readDocumentSummaryInformation();
@@ -707,7 +707,7 @@ class PHPExcel_Reader_Excel5 implements PHPExcel_Reader_IReader
 
 		// initialize
 		$this->_pos					= 0;
-		$this->_codepage			= 'CP1252';
+		$this->_codepage			= 'CP1251';
 		$this->_formats				= array();
 		$this->_objFonts			= array();
 		$this->_palette				= array();
