@@ -10,6 +10,7 @@ class Import extends CModel {
 
     public $fields = null;
     public $importFields = null;
+    public $fileFields = null;
 
     public function rules()
     {

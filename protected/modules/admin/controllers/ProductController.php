@@ -487,11 +487,14 @@ class ProductController extends Controller
 
 						spl_autoload_register(array('YiiBase','autoload'));
 
-
+						$objReader = PHPExcel_IOFactory::createReaderForFile($file);
+						$objReader->setReadDataOnly(false);
 						$objPHPExcel = $objReader->load($file);
+
+						//$objPHPExcel = $objReader->load($file);
 						$objWorksheet = $objPHPExcel->getActiveSheet();
 						$highestRow = $objWorksheet->getHighestRow(); // e.g. 10
-						$highestColumn = $objWorksheet->getHighestColumn(); // e.g 'F'
+						$highestColumn = $objWorksheet->getHighestDataColumn(); // e.g 'F'
 						$highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn); // e.g. 5
 						echo '<table>' . "\n";
 						for ($row = 2; $row <= $highestRow; ++$row) {
