@@ -478,7 +478,7 @@ class ProductController extends Controller
 
 						$import->file->saveAs($file );
 						$import->step = 2;
-						$form = $import->getStepTwoCForm();
+
 
 						//Autoload fix
 						spl_autoload_unregister(array('YiiBase','autoload'));
@@ -491,6 +491,11 @@ class ProductController extends Controller
 						$objReader->setReadDataOnly(false);
 						$objPHPExcel = $objReader->load($file);
 
+						$objWorksheet = $objPHPExcel->getActiveSheet();
+						$import->countImportFields = PHPExcel_Cell::columnIndexFromString($objWorksheet->getHighestDataColumn());
+
+
+						/*
 						//$objPHPExcel = $objReader->load($file);
 						$objWorksheet = $objPHPExcel->getActiveSheet();
 						$highestRow = $objWorksheet->getHighestRow(); // e.g. 10
@@ -505,8 +510,8 @@ class ProductController extends Controller
 						  echo '</tr>' . "\n";
 						}
 						echo '</table>' . "\n";
-
-
+						*/
+						$form = $import->getStepTwoCForm();
 					}
 				break;
 			}
