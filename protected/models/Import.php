@@ -94,6 +94,37 @@ class Import extends CModel {
 		$fieldMapping='';
 		if( !empty($this->countImportFields) ){
 
+$js = <<<JS
+$(function(){
+	jQuery("#addFile").click(function(){
+
+		var tbody = $(this).closest("table").find("tbody");
+
+
+
+		var tr = tbody.find("tr:last").clone()
+					.find("select").attr('name', function(i, val) {
+						var name = val.match(/[\d+]/)[0];
+						return val.replace(/[\d+]/, parseInt(name) + 1 )
+					}).end()
+					.find("input").val("").end()
+					.find("a").show().end();
+
+
+
+
+	   tbody.append( tr );
+
+	   return false;
+	});
+});
+
+JS;
+
+		$cs=Yii::app()->getClientScript();
+		$cs->registerScript('files',$js);
+
+
 			$listFiels = array();
 			for($i = 1; $i<=$this->countImportFields;$i++)
 				$listFiels[] = Yii::t('product','Col #'.$i);
@@ -104,16 +135,25 @@ class Import extends CModel {
 				$fieldMapping .= CHtml::openTag('tbody',array());
 					$fieldMapping .= CHtml::openTag('tr',array());
 						$fieldMapping .= CHtml::openTag('td',array());
-							$fieldMapping .= CHtml::dropDownList('asd',null, $listFiels,array('empty'=>'') );
+							$fieldMapping .= CHtml::dropDownList('importFields[0][to]',null, $listFiels,array('empty'=>'') );
 						$fieldMapping .=  CHtml::closeTag('td');
 						$fieldMapping .=  CHtml::openTag('td',array());
-							$fieldMapping .= CHtml::dropDownList('asd',1, array(0=>"=",1=>">") );
+							$fieldMapping .= CHtml::dropDownList('importFields[0][param]',1, array(0=>"=",1=>">") );
 						$fieldMapping .= CHtml::closeTag('td');
 						$fieldMapping .= CHtml::openTag('td',array());
-							$fieldMapping .= CHtml::dropDownList('asd',null, CHtml::listData($this->fields,'id','name'),array('empty'=>'') );
+							$fieldMapping .= CHtml::dropDownList('importFields[0][from]',null, CHtml::listData($this->fields,'id','name'),array('empty'=>'') );
 						$fieldMapping .= CHtml::closeTag('td');
 					$fieldMapping .= CHtml::closeTag('tr');
 				$fieldMapping .= CHtml::closeTag('tbody');
+
+				$fieldMapping .= CHtml::openTag('tfoot',array());
+					$fieldMapping .= CHtml::openTag('tr',array());
+						$fieldMapping .= CHtml::openTag('td',array('colspan'=>3));
+							$fieldMapping .= CHtml::link(Yii::t('fields', 'Еще'),"#", array('id'=>'addFile'));
+						$fieldMapping .= CHtml::closeTag('td');
+					$fieldMapping .= CHtml::closeTag('tr');
+				$fieldMapping .= CHtml::closeTag('tfoot');
+
 			$fieldMapping .= CHtml::closeTag("table");
 
 
