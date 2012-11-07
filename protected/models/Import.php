@@ -23,6 +23,8 @@ class Import extends CModel {
 			array('countImportFields', 'numerical', 'integerOnly'=>true),
 			array('file', 'file', 'types'=>'xls, csv','safe'=>true,'on'=>'step_1'),
 
+			array('importFields','required', 'on'=>'step_2' ),
+			array('importFields','safe' ),
         );
     }
 
@@ -39,7 +41,7 @@ class Import extends CModel {
         return array(
             'file' => Yii::t('record','File'),
             'importType' => Yii::t('record','Export type'),
-            'importFields' => Yii::t('record','Export fields'),
+            'importFields' => Yii::t('record','Import fields'),
             'countImportFields' => Yii::t('record','countImportFields'),
         );
     }
@@ -124,6 +126,7 @@ JS;
 		$cs=Yii::app()->getClientScript();
 		$cs->registerScript('files',$js);
 
+			$name = CHtml::activeName($this,'importFields');
 
 			$listFiels = array();
 			for($i = 1; $i<=$this->countImportFields;$i++)
@@ -135,13 +138,13 @@ JS;
 				$fieldMapping .= CHtml::openTag('tbody',array());
 					$fieldMapping .= CHtml::openTag('tr',array());
 						$fieldMapping .= CHtml::openTag('td',array());
-							$fieldMapping .= CHtml::dropDownList('importFields[0][to]',null, $listFiels,array('empty'=>'') );
+							$fieldMapping .= CHtml::dropDownList($name.'[0][to]',null, $listFiels,array('empty'=>'') );
 						$fieldMapping .=  CHtml::closeTag('td');
 						$fieldMapping .=  CHtml::openTag('td',array());
-							$fieldMapping .= CHtml::dropDownList('importFields[0][param]',1, array(0=>"=",1=>">") );
+							$fieldMapping .= CHtml::dropDownList($name.'[0][param]',1, array(0=>"=",1=>">") );
 						$fieldMapping .= CHtml::closeTag('td');
 						$fieldMapping .= CHtml::openTag('td',array());
-							$fieldMapping .= CHtml::dropDownList('importFields[0][from]',null, CHtml::listData($this->fields,'id','name'),array('empty'=>'') );
+							$fieldMapping .= CHtml::dropDownList($name.'[0][from]',null, CHtml::listData($this->fields,'id','name'),array('empty'=>'') );
 						$fieldMapping .= CHtml::closeTag('td');
 					$fieldMapping .= CHtml::closeTag('tr');
 				$fieldMapping .= CHtml::closeTag('tbody');
@@ -169,10 +172,10 @@ JS;
 			),
 			'activeForm' => array(
 				'class' => 'CActiveForm',
-				'enableAjaxValidation' => false,
+				'enableAjaxValidation' => true,
 				'enableClientValidation' => false,
 				'clientOptions' => array(
-					'validateOnSubmit' => false,
+					'validateOnSubmit' => true,
 					'validateOnChange' => false,
 				),
 			),

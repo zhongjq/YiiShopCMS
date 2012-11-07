@@ -511,8 +511,14 @@ class ProductController extends Controller
 						}
 						echo '</table>' . "\n";
 						*/
+
 						$form = $import->getStepTwoCForm();
 					}
+				break;
+				case 2:
+					$import->setScenario('step_2');
+					$import->validate();
+					$form = $import->getStepTwoCForm();
 				break;
 			}
 
