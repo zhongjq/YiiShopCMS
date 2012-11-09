@@ -24,8 +24,14 @@ class Import extends CModel {
 			array('file', 'file', 'types'=>'xls, csv','safe'=>true,'on'=>'step_1'),
 
 			array('importFields','required', 'on'=>'step_2' ),
+            array('importFields','ImportValidator', 'on'=>'step_2' ),
 			array('importFields','safe' ),
         );
+    }
+
+    public function ImportValidator($attribute,$params)
+    {
+        $this->addError($attribute,'Неправильное имя пользователя или пароль.');
     }
 
     public function attributeNames(){
@@ -172,10 +178,10 @@ JS;
 			),
 			'activeForm' => array(
 				'class' => 'CActiveForm',
-				'enableAjaxValidation' => true,
+				'enableAjaxValidation' => false,
 				'enableClientValidation' => false,
 				'clientOptions' => array(
-					'validateOnSubmit' => true,
+					'validateOnSubmit' => false,
 					'validateOnChange' => false,
 				),
 			),
@@ -194,7 +200,9 @@ JS;
                 'countImportFields' => array(
         	    	'type' => 'text',
 			    ),
-				$fieldMapping,
+				'importFields' => array(
+                    'type' => 'ImportFields'
+                ) 
             ),
 			'buttons' => array(
 				'<br/>',
