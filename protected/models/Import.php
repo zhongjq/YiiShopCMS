@@ -23,15 +23,22 @@ class Import extends CModel {
 			array('countImportFields', 'numerical', 'integerOnly'=>true),
 			array('file', 'file', 'types'=>'xls, csv','safe'=>true,'on'=>'step_1'),
 
-			array('importFields','required', 'on'=>'step_2' ),
+			array('importFields, file','required', 'on'=>'step_2' ),
             array('importFields','ImportValidator', 'on'=>'step_2' ),
-			array('importFields','safe' ),
+			array('importFields, file','safe' ),
         );
     }
 
     public function ImportValidator($attribute,$params)
     {
-        $this->addError($attribute,'Неправильное имя пользователя или пароль.');
+		if ( !is_array($this->$attribute) )
+			$this->addError($attribute,'Необходимо выбрать соответсвия полей1.');
+
+		foreach ($this->$attribute as $value) {
+			if( empty($value['to']) || empty($value['from']) )
+				$this->addError($attribute,'Необходимо выбрать соответсвия полей.');
+		}
+
     }
 
     public function attributeNames(){
@@ -99,76 +106,6 @@ class Import extends CModel {
 
     public function getStepTwoCForm()
     {
-		$fieldMapping='';
-		if( !empty($this->countImportFields) ){
-
-$js = <<<JS
-$(function(){
-	jQuery("#addFile").click(function(){
-
-		var tbody = $(this).closest("table").find("tbody");
-
-
-
-		var tr = tbody.find("tr:last").clone()
-					.find("select").attr('name', function(i, val) {
-						var name = val.match(/[\d+]/)[0];
-						return val.replace(/[\d+]/, parseInt(name) + 1 )
-					}).end()
-					.find("input").val("").end()
-					.find("a").show().end();
-
-
-
-
-	   tbody.append( tr );
-
-	   return false;
-	});
-});
-
-JS;
-
-		$cs=Yii::app()->getClientScript();
-		$cs->registerScript('files',$js);
-
-			$name = CHtml::activeName($this,'importFields');
-
-			$listFiels = array();
-			for($i = 1; $i<=$this->countImportFields;$i++)
-				$listFiels[] = Yii::t('product','Col #'.$i);
-
-			$fieldMapping .= CHtml::tag("div",array('class'=>'row'));
-			$fieldMapping .= CHtml::label("Field mapping", '');
-			$fieldMapping .= CHtml::openTag('table',array('class'=>"table"));
-				$fieldMapping .= CHtml::openTag('tbody',array());
-					$fieldMapping .= CHtml::openTag('tr',array());
-						$fieldMapping .= CHtml::openTag('td',array());
-							$fieldMapping .= CHtml::dropDownList($name.'[0][to]',null, $listFiels,array('empty'=>'') );
-						$fieldMapping .=  CHtml::closeTag('td');
-						$fieldMapping .=  CHtml::openTag('td',array());
-							$fieldMapping .= CHtml::dropDownList($name.'[0][param]',1, array(0=>"=",1=>">") );
-						$fieldMapping .= CHtml::closeTag('td');
-						$fieldMapping .= CHtml::openTag('td',array());
-							$fieldMapping .= CHtml::dropDownList($name.'[0][from]',null, CHtml::listData($this->fields,'id','name'),array('empty'=>'') );
-						$fieldMapping .= CHtml::closeTag('td');
-					$fieldMapping .= CHtml::closeTag('tr');
-				$fieldMapping .= CHtml::closeTag('tbody');
-
-				$fieldMapping .= CHtml::openTag('tfoot',array());
-					$fieldMapping .= CHtml::openTag('tr',array());
-						$fieldMapping .= CHtml::openTag('td',array('colspan'=>3));
-							$fieldMapping .= CHtml::link(Yii::t('fields', 'Еще'),"#", array('id'=>'addFile'));
-						$fieldMapping .= CHtml::closeTag('td');
-					$fieldMapping .= CHtml::closeTag('tr');
-				$fieldMapping .= CHtml::closeTag('tfoot');
-
-			$fieldMapping .= CHtml::closeTag("table");
-
-
-
-			$fieldMapping .= CHtml::closeTag("div");
-		}
 
     	$form = array(
 			'attributes' => array(
@@ -202,7 +139,7 @@ JS;
 			    ),
 				'importFields' => array(
                     'type' => 'ImportFields'
-                ) 
+                )
             ),
 			'buttons' => array(
 				'<br/>',
