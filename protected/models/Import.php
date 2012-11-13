@@ -32,10 +32,10 @@ class Import extends CModel {
     public function ImportValidator($attribute,$params)
     {
 		if ( !is_array($this->$attribute) )
-			$this->addError($attribute,'Необходимо выбрать соответсвия полей1.');
+			$this->addError($attribute,'Необходимо выбрать соответсвия полей.');
 
-		foreach ($this->$attribute as $value) {
-			if( empty($value['to']) || empty($value['from']) )
+		foreach ($this->$attribute as &$value) {
+			if( !isset($value['to']) || !isset($value['from']) || !is_numeric($value['to']) || !is_numeric($value['from']) )
 				$this->addError($attribute,'Необходимо выбрать соответсвия полей.');
 		}
 
