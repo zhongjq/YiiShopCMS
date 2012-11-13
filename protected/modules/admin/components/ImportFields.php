@@ -37,11 +37,13 @@ class ImportFields extends CInputWidget
 								echo CHtml::openTag('td',array());
 									echo CHtml::dropDownList($name.'[0][from]',$value['from'], CHtml::listData($this->model->fields,'id','name'),array('empty'=>'') );
 								echo CHtml::closeTag('td');
-								echo CHtml::openTag('td',array());
-									echo CHtml::link('<span class="close deletetr" title="'.Yii::t('main','Delete').'">&times;</span>',"#", array('onclick'=>"$(this).closest('tr').remove();"));
-								echo CHtml::closeTag('td');
+                				echo CHtml::openTag('td',array());
+            						echo CHtml::link('<span class="close deletetr" title="'.Yii::t('main','Delete').'">&times;</span>',"#", array(
+            							'onclick'=>"$(this).closest('tr').remove();",
+            						));
+            					echo CHtml::closeTag('td');
 							echo CHtml::closeTag('tr');
-						} else {
+						}
 							echo CHtml::openTag('tr',array());
 								echo CHtml::openTag('td',array());
 									echo CHtml::dropDownList($name.'[0][to]',null, $listFiels,array('empty'=>'') );
@@ -52,16 +54,19 @@ class ImportFields extends CInputWidget
 								echo CHtml::openTag('td',array());
 									echo CHtml::dropDownList($name.'[0][from]',null, CHtml::listData($this->model->fields,'id','name'),array('empty'=>'') );
 								echo CHtml::closeTag('td');
-								echo CHtml::openTag('td',array());
-									echo CHtml::link('<span class="close deletetr" title="'.Yii::t('main','Delete').'">&times;</span>',"#", array('onclick'=>"$(this).closest('tr').remove();"));
-								echo CHtml::closeTag('td');
+                				echo CHtml::openTag('td',array());
+            						echo CHtml::link('<span class="close deletetr" title="'.Yii::t('main','Delete').'">&times;</span>',"#", array(
+            							'onclick'=>"$(this).closest('tr').remove();",
+            							'style'=>"display:none;"
+            						));
+            					echo CHtml::closeTag('td');
 							echo CHtml::closeTag('tr');
-						}
+						
 				echo CHtml::closeTag('tbody');
 
 				echo CHtml::openTag('tfoot',array());
 					echo CHtml::openTag('tr',array());
-						echo CHtml::openTag('td',array('colspan'=>3));
+						echo CHtml::openTag('td',array('colspan'=>4));
 							echo CHtml::link(Yii::t('fields', 'Еще'),"#", array('id'=>'addFile'));
 						echo CHtml::closeTag('td');
 					echo CHtml::closeTag('tr');
