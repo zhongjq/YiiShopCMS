@@ -154,5 +154,5 @@ class Import extends CModel {
 
 		return new CForm($form,$this);
 	}
-
+	
 }

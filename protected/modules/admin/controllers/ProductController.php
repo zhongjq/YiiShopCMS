@@ -464,7 +464,19 @@ class ProductController extends Controller
         $import = new Import();
 		$import->scenario='step_1';
         $import->fields = $product->fields;
-        
+
+
+		if( !empty($import->fields) )
+            $this->fields[0] = (object)array(	'id'=>0,
+												'name'=>'id',
+												'alias'=>'id',
+												'field_type'=>TypeField::INTEGER,
+												'is_mandatory'=>false,
+												'is_editing_table_admin'=>false,
+												'is_column_table_admin'=>false,
+												'tab_id'=>false,
+											);
+
         $form = $import->getStepOneCForm();
 
 		if( isset($_POST['Import']) ){
@@ -520,10 +532,10 @@ class ProductController extends Controller
 				case 2:
 					$import->setScenario('step_2');
 					$import->validate();
-                    
+
                     if ( $import->validate() ){
-                        
-                        
+
+
     					//Autoload fix
 						spl_autoload_unregister(array('YiiBase','autoload'));
 						Yii::import('ext.phpexcel.Classes.PHPExcel', true);
@@ -535,24 +547,24 @@ class ProductController extends Controller
 						$objReader->setReadDataOnly(false);
 						$objPHPExcel = $objReader->load($import->file);
 
-						$objWorksheet = $objPHPExcel->getActiveSheet();    					
+						$objWorksheet = $objPHPExcel->getActiveSheet();
 						$highestRow = $objWorksheet->getHighestRow(); // e.g. 10
 						$highestColumn = $objWorksheet->getHighestDataColumn(); // e.g 'F'
 						$highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn); // e.g. 5
-					    
-                        
+
+
                         $model = $product->getRecordObject();
                         // проходим по строкам
 						for ($row = 2; $row <= $highestRow; ++$row) {
                             $attributes = array();
                             $condition = array();
                             $params = array();
-                            
+
                         	foreach ($import->importFields as &$value) {
                     			if( isset($value['to'],$value['param'],$value['from']) && is_numeric($value['to']) && is_numeric($value['from']) ){
                                     $fieldAlias = $import->fields[$value['from']]->alias;
                              		switch ($value['param']){
-                        				case 0: // =                                            
+                        				case 0: // =
                                             $condition[] = $fieldAlias." = :".$fieldAlias;
                                             $params[":".$fieldAlias] = $objWorksheet->getCellByColumnAndRow($value['to'], $row)->getValue();
                                         break;
@@ -562,20 +574,20 @@ class ProductController extends Controller
                              		}
                     			}
                     		}
-                            
+
                             if( !empty($condition) && !empty($params) ) {
                                 $condition = implode(" AND ",$condition);
                             } else {
                                 $condition = null;
                                 $params = array();
                             }
-                            
+
 						    $model->updateAll($attributes,$condition,$params);
 						}
-						
+
                         $this->redirect($this->createUrl('/admin/product/view',array('id'=>$product->id)));
                     }
-                    
+
 					$form = $import->getStepTwoCForm();
 				break;
 			}

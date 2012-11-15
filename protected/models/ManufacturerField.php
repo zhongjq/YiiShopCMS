@@ -94,4 +94,23 @@ class ManufacturerField extends CActiveRecord
 			'criteria'=>$criteria,
 		));
 	}
+
+
+    // форма в формате CForm
+    public function getElementsMotelCForm(){
+		return array(
+			'type'=>'form',
+			'elements'=>array(
+				'manufacturer_id'=> array(
+    		    	'type' => 'dropdownlist',
+				    'items' => CHtml::listData(Manufacturer::model()->findAll(array('order'=>'lft')), 'id', 'name'),
+				    'empty'=> '',
+			    ),
+				'is_multiple_select'=>array(
+    				'type'=>'checkbox',
+					'layout'=>'{input}{label}{error}{hint}',
+				),
+			)
+		);
+	}
 }

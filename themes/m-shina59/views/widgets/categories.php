@@ -1,4 +1,9 @@
 <div>
-<h3><?= $title ?></h3>
-<?php $this->widget('zii.widgets.CMenu',array('items'=> $categories ));?>
+<?php
+        $this->widget('zii.widgets.CMenu',array(
+            'items'=> $categories,
+            'encodeLabel'=> false,
+            'htmlOptions'=> array('class'=>'nav nav-tabs nav-stacked')
+        ));
+?>
 </div>

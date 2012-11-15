@@ -139,7 +139,8 @@ SELECT
 NULL as `min_value`, NULL as `max_value`,NULL as `rows`,NULL as `decimal`,NULL as `default`,NULL as list_id,
 NULL as is_multiple_select,
 `tab_id`,
-NULL as `file_type`
+NULL as `file_type`,
+NULL as `manufacturer_id`
 FROM `product_field`
 -- min_length, max_length
 JOIN `string_field` ON string_field.field_id = id
@@ -153,7 +154,8 @@ SELECT
 `field_tab`.`position` as `position_tab`,
 NULL,NULL,`min_value`,`max_value`,NULL,NULL,NULL,NULL,NULL,
 `tab_id`,
-NULL as `file_type`
+NULL as `file_type`,
+NULL as `manufacturer_id`
 FROM `product_field`
 -- min_value, max_value
 JOIN `integer_field` ON integer_field.field_id = id
@@ -173,7 +175,8 @@ NULL as `default`,
 NULL as list_id,
 NULL as is_multiple_select,
 `tab_id`,
-NULL as `file_type`
+NULL as `file_type`,
+NULL as `manufacturer_id`
 FROM `product_field`
 -- row, min_length, max_length
 JOIN `text_field` ON text_field.field_id = id
@@ -192,7 +195,8 @@ NULL as `default`,
 NULL as list_id,
 NULL as is_multiple_select,
 `tab_id`,
-NULL as `file_type`
+NULL as `file_type`,
+NULL as `manufacturer_id`
 FROM `product_field`
 -- max_value
 JOIN `price_field` ON price_field.field_id = id
@@ -211,7 +215,8 @@ NULL as `default`,
 NULL as list_id,
 NULL as is_multiple_select,
 `tab_id`,
-NULL as `file_type`
+NULL as `file_type`,
+NULL as `manufacturer_id`
 FROM `product_field`
 -- decimal
 JOIN `double_field` ON double_field.field_id = id
@@ -230,7 +235,8 @@ NULL as `decimal`,
 NULL as list_id,
 NULL as is_multiple_select,
 `tab_id`,
-NULL as `file_type`
+NULL as `file_type`,
+NULL as `manufacturer_id`
 FROM `product_field`
 -- default
 JOIN `boolean_field` ON boolean_field.field_id = id
@@ -249,7 +255,8 @@ NULL as `default`,
 list_id,
 is_multiple_select,
 `tab_id`,
-NULL as `file_type`
+NULL as `file_type`,
+NULL as `manufacturer_id`
 FROM `product_field`
 -- list_id, is_multiple_select
 JOIN `list_field` ON list_field.field_id = id
@@ -268,10 +275,31 @@ NULL as `default`,
 NULL as list_id,
 NULL as is_multiple_select,
 `tab_id`,
-`file_type`
+`file_type`,
+NULL as `manufacturer_id`
 FROM `product_field`
 -- type_file
 JOIN `file_field` ON file_field.field_id = id
+LEFT JOIN `field_tab` ON `field_tab`.field_id = id
+WHERE `product_id` = :product_id
+
+UNION
+
+SELECT `product_field`.*,
+`field_tab`.`position` as `position_tab`,
+NULL as `min_length`, NULL as `max_length`,
+NULL as `min_value`, NULL as `max_value`,
+NULL as `rows`,
+NULL as `decimal`,
+NULL as `default`,
+NULL as list_id,
+is_multiple_select,
+NULL as `tab_id`,
+NULL as `file_type`,
+`manufacturer_id`
+FROM `product_field`
+-- manufacturer_field
+JOIN `manufacturer_field` ON `manufacturer_field`.field_id = id
 LEFT JOIN `field_tab` ON `field_tab`.field_id = id
 WHERE `product_id` = :product_id
 
@@ -284,16 +312,13 @@ ORDER BY ".$order  ;
         $fields = $command->setFetchMode(PDO::FETCH_OBJ)->queryAll();
 
 		if( !empty($fields) ){
-    		
-            $this->fields[0] = (object)array('id'=>0,'name'=>'id','alias'=>'id','field_type'=>TypeField::INTEGER );
-            
             foreach ($fields as &$value) {
     			$this->fields[$value->id] = $value;
     		}unset($value);
 		}
-        //echo"<pre>";
-        //print_r($this->fields);
-        //die;
+//        echo"<pre>";
+//        print_r($this->fields);
+//        die;
     }
 
 

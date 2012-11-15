@@ -296,7 +296,7 @@ class CustemCActiveRecord extends CActiveRecord {
         							if ($field->is_multiple_select)
     									$f['value'] = '$data->getRecordItems("'.$field->alias.'")';
     								else
-    									$f['value'] = 'isset($data->'.$field->alias.') ? $data->'.$field->alias.'->name : null';
+    									$f['value'] = 'isset($data->'.$field->alias.') ? $data->'.$field->alias.' : null';
 
                                 }
 
@@ -357,7 +357,7 @@ class CustemCActiveRecord extends CActiveRecord {
         							if ( $field->is_multiple_select )
     									$f['value'] = '$data->getRecordManufacturer("'.$field->alias.'")';
     								else
-    									$f['value'] = 'isset($data->'.$field->alias.'Manufacturer) ? $data->'.$field->alias.'Manufacturer->name : null';
+    									$f['value'] = 'isset($data->'.$field->alias.') ? $data->'.$field->alias.' : null';
                                 }
 
 								if ( $field->is_filter ) {
@@ -623,6 +623,7 @@ class CustemCActiveRecord extends CActiveRecord {
 					$return[$field->alias]['multiple'] = true;
 					$return[$field->alias]['class'] = 'chzn-select';
                 }
+
 			break;
 		}
 
@@ -898,6 +899,16 @@ class CustemCActiveRecord extends CActiveRecord {
 				}
 			break;
 
+            case TypeField::MANUFACTURER :
+				if ($field->is_multiple_select){
+                    $types[] = 'ArrayValidator';
+    				$params['ArrayValidator'] = array('validator'=>'numerical', 'params'=>array('integerOnly'=>true));
+				} else {
+        		    $types[] = 'numerical';
+    			    $params['numerical'] = array('integerOnly'=>true,'allowEmpty'=>true);
+				}
+			break;
+
             case TypeField::FILE :
                 $types[] = 'ArrayValidator';
         		$params['ArrayValidator'] = array('validator'=>'file', 'params'=>array('types'=>FileField::getTypesFilesValidate($field->file_type), 'maxSize' => 1048576, 'allowEmpty'=>false));
@@ -979,7 +990,7 @@ class CustemCActiveRecord extends CActiveRecord {
 																'together' => true
 														));
                         else
-                            $this->metaData->addRelation($field->alias,array( CActiveRecord::BELONGS_TO,'Manufacturer', $field->alias, 'select'=> "`{$field->alias}'_manufacturer`.`name`" ));
+                            $this->metaData->addRelation($field->alias,array( CActiveRecord::BELONGS_TO, 'Manufacturer', $field->alias ));
                     break;
 
     				case TypeField::FILE :

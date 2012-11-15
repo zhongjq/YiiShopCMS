@@ -11,9 +11,12 @@ class Categories extends CWidget
         } else
             $category = Category::model()->findAll(array('order'=>'lft'));
 
+		$menu = $this->title ? array_merge(array(array('label'=>$this->title,'linkOptions'=>array('class'=>'header'))),
+											Category::getMenuArray($category)) : Category::getMenuArray($category);
+
         $this->controller->renderPartial('//widgets/categories',array(
 			"title" => $this->title,
-			"categories" => Category::getMenuArray($category),
+			"categories" => $menu,
 		));
 	}
 }
