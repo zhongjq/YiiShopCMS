@@ -1,7 +1,7 @@
-<?php $this->pageTitle = Yii::t('users',"Login"); ?>
-
-<div class="row">
-<div class="offset4 span3">
-<?=$form; ?>
-</div>
-</div>
+<?php 
+    $this->pageTitle = Yii::t('users',"Login");
+    
+    Yii::app()->getClientScript()->registerCssFile($this->assetsBase.'/login.css');
+    
+    echo $form; 
+?>

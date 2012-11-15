@@ -3,6 +3,9 @@
 // для production режима эту строку удалите
 defined('YII_DEBUG') or define('YII_DEBUG',true);
 
+// include setting
+include dirname(__FILE__).'/config.php';
+
 // include Yii bootstrap file
 require_once(dirname(__FILE__).'/yii/framework/yii.php');
 

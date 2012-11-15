@@ -14,7 +14,9 @@ return array(
 				"<action:(login|logout|registration|signup)>" => 'site/<action>',
 				// подтверждение регистрации
 				'/confirmation/<code>' => 'site/confirmation',
-
+                
+                '/manufacturers' => 'manufacturer/index',
+                
 
                 /* АДМИНИСТРАТИРОВАНИЕ */
                 "/admin/<action:(login|logout)>" => "admin/default/<action>",

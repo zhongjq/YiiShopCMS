@@ -11,7 +11,6 @@ class Categories extends CWidget
         } else
             $category = Category::model()->findAll(array('order'=>'lft'));
 
-
         $this->controller->renderPartial('//widgets/categories',array(
 			"title" => $this->title,
 			"categories" => Category::getMenuArray($category),

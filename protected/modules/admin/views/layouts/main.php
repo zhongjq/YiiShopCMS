@@ -123,8 +123,6 @@
 							<li><?=CHtml::link('Выйти',$this->createUrl('/admin/default/logout'))?></li>
 						</ul>
 					</li>
-					<? else : ?>
-					<li><?=CHtml::link('Войти',$this->createUrl('login'))?></li>
 					<? endif;?>
 				</ul>
 

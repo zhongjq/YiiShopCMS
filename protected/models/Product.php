@@ -283,10 +283,17 @@ ORDER BY ".$order  ;
 
         $fields = $command->setFetchMode(PDO::FETCH_OBJ)->queryAll();
 
-		if( !empty($fields) )
-		foreach ($fields as &$value) {
-			$this->fields[$value->id] = $value;
-		}unset($value);
+		if( !empty($fields) ){
+    		
+            $this->fields[0] = (object)array('id'=>0,'name'=>'id','alias'=>'id','field_type'=>TypeField::INTEGER );
+            
+            foreach ($fields as &$value) {
+    			$this->fields[$value->id] = $value;
+    		}unset($value);
+		}
+        //echo"<pre>";
+        //print_r($this->fields);
+        //die;
     }
 
 
