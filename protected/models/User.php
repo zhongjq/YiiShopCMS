@@ -208,20 +208,19 @@ class User extends CActiveRecord
     	return array(
 			'attributes' => array(
 				'enctype' => 'application/form-data',
-				'class' => 'well',
-				'id'=>'userForm',
+				'class' => 'form-signin',
+				'id'=>'loginForm',
 			),
 			'activeForm' => array(
 				'class' => 'CActiveForm',
 				'enableAjaxValidation' => false,
 				'enableClientValidation' => false,
-				'id' => "loginForm",
 				'clientOptions' => array(
 					'validateOnSubmit' => false,
 					'validateOnChange' => false,
 				),
 			),
-
+            'title'=>'Авторизация',
     		'elements'=>array(
     			'email'=>array(
     				'type'=>'text',
@@ -242,11 +241,10 @@ class User extends CActiveRecord
     			),
     		),
     		'buttons'=>array(
-				'<br/>',
 				'submit'=>array(
 					'type'  =>  'submit',
 					'label' =>  Yii::t("users",'Login'),
-					'class' =>  "btn"
+					'class' =>  "btn btn-large btn-primary"
 				),
 			),
         );

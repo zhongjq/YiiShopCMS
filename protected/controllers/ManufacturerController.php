@@ -38,6 +38,19 @@ class ManufacturerController extends Controller
 		);
 	}
 
+
+
+    /**
+	 * Lists all models.
+	 */
+	public function actionIndex()
+	{
+		$dataProvider=new CActiveDataProvider('Manufacturer');
+		$this->render('index',array(
+			'dataProvider'=>$dataProvider,
+		));
+	}
+
 	/**
 	 * Displays a particular model.
 	 * @param integer $id the ID of the model to be displayed
@@ -69,18 +82,6 @@ class ManufacturerController extends Controller
 		$this->render('view',array(
 			'manufacturer' => $manufacturer,
 			'products'=>$arProducts,
-		));
-	}
-
-
-	/**
-	 * Lists all models.
-	 */
-	public function actionIndex()
-	{
-		$dataProvider=new CActiveDataProvider('Categories');
-		$this->render('index',array(
-			'dataProvider'=>$dataProvider,
 		));
 	}
 

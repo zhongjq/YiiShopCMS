@@ -5,8 +5,10 @@
  */
 class Controller extends CController
 {
-	public $layout='//layouts/main';
-
+	public $layout='//layouts/sidebar/right';
+    public $pageDescription = null;
+    public $pageKeywords = null;
+    
 	/**
 	 * @var array context menu items. This property will be assigned to {@link CMenu::items}.
 	 */
@@ -17,5 +19,19 @@ class Controller extends CController
 	 * for more details on how to specify this property.
 	 */
 	public $breadcrumbs	=	array();
+
+	private $_assetsBase;
+	public function getAssetsBase()
+	{
+		if ($this->_assetsBase === null) {
+				$this->_assetsBase = Yii::app()->assetManager->publish(
+						Yii::getPathOfAlias('webroot.themes.'.Yii::app()->theme->name.'.assets'),
+						false,
+						-1,
+						YII_DEBUG
+				);
+		}
+		return $this->_assetsBase;
+	}
 
 }

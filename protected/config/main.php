@@ -5,8 +5,8 @@ return array(
 	'defaultController'	=>  'site',
 	'sourceLanguage'    =>  'en',
 	'language'          =>  'ru',
-	'theme'             =>  'classic',
-
+    'theme' => YII_THEME,
+    
 	'params'=>array(
 		'keywords' => array(),
 		'description' => '',
@@ -60,11 +60,11 @@ return array(
 		),
 		// База
 		'db'=>array(
-			'connectionString' => 'mysql:host=localhost;dbname=enchikiben_fbfde',
-			//'connectionString' => 'mysql:host=mysql0.db.koding.com;dbname=enchikiben_fbfde',
+			//'connectionString' => 'mysql:host=localhost;dbname=enchikiben_fbfde',
+			'connectionString' => CONNECTION_STRING,
 			'emulatePrepare' => true,
-			'username' => 'enchikiben_fbfde',
-			'password' => '754089db',
+			'username' => DB_USERNAME,
+			'password' => DB_PASSWORD,
 			'charset' => 'utf8',
 			'tablePrefix' => '',
             'schemaCachingDuration'=>3600,
