@@ -11,21 +11,19 @@
 
         <?php
             Yii::app()->clientScript->registerCoreScript('jquery');
-    
+
             Yii::app()->getClientScript()->registerScriptFile($this->assetsBase.'/bootstrap/js/bootstrap.min.js');
-    
+
             Yii::app()->getClientScript()->registerCssFile($this->assetsBase.'/bootstrap/css/bootstrap.css');
             Yii::app()->getClientScript()->registerCssFile($this->assetsBase.'/bootstrap/css/bootstrap-responsive.css');
-            Yii::app()->getClientScript()->registerCssFile($this->assetsBase.'/style.css');    
+            Yii::app()->getClientScript()->registerCssFile($this->assetsBase.'/style.css');
         ?>
 	</head>
 	<body>
         <div class="container">
-<header>
-    <h1>Персональный сайт Кристины Ветровой</h1>
-  </header>        
-        
-        
+			<header>
+				<h1>Персональный сайт Кристины Ветровой</h1>
+			</header>
             <?php echo $content; ?>
             <footer id="footer">
     		    <?php
@@ -38,6 +36,6 @@
     		    ?>
     	    </footer>
         </div>
-       
+
 	</body>
 </html>

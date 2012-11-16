@@ -22,8 +22,8 @@ class ProductController extends Controller
 				    'actions'=>array('index','view','viewId','viewAlias'),
 				    'users'=>array('*'),
 			),
-			array('deny',  // deny all users
-				'users'=>array('*'),
+			array(	'deny',  // deny all users
+					'users'=>array('*'),
 			),
 		);
 	}
@@ -59,6 +59,10 @@ class ProductController extends Controller
 		));
 	}
 
+
+	/*
+	 * var $product Product
+	 */
 	public function actionViewAlias($product,$alias)
 	{
 		$product = Product::model()->find('alias = :alias', array(':alias'=>$product));

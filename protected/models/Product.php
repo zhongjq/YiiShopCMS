@@ -424,7 +424,9 @@ ORDER BY ".$order  ;
                 $product->{$field->alias} = $manufacturer_id;
         }
 
-        $product->attributes = $_GET[get_class($product)];
+		$className = get_class($product);
+		if (isset($_GET[$className]))
+			$product->attributes = $_GET[$className];
 
         return $product;
     }

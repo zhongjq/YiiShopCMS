@@ -1,5 +1,8 @@
 <?php
 
+/* var $product Product */
+/* var $record CustemCActiveRecord */
+
 $this->pageTitle = $record->title;
 $this->pageDescription = $record->description;
 $this->pageKeywords = $record->keywords;
@@ -12,8 +15,6 @@ $this->breadcrumbs = array(
 $this->widget('zii.widgets.CDetailView', array(
     'data'=>$record
 ));
-
-
 
 ?>
 

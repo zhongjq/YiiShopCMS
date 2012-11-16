@@ -1,7 +1,7 @@
 <?php
-$this->pageTitle = $record->name;
-$this->pageDescription = $record->description;
-$this->pageKeywords = $record->keywords;
+$this->pageTitle = $product->name;
+$this->pageDescription = $product->description;
+$this->pageKeywords = $product->keywords;
 
 $this->breadcrumbs = array(
     CHtml::encode($product->name) => array('product/index','alias'=>$product->alias)

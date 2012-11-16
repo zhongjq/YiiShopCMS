@@ -17,24 +17,23 @@ class Record extends CActiveRecord
 
     public $productName = null;
     public $data = null;
-  
+
     public static function model($className=__CLASS__)
     {
         eval("class ".$className." extends Record{}");
-		//return parent::model($className);      
+		//return parent::model($className);
         return new $className();
 	}
 
     public function __construct($scenario = 'add')
 	{
-
-        echo $this->productName = get_class($this);        
+        $this->productName = get_class($this);
 
         $this->getProductFields();
 
         Yii::setPathOfAlias('files', Yii::getPathOfAlias('webroot')."/data/".$this->productName."/");
     	Yii::setPathOfAlias('url', Yii::app()->baseUrl."/data/".$this->productName."/");
-        
+
         parent::__construct($scenario);
 	}
 
@@ -85,9 +84,9 @@ class Record extends CActiveRecord
 		if ( isset(Yii::app()->params[$this->tableName()]) && $update === false ) return Yii::app()->params[$this->tableName()];
 
 		if ( $this->_productFields === null || $update === true ) {
-            
+
             if ( !$this->_product ) $this->setProduct();
-            
+
 			if ( $this->_product ){
 				$this->_productFields = $this->_product->productFields();
 
@@ -319,31 +318,31 @@ class Record extends CActiveRecord
 								}
 							break;
 							case TypeField::LISTS:
-                                
+
                                 if ( $field->is_editing_table_admin ) {
                                     $f['type']='raw';
-                                    
+
                                     $multiple = 'array()';
                                     if ($field->listField->is_multiple_select){
                                         $name = $name.'[]';
                                         $multiple = 'array("multiple"=>true,"class"=>"chzn-select")';
                                     }
-    
+
                                     $f['value'] = 'CHtml::dropDownList("'.$name.'", $data->'.$field->alias.',
                                                                             CHtml::listData($data->getListFilter('.$field->listField->list_id.') , "id", "name"),
                                                                             '.$multiple.'
                                                                             );';
-                                    
-                                                                        
+
+
                                 } else {
-                                    
+
         							if ($field->listField->is_multiple_select)
     									$f['value'] = '$data->getRecordItems("'.$field->alias.'")';
     								else
-    									$f['value'] = 'isset($data->'.$field->alias.') ? $data->'.$field->alias.'->name : null';                                    
-                                    
+    									$f['value'] = 'isset($data->'.$field->alias.') ? $data->'.$field->alias.'->name : null';
+
                                 }
-                                
+
 								if ( $field->is_filter ) {
 									$f['filter'] = CHtml::listData( $this->getListFilter($field->listField->list_id) , 'id', 'name');
 								}
@@ -706,7 +705,7 @@ class Record extends CActiveRecord
                             $name = $field->alias;
     						$relations[$name] = array(	self::MANY_MANY,
 														'ListItem', 'record_list(record_id, list_item_id)',
-                                                        
+
 														'condition'=> '`'.$name."_".$name.'`.`product_id` = :product_id',
 														'params' => array(":product_id" => $this->getProductID() ),
 														//'together'=>true

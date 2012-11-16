@@ -12,9 +12,8 @@
 
     ?>
 
-
     <div class="row-fluid">
-        <div class="span9">1
+        <div class="span9">
             <?php echo $content; ?>
         </div>
         <div class="span3">
