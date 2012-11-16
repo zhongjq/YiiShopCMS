@@ -17,7 +17,7 @@ if( !empty($products) ){
             'columns' => array(
                 array(
                     'name'=>'name',
-                    'value'=>'$data->getRecordLinkId($data->name,$data->id)',
+                    'value'=>'$data->getLink($data->name)',
                     'type'=>'raw'
                 ),
                 'price'

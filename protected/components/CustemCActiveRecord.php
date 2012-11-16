@@ -52,9 +52,11 @@ class CustemCActiveRecord extends CActiveRecord {
                     switch( $field->field_type ){
             			case TypeField::LISTS :
     					case TypeField::CATEGORIES :
-    					case TypeField::MANUFACTURER :
         				case TypeField::FILE :
                             $this->with[] = $field->alias;
+                        break;
+                        case TypeField::MANUFACTURER :
+                            $this->with[] = $field->alias."Manufacturer";
                         break;
 				    }
                 }
@@ -357,11 +359,11 @@ class CustemCActiveRecord extends CActiveRecord {
         							if ( $field->is_multiple_select )
     									$f['value'] = '$data->getRecordManufacturer("'.$field->alias.'")';
     								else
-    									$f['value'] = 'isset($data->'.$field->alias.') ? $data->'.$field->alias.' : null';
+    									$f['value'] = 'isset($data->'.$field->alias.'Manufacturer ) ? $data->'.$field->alias.'Manufacturer->name : null';
                                 }
 
 								if ( $field->is_filter ) {
-                                    $listData = CHtml::listData($this->getManufacturerFilter($field) , 'id', 'name') ;
+                                    $listData = CHtml::listData($this->getManufacturerFilter($field->manufacturer_id) , 'id', 'name') ;
                                     $htmlOptions = $field->is_multiple_select ? array("multiple"=>true,"class"=>"chzn-select","data-placeholder"=>" ") : null;
                                     $htmlOptions['empty'] = "";
 									$f['filter'] = CHtml::activeDropDownList($this,$field->alias,$listData,$htmlOptions);
@@ -473,7 +475,7 @@ class CustemCActiveRecord extends CActiveRecord {
 	{
         $name = "manufacturerFilterСache";
 
-        //if ( isset(Yii::app()->params[$name]) ) return Yii::app()->params[$name];
+        if ( isset(Yii::app()->params[$name]) ) return Yii::app()->params[$name];
 
 		if ( $this->_manufacturerFilter === null ){
 			if( is_numeric($manufacturer_id) ){
@@ -990,7 +992,7 @@ class CustemCActiveRecord extends CActiveRecord {
 																'together' => true
 														));
                         else
-                            $this->metaData->addRelation($field->alias,array( CActiveRecord::BELONGS_TO, 'Manufacturer', $field->alias ));
+                            $this->metaData->addRelation($field->alias."Manufacturer",array( CActiveRecord::BELONGS_TO, 'Manufacturer', $field->alias ));
                     break;
 
     				case TypeField::FILE :
