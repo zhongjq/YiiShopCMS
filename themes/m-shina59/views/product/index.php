@@ -4,7 +4,7 @@ $this->pageDescription = $product->description;
 $this->pageKeywords = $product->keywords;
 
 $this->breadcrumbs = array(
-    CHtml::encode($product->name) => array('product/index','alias'=>$product->alias)
+    CHtml::encode($product->name)
 );
 
 
@@ -49,8 +49,8 @@ $alias = $product->alias;
         ));
 
 
-$this->beginClip('sidebar');
-  echo $records->getFilterForm();
+$this->beginClip('search');
+	echo $records->getFilterForm();
 $this->endClip();
 
 ?>

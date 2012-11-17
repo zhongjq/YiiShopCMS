@@ -24,6 +24,18 @@
 			<header>
 				<h1>Персональный сайт Кристины Ветровой</h1>
 			</header>
+			<?php
+
+				$this->widget('zii.widgets.CBreadcrumbs', array(
+					'separator'=>'<span class="divider">/</span>',
+					'htmlOptions'=>array(
+						'class'=>'breadcrumb'
+					),
+					'links'=>$this->breadcrumbs
+				));
+
+			?>
+
             <?php echo $content; ?>
             <footer id="footer">
     		    <?php

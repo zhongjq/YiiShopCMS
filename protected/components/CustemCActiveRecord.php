@@ -194,7 +194,7 @@ class CustemCActiveRecord extends CActiveRecord {
 								$f['value'] = 'isset($data->'.$field->alias.'Manufacturer) ? $data->'.$field->alias.'Manufacturer->name : null';
 
 							if ( $field->is_filter ) {
-                                    $listData = CHtml::listData($this->getManufacturerFilter($field) , 'id', 'name') ;
+                                    $listData = CHtml::listData($this->getManufacturerFilter($field->manufacturer_id ) , 'id', 'name') ;
                                     $htmlOptions = $field->is_multiple_select ? array("multiple"=>true,"class"=>"chzn-select") : null;
                                     $htmlOptions['empty'] = "";
 									$f['filter'] = CHtml::activeDropDownList(   $this,
@@ -423,10 +423,12 @@ class CustemCActiveRecord extends CActiveRecord {
                 $filter = CHtml::listData($this->getCategoryFilter($field->category_id) , 'id', 'name');
 			break;
             case TypeField::MANUFACTURER:
-                $listData = CHtml::listData($this->getManufacturerFilter($field) , 'id', 'name') ;
-                $htmlOptions = $field->is_multiple_select ? array("multiple"=>true,"class"=>"chzn-select","data-placeholder"=>" ") : null;
-                $htmlOptions['empty'] = "";
-				$filter = CHtml::activeDropDownList($this,$field->alias,$listData,$htmlOptions);
+                $filter = array(
+        	    	'type' => 'dropdownlist',
+				    'items' => CHtml::listData($this->getManufacturerFilter($field->manufacturer_id) , 'id', 'name'),
+				    'empty'=> '',
+					'htmlOptions' => $field->is_multiple_select ? array("multiple"=>true,"class"=>"chzn-select","data-placeholder"=>" ") : null,
+			    );
 			break;
             case TypeField::DATETIME:
             break;
@@ -1088,5 +1090,6 @@ class CustemCActiveRecord extends CActiveRecord {
 
 		return new CForm($form,$this);
     }
+
 
 }
