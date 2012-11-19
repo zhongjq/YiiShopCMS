@@ -48,7 +48,7 @@ class ProductController extends Controller
 
 	public function actionViewId($product,$id)
 	{
-		$product = Product::model()->find('alias = :alias', array(':alias'=>$product));
+		$product = Product::model()->find('t.alias = :alias', array(':alias'=>$product));
 
 		$record = $product->getRecordObject();
         $record = $record->with($record->with)->findByPk($id);
@@ -68,7 +68,7 @@ class ProductController extends Controller
 		$product = Product::model()->find('alias = :alias', array(':alias'=>$product));
 
 		$record = $product->getRecordObject();
-        $record = $record->with($record->with)->find('alias = :alias', array(':alias'=>$alias));
+        $record = $record->with($record->with)->find('t.alias = :alias', array(':alias'=>$alias));
 
 		$this->render('view',array(
 			"product"=>$product,

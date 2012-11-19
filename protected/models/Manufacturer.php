@@ -70,6 +70,7 @@ class Manufacturer extends CActiveRecord
 			'description'	=>	Yii::t("manufacturers",'Description'),
 			'logo'			=>	Yii::t("manufacturers",'Logo'),
 			'isDeleteLogoFile' => Yii::t("manufacturers",'Delete an existing logo?'),
+			'parentId' => Yii::t("manufacturers",'Parent'),
 		);
 	}
 
@@ -125,40 +126,54 @@ class Manufacturer extends CActiveRecord
 			),
 
     		'elements'=>array(
-        		'status'=>array(
-        			'type'=>'checkbox',
-    				'layout'=>'{input}{label}{error}{hint}',
-    			),
-    			'parentId'=>array(
-					'type'  =>  'dropdownlist',
-					'items' =>  CHtml::listData(Manufacturer::model()->findAll(array(
-																'select'=>"id,name",
-    															'order'=>'lft',
-																'condition'=>'id != :id',
-																'params'=>array(':id' => $this->id ? $this->id : 0 )
-															)
-															), 'id', 'name'),
-					'empty'=>  '',
-				),
-    			'name'=>array(
-    				'type'=>'text',
-    				'maxlength'=>255
-    			),
-    			'alias'=>array(
-    				'type'=>'text',
-    				'maxlength'=>255
-    			),
-    			'description'=>array(
-    				'type'=>'textarea',
-    				'rows'=>5
-    			),
-        		'logo'=>array(
-    				'type'=>'file',
-					'class'=>'input-file'
-    			),
+				'<ul class="nav nav-tabs" data-tabs="tabs">
+					<li class="active"><a data-toggle="tab" href="#p">'.Yii::t('manufacturers','Primary').'</a></li>
+					<li><a data-toggle="tab" href="#seo">'.Yii::t('manufacturers','SEO').'</a></li>
+				</ul>',
+				'<div class="tab-content">',
+					'<div class="tab-pane active" id="p">',
+						'status'=>array(
+							'type'=>'checkbox',
+							'layout'=>'{input}{label}{error}{hint}',
+						),
+						'parentId'=>array(
+							'type'  =>  'dropdownlist',
+							'items' =>  CHtml::listData(Manufacturer::model()->findAll(array(
+																		'select'=>"id,name",
+																		'order'=>'lft',
+																		'condition'=>'id != :id',
+																		'params'=>array(':id' => $this->id ? $this->id : 0 )
+																	)
+																	), 'id', 'name'),
+							'empty'=>  '',
+						),
+						'name'=>array(
+							'type'=>'text',
+							'maxlength'=>255
+						),
+						'alias'=>array(
+							'type'=>'text',
+							'maxlength'=>255
+						),
+						'logo'=>array(
+							'type'=>'file',
+							'class'=>'input-file'
+						),
+
+					'</div>',
+					'<div class="tab-pane" id="seo">',
+				    	'keywords'=>array(
+							'type'=>'textarea',
+							'rows'=>5
+						),
+				    	'description'=>array(
+							'type'=>'textarea',
+							'rows'=>5
+						),
+					'</div>',
+				'</div>'
     		),
     		'buttons'=>array(
-				'<br/>',
 				'submit'=>array(
 					'type'  =>  'submit',
 					'label' =>  $this->isNewRecord ? Yii::t("main",'Add') : Yii::t("main",'Save'),
@@ -248,12 +263,13 @@ class Manufacturer extends CActiveRecord
 	public static function getMenuArray($manufacturers) {
 		$return = array();
 
-		foreach ($manufacturers as $manufacturer) {
-            $return[] = array(	'label'     =>  CHtml::encode($manufacturer->name),
-								'url'       =>  array('manufacturer/view','alias'=>$manufacturer->alias),
-								'active'    =>  CHttpRequest::getParam('alias') == $manufacturer->alias,
-						      );
-		}
+		if ( !empty($manufacturers) )
+			foreach ($manufacturers as &$manufacturer) {
+				$return[] = array(	'label'     =>  CHtml::encode($manufacturer->name),
+									'url'       =>  array('manufacturer/view','alias'=>$manufacturer->alias),
+									'active'    =>  CHttpRequest::getParam('alias') == $manufacturer->alias,
+								  );
+			}
 
         return $return;
 	}

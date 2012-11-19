@@ -6,12 +6,12 @@ return array(
 	'Add manufacturer'	=> 'Добавить производителя',
 	// Fields
 	'ID'			=> "ID",
-	'Status'		=> "Сатус (вкл./выкл.)",
+	'Status'		=> "Статус (вкл./выкл.)",
 	'Name'			=> "Наименование производителя",
 	'Alias'			=> "Псевдоним (URL)",
 	'Description'	=> "Описание",
-	'Logo'			=> "Логотип",
-
+	'Logo'=> "Логотип",
+	'Parent'=>'Родитель',
     //
     'Alias contains invalid characters.'=>'Псевдоним содержит недопустимые символы.',
     //
