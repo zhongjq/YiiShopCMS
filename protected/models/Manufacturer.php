@@ -21,7 +21,7 @@ class Manufacturer extends CActiveRecord
 	{
 		parent::__construct($scenario);
 
-		Yii::setPathOfAlias('manufacturersfiles', Yii::getPathOfAlias('webroot')."/data/manufacturers/");
+		Yii::setPathOfAlias('manufacturersfiles', Yii::getPathOfAlias('webroot.data.manufacturers') );
 		Yii::setPathOfAlias('manufacturersurl', Yii::app()->baseUrl."/data/manufacturers/");
 	}
 
@@ -42,9 +42,9 @@ class Manufacturer extends CActiveRecord
 			array('status, isDeleteLogoFile, lft, rgt, level, parentId', 'numerical', 'integerOnly'=>true),
     		array('alias, name', 'length', 'max'=>255),
 			array('alias, name', 'unique'),
-    		array('alias', 'match', 'pattern' => '/^[A-Za-z0-9]+$/u','message' => Yii::t("manufacturers",'Alias contains invalid characters.')),
-			array('description', 'safe'),
-            array('logo', 'file', 'types'=>'jpg, gif, png', 'maxSize' => 1048576, 'allowEmpty'=>true ),
+    		array('alias', 'match', 'pattern' => '/^[A-Za-z0-9_-]+$/u','message' => Yii::t("manufacturers",'Alias contains invalid characters.')),
+			array('title,keywords,description', 'safe'),
+            array('logo', 'file', 'types'=>'jpg, gif, png', 'maxSize' => 1048576, 'allowEmpty'=>true,'safe'=>true ),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, status, alias, name, description', 'safe', 'on'=>'search'),
@@ -157,11 +157,15 @@ class Manufacturer extends CActiveRecord
 						),
 						'logo'=>array(
 							'type'=>'file',
-							'class'=>'input-file'
+							'class'=>'input-file',
+							'safe'=>true
 						),
 
 					'</div>',
 					'<div class="tab-pane" id="seo">',
+						'title'=>array(
+							'type'=>'text'
+						),
 				    	'keywords'=>array(
 							'type'=>'textarea',
 							'rows'=>5
@@ -228,8 +232,14 @@ class Manufacturer extends CActiveRecord
 		parent::afterSave();
 
 		if ( $this->logoFile ){
-			$file = Yii::getPathOfAlias('manufacturersfiles').'/'.$this->logo;
+			$dirName = Yii::getPathOfAlias('manufacturersfiles');
+
+			if ( !is_dir($dirName) ){
+				@mkdir($dirName,777,true);
+			}
+			$file = $dirName.DIRECTORY_SEPARATOR.$this->logo;
 			$this->logoFile->saveAs($file);
+
 			/*
 			Yii::import('ext.wideimage.WideImage');
 			WideImage::load($file)->resize(50, 30)->saveToFile('small.jpg');

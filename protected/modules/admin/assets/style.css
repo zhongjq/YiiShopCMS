@@ -259,3 +259,7 @@ td.edit,td.delele {
 td.delele {
     padding-right: 10px;
 }
+
+div.row.buttons{
+	margin-top: 20px;
+}
