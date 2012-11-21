@@ -250,12 +250,12 @@ class ProductField extends CActiveRecord
                     '</div>',
 
                     '<div id="admin" class="tab-pane">',
+                        'is_column_table_admin'=>array(
+                			'type'=>'checkbox',
+        					'layout'=>'{input}{label}{error}{hint}',
+        				),                    
                         'is_editing_table_admin'=>array(
                     		'type'=>'checkbox',
-        					'layout'=>'{input}{label}{error}{hint}',
-        				),
-                        'is_column_table_admin'=>array(
-            				'type'=>'checkbox',
         					'layout'=>'{input}{label}{error}{hint}',
         				),
                     '</div>',
@@ -264,7 +264,6 @@ class ProductField extends CActiveRecord
 			),
 
 			'buttons'=>array(
-				'<br/>',
 				'submit'=>array(
 					'type'  =>  'submit',
 					'label' =>  $this->isNewRecord ? Yii::t('main','Create') : Yii::t('main','Save'),

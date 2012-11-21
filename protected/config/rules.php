@@ -41,7 +41,7 @@ return array(
 		        '/admin/constructor/<productId:\d+>/field/<action:(edit|delete)>/<fieldId:\d+>' => 'admin/constructor/<action>field',
 				// Форма
                 '/admin/constructor/<id:\d+>/<action:(form|addtab)>' => 'admin/constructor/<action>',
-                '/admin/constructor/<id:\d+>/form/<action:(savepositiontabs|savepositionfield|savepositionfields)>' => 'admin/constructor/<action>',
+                '/admin/constructor/<id:\d+>/form/<action:(savePositionTabs|savePositionField|savePositionFields)>' => 'admin/constructor/<action>',
 		        '/admin/constructor/<productId:\d+>/form/tab<action:(edit|delete)>/<tabId:\d+>' => 'admin/constructor/<action>tab',
 		        '/admin/constructor/<productId:\d+>/field/<action:(edit|delete)>/<fieldId:\d+>' => 'admin/constructor/<action>field',
                 
@@ -52,6 +52,7 @@ return array(
                 '/admin/product/<productId:\d+>/record/' => 'admin/product/<action>record',
 
 				// Списки
+                '/admin/lists' => 'admin/lists',
                 '/admin/lists/add' => 'admin/lists/add',
 		        '/admin/list/<action:(edit|delete)>/<id:\d+>' => 'admin/lists/<action>list',
                 '/admin/list/<id:\d+>/items' => 'admin/lists/items',

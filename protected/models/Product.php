@@ -17,7 +17,7 @@
  */
 class Product extends CActiveRecord
 {
-    public static $exceptions = array('admin','cart','my','baner');
+    public static $exceptions = array('admin','cart','my','baner','manufacturer');
 
     public $fields;
 
@@ -312,6 +312,7 @@ ORDER BY ".$order  ;
         $fields = $command->setFetchMode(PDO::FETCH_OBJ)->queryAll();
 
 		if( !empty($fields) ){
+            $this->fields = array();
             foreach ($fields as &$value) {
     			$this->fields[$value->id] = $value;
     		}unset($value);

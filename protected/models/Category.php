@@ -46,9 +46,8 @@ class Category extends CActiveRecord
 			array('lft, rgt, level, status, parentId', 'numerical', 'integerOnly'=>true),
 			array('alias, name', 'length', 'max'=>255),
 			array('alias, name', 'unique'),
-    		array('alias', 'match', 'pattern' => '/^[A-Za-z0-9-]+$/u',
-				    'message' => Yii::t("categories",'Alias contains invalid characters.')),
-			array('description', 'safe'),
+    		array('alias', 'match', 'pattern' => '/^[A-Za-z0-9_-]+$/u', 'message' => Yii::t("categories",'Alias contains invalid characters.')),
+			array('title, keywords, description', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, lft, rgt, level, status, alias, name, description', 'safe', 'on'=>'search'),
@@ -72,15 +71,17 @@ class Category extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'id'			=>	Yii::t("AdminModule.main",'ID'),
-			'lft'			=> 'Lft',
-			'rgt'			=> 'Rgt',
-			'level'			=> 'Level',
-			'status'		=>	Yii::t("categories",'Status'),
-			'alias'			=>	Yii::t("categories",'Alias'),
-			'name'			=>	Yii::t("categories",'Name'),
-			'description'	=>	Yii::t("categories",'Description'),
-			'parentId'		=>	Yii::t("categories",'Parent'),
+			'id' => Yii::t("AdminModule.main",'ID'),
+			'lft' => 'Lft',
+			'rgt' => 'Rgt',
+			'level' => 'Level',
+			'status' => Yii::t("categories",'Status'),
+			'alias' => Yii::t("categories",'Alias'),
+			'name' => Yii::t("categories",'Name'),
+            'title' => Yii::t("categories",'Title'),
+            'keywords' => Yii::t("categories",'Keywords'),
+			'description' => Yii::t("categories",'Description'),
+			'parentId' => Yii::t("categories",'Parent'),
 		);
 	}
 
@@ -175,36 +176,52 @@ class Category extends CActiveRecord
 					'validateOnChange' => false,
 				),
 			),
-
-    		'elements'=>array(
-        		'status'=>array(
-        			'type'=>'checkbox',
-    				'layout'=>'{input}{label}{error}{hint}',
-    			),
-    			'parentId'=>array(
-					'type'  =>  'dropdownlist',
-					'items' =>  CHtml::listData(Category::model()->findAll(array(
-																'select'=>"id,name",
-    															'order'=>'lft',
-																'condition'=>'id != :id',
-																'params'=>array(':id' => $this->id ? $this->id : 0 )
-															)
-															), 'id', 'name'),
-					'empty'=>  '',
-				),
-    			'name'=>array(
-    				'type'=>'text',
-    				'maxlength'=>255
-    			),
-    			'alias'=>array(
-    				'type'=>'text',
-    				'maxlength'=>255
-    			),
-    			'description'=>array(
-    				'type'=>'textarea',
-    				'rows'=>5
-    			),
-    		),
+        	'elements'=>array(
+				'<ul class="nav nav-tabs" data-tabs="tabs">
+					<li class="active"><a data-toggle="tab" href="#p">'.Yii::t('manufacturers','Primary').'</a></li>
+					<li><a data-toggle="tab" href="#seo">'.Yii::t('manufacturers','SEO').'</a></li>
+				</ul>',
+				'<div class="tab-content">',
+					'<div class="tab-pane active" id="p">',
+						'status'=>array(
+							'type'=>'checkbox',
+							'layout'=>'{input}{label}{error}{hint}',
+						),
+						'parentId'=>array(
+							'type'  =>  'dropdownlist',
+            				'items' =>  CHtml::listData(Category::model()->findAll(array(
+        																'select'=>"id,name",
+            															'order'=>'lft',
+        																'condition'=>'id != :id',
+        																'params'=>array(':id' => $this->id ? $this->id : 0 )
+        															)
+        															), 'id', 'name'),
+							'empty'=>  '',
+						),
+						'name'=>array(
+							'type'=>'text',
+							'maxlength'=>255
+						),
+						'alias'=>array(
+							'type'=>'text',
+							'maxlength'=>255
+						),
+					'</div>',
+					'<div class="tab-pane" id="seo">',
+						'title'=>array(
+							'type'=>'text'
+						),
+				    	'keywords'=>array(
+							'type'=>'textarea',
+							'rows'=>5
+						),
+				    	'description'=>array(
+							'type'=>'textarea',
+							'rows'=>5
+						),
+					'</div>',
+				'</div>'
+    		),            
     		'buttons'=>array(
 				'<br/>',
 				'submit'=>array(

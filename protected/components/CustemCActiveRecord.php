@@ -654,8 +654,11 @@ class CustemCActiveRecord extends CActiveRecord {
                 $arTabs[] = array("id"=>$tab->id,"position"=>$tab->position,"name"=>$tab->name,"content"=>array(),'productId'=> $isEdit ? $this->getProductID() : null );
             }
         }
-        $this->product->setFields('position_tab');
+       
         if ( $this->product ){
+            
+            $this->product->setFields('position_tab');
+            
             foreach( $this->product->fields as $field ){
 
                 $id = $this->searchForId( $field->tab_id > 0 ? $field->tab_id : 0 , $arTabs);

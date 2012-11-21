@@ -202,7 +202,7 @@ class Manufacturer extends CActiveRecord
 	// до сохранения
 	protected function beforeSave()
 	{
-		if (parent::beforeSave() ){
+		if (parent::beforeSave()){
 			$this->logo = $this->oldLogoFile;
 
 			// если стоит галка удалить логотип
@@ -210,6 +210,15 @@ class Manufacturer extends CActiveRecord
 				if ( $this->deleteLogoFile() ) $this->logo = null;
 			}
 
+    		
+			if ( $this->name ){
+				$this->name = trim($this->name);
+			}        	
+            
+			if ( $this->alias ){
+				$this->alias = trim($this->alias);
+			}
+            
 			if ( $this->logoFile ){
 				// если загружается новый файл то удаляем старый
 				if ( $this->deleteLogoFile() )
@@ -235,7 +244,7 @@ class Manufacturer extends CActiveRecord
 			$dirName = Yii::getPathOfAlias('manufacturersfiles');
 
 			if ( !is_dir($dirName) ){
-				@mkdir($dirName,777,true);
+				@mkdir($dirName,0777,true);
 			}
 			$file = $dirName.DIRECTORY_SEPARATOR.$this->logo;
 			$this->logoFile->saveAs($file);

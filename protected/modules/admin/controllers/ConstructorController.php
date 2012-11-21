@@ -50,7 +50,7 @@ class ConstructorController extends Controller
 					), 'ENGINE=InnoDB');
 
 					$transaction->commit();
-					$this->redirect(array('/admin/product'));
+					$this->redirect(array('/admin/constructor'));
 				}
 			}
 			catch(Exception $e) // в случае ошибки при выполнении запроса выбрасывается исключение
