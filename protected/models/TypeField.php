@@ -7,13 +7,12 @@ class TypeField
 	const PRICE = 3;
 	const TEXT = 4;
     const LISTS = 5;
-    const CATEGORIES = 6;
+    const CATEGORY = 6;
     const MANUFACTURER = 7;
-    const IMAGE = 8;
-    const FILE = 9;
-    const DOUBLE = 10;
-    const BOOLEAN = 11;
-    const DATETIME = 12;
+    const FILE = 8;
+    const DOUBLE = 9;
+    const BOOLEAN = 10;
+    const DATETIME = 11;
 
 	public static $TypeToIDFields = array(
 		'integer'   => self::INTEGER,
@@ -21,8 +20,7 @@ class TypeField
 		'price'     => self::PRICE,
 		'text'      => self::TEXT,
         'list'      => self::LISTS,
-        'categories'=> self::CATEGORIES,
-        'image'		=> self::IMAGE,
+        'categories'=> self::CATEGORY,
         'file'		=> self::FILE,
         'double'	=> self::DOUBLE,
         'boolean'	=> self::BOOLEAN,
@@ -123,9 +121,9 @@ class TypeField
 
 
 
-        self::CATEGORIES     => array(
+        self::CATEGORY     => array(
 			'name'      =>  "Категория(и)",
-			'type'      =>  "categories",
+			'type'      =>  "category",
             'class'     =>  "CategoryField",
 			'dbType'    =>  "int(11)",
 			'form'      =>  array(

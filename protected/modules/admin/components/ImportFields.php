@@ -37,6 +37,9 @@ class ImportFields extends CInputWidget
 				echo CHtml::openTag('td',array());
 					echo CHtml::dropDownList($name.'[0][from]',null, CHtml::listData($this->model->fields,'id','name'),array('empty'=>'') );
 				echo CHtml::closeTag('td');
+    			echo CHtml::openTag('td',array());
+					echo CHtml::textField($name.'[0][regex ]',null,array());
+				echo CHtml::closeTag('td');                
 				echo CHtml::openTag('td',array());
 					echo CHtml::link('<span class="close deletetr" title="'.Yii::t('main','Delete').'">&times;</span>',"#", array(
 						'onclick'=>"$(this).closest('tr').remove();",

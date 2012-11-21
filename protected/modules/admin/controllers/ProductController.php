@@ -399,7 +399,7 @@ class ProductController extends Controller
         $product = Product::model()->findByPk($id);
 
         $export = new Export();
-        $export->fields = $product->fields;
+        $export->setFields($product->fields);
 
         $form = $export->getExportMotelCForm();
 
@@ -412,7 +412,7 @@ class ProductController extends Controller
 
 				$columns = array();
 				foreach ($export->exportFields as $fieldId) {
-					$field = $product->fields[$fieldId];
+					$field = $export->fields[$fieldId];
 					$columns[$fieldId]['name']=$field->alias;
 					$columns[$fieldId]['type']='text';
 					switch( $field->field_type ){
@@ -432,21 +432,33 @@ class ProductController extends Controller
 							else
 								$columns[$fieldId]['value'] = 'isset($data->'.$field->alias.') ? $data->'.$field->alias.' : null';
 						break;
+        				case TypeField::CATEGORIES:
+							if ($field->is_multiple_select)
+								$columns[$fieldId]['value'] = '$data->getRecordItems("'.$field->alias.'Category")';
+							else
+								$columns[$fieldId]['value'] = 'isset($data->'.$field->alias.'Category) ? $data->'.$field->alias.'Category->name : null';
+						break;                         
+    					case TypeField::MANUFACTURER:
+							if ($field->is_multiple_select)
+								$columns[$fieldId]['value'] = '$data->getRecordItems("'.$field->alias.'Manufacturer")';
+							else
+								$columns[$fieldId]['value'] = 'isset($data->'.$field->alias.'Manufacturer) ? $data->'.$field->alias.'Manufacturer->name : null';
+						break;                        
 						default :
 							$columns[$fieldId]['value'] = '';
 
 					}
 				}
-
+                
 				$type = array('Excel5','CSV');
-				$this->widget('ext.EExcelView.EExcelView', array(
-								'dataProvider'=> $model->search(),
-								'grid_mode'=>'export',
+				$this->widget(  'ext.EExcelView.EExcelView', array(
+								'dataProvider' => $model->search(),
+								'grid_mode' =>'export',
 								'title'=> $product->name ,
 								'filename'=> $product->alias ,
-								'stream'=>true,
-								'exportType'=>$type[$export->exportType],
-								'columns'=> $columns,
+								'stream' => true,
+								'exportType' => $type[$export->exportType],
+								'columns' => $columns,
 				));
 			}
         }

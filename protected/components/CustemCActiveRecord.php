@@ -51,7 +51,7 @@ class CustemCActiveRecord extends CActiveRecord {
                 if ( $field->is_column_table_admin ) {
                     switch( $field->field_type ){
             			case TypeField::LISTS :
-    					case TypeField::CATEGORIES :
+    					case TypeField::CATEGORY :
         				case TypeField::FILE :
                             $this->with[] = $field->alias;
                         break;
@@ -177,7 +177,7 @@ class CustemCActiveRecord extends CActiveRecord {
 						break;
 
 
-    					case TypeField::CATEGORIES:
+    					case TypeField::CATEGORY:
                             if ($field->is_multiple_select)
                                 $f['value'] = '$data->getRecordCategory("'.$field->alias.'")';
                             else
@@ -308,7 +308,7 @@ class CustemCActiveRecord extends CActiveRecord {
 
 							break;
 
-							case TypeField::CATEGORIES:
+							case TypeField::CATEGORY:
 
                                 if ( $field->is_editing_table_admin ) {
                                     $f['type']='raw';
@@ -419,8 +419,13 @@ class CustemCActiveRecord extends CActiveRecord {
 				    'empty'=> '',
 			    );
 			break;
-            case TypeField::CATEGORIES:
-                $filter = CHtml::listData($this->getCategoryFilter($field->category_id) , 'id', 'name');
+            case TypeField::CATEGORY:
+                $filter = array(
+                	'type' => 'dropdownlist',
+				    'items' => CHtml::listData($this->getCategoryFilter($field->category_id) , 'id', 'name'),
+				    'empty'=> '',
+					'htmlOptions' => $field->is_multiple_select ? array("multiple"=>true,"class"=>"chzn-select","data-placeholder"=>" ") : null,
+			    );                
 			break;
             case TypeField::MANUFACTURER:
                 $filter = array(
@@ -581,7 +586,7 @@ class CustemCActiveRecord extends CActiveRecord {
 				}
 			break;
 
-    		case TypeField::CATEGORIES :
+    		case TypeField::CATEGORY :
 
 				if( $field->category_id ){
 					$category = Category::model()->findByPk($field->category_id)->descendants()->findAll();
@@ -719,7 +724,7 @@ class CustemCActiveRecord extends CActiveRecord {
 						}
                     break;
 
-					case TypeField::CATEGORIES :
+					case TypeField::CATEGORY :
 						if ($field->is_multiple_select){
 							RecordCategory::model()->deleteAll('product_id = :product_id AND record_id = :record_id',array(":product_id"=> $this->getProductID(),':record_id'=> $this->id));
 
@@ -896,16 +901,7 @@ class CustemCActiveRecord extends CActiveRecord {
                 $params['default'] = array('value'=> null );
 			break;
 
-            case TypeField::CATEGORIES :
-				if ($field->is_multiple_select){
-                    $types[] = 'ArrayValidator';
-    				$params['ArrayValidator'] = array('validator'=>'numerical', 'params'=>array('integerOnly'=>true));
-				} else {
-        		    $types[] = 'numerical';
-    			    $params['numerical'] = array('integerOnly'=>true,'allowEmpty'=>true);
-				}
-			break;
-
+            case TypeField::CATEGORY :
             case TypeField::MANUFACTURER :
 				if ($field->is_multiple_select){
                     $types[] = 'ArrayValidator';
@@ -976,21 +972,21 @@ class CustemCActiveRecord extends CActiveRecord {
                             $this->metaData->addRelation($field->alias,array( CActiveRecord::BELONGS_TO,'ListItem', $field->alias ));
                     break;
 
-					case TypeField::CATEGORIES :
+					case TypeField::CATEGORY :
                         if ($field->is_multiple_select)
-    						$this->metaData->addRelation($field->alias,array(	CActiveRecord::MANY_MANY,
+    						$this->metaData->addRelation($field->alias.'Category',array(	CActiveRecord::MANY_MANY,
 																'Category', 'record_category(record_id, category_id)',
 																'on'=> '`'.$name."_".$name.'`.`product_id` = :product_id',
 																'params' => array(":product_id" => $this->getProductID() ),
 																'together' => true
 															));
                         else
-                            $this->metaData->addRelation($field->alias,array( CActiveRecord::BELONGS_TO,'Category', $field->alias ));
+                            $this->metaData->addRelation($field->alias.'Category',array( CActiveRecord::BELONGS_TO,'Category', $field->alias ));
                     break;
 
 					case TypeField::MANUFACTURER :
                         if ($field->is_multiple_select)
-                            $this->metaData->addRelation($field->alias,array(CActiveRecord::MANY_MANY,
+                            $this->metaData->addRelation($field->alias."Manufacturer",array(CActiveRecord::MANY_MANY,
 																'Manufacturer', 'record_manufacturer(record_id, manufacturer_id)',
 																'on'=> '`'.$name."_".$name.'`.`product_id` = :product_id',
 																'params' => array(":product_id" => $this->getProductID() ),
