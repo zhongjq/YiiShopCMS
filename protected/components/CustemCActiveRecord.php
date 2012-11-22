@@ -1018,7 +1018,7 @@ class CustemCActiveRecord extends CActiveRecord {
         			switch( $field->field_type ){
 
                         case TypeField::LISTS :
-    					case TypeField::CATEGORIES :
+    					case TypeField::CATEGORY :
                         case TypeField::MANUFACTURER :
                             if ($field->is_multiple_select && !empty($this->{$field->alias}) ){
                                 $tmp = array();

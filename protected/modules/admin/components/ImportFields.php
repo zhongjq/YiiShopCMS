@@ -38,7 +38,7 @@ class ImportFields extends CInputWidget
 					echo CHtml::dropDownList($name.'[0][from]',null, CHtml::listData($this->model->fields,'id','name'),array('empty'=>'') );
 				echo CHtml::closeTag('td');
     			echo CHtml::openTag('td',array());
-					echo CHtml::textField($name.'[0][regex ]',null,array());
+					echo CHtml::textField($name.'[0][regex]',null,array());
 				echo CHtml::closeTag('td');                
 				echo CHtml::openTag('td',array());
 					echo CHtml::link('<span class="close deletetr" title="'.Yii::t('main','Delete').'">&times;</span>',"#", array(
@@ -64,6 +64,9 @@ class ImportFields extends CInputWidget
 								echo CHtml::openTag('td',array());
 									echo CHtml::dropDownList($name.'['.$key.'][from]',$value['from'], CHtml::listData($this->model->fields,'id','name'),array('empty'=>'') );
 								echo CHtml::closeTag('td');
+                        		echo CHtml::openTag('td',array());
+                					echo CHtml::textField($name.'['.$key.'][regex]',$value['regex'],array());
+                				echo CHtml::closeTag('td');
                 				echo CHtml::openTag('td',array());
             						echo CHtml::link('<span class="close deletetr" title="'.Yii::t('main','Delete').'">&times;</span>',"#", array(
             							'onclick'=>"$(this).closest('tr').remove();",
@@ -107,6 +110,11 @@ $(function(){
 						$(this).find("option:selected").prop("selected", false);
 						return val.replace(/[\d+]/, parseInt(name) + 1 )
 					}).end()
+    				.find("input").attr('name', function(i, val) {
+						var tr = tbody.find("tr").eq(-2);
+						var name = tr.length > 0 ? tr.find("input:first").attr('name').match(/[\d+]/)[0] : 0;
+						return val.replace(/[\d+]/, parseInt(name) + 1 )
+					}).end()                    
 					.find("a").show().end();
 
 		return false;

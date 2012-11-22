@@ -154,5 +154,21 @@ class Import extends CModel {
 
 		return new CForm($form,$this);
 	}
+    
+    
+    public function setFields($fields){
+        
+        $this->fields[0] = (object)array('id'=>0,'name'=>"ID",'alias'=>"id",'field_type'=>TypeField::INTEGER);
+        
+        foreach ($fields as $key => $field) {
+			switch( $field->field_type ){
+				case TypeField::FILE:
+				break;
+                default:                    
+                    $this->fields[$key] = $field;
+			}
+		}        
+        
+    }    
 	
 }

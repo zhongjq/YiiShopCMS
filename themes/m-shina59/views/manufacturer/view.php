@@ -13,15 +13,7 @@ if( !empty($products) ){
         $this->widget('zii.widgets.grid.CGridView', array(
             'dataProvider'=>$product->search(),
 			//'filter'=>$product,
-        	//'columns' =>$product->getTableFields(),
-            'columns' => array(
-                array(
-                    'name'=>'name',
-                    'value'=>'$data->getLink($data->name)',
-                    'type'=>'raw'
-                ),
-                'price'
-            ),
+        	'columns' =>$product->getTableFields(),
         	'htmlOptions'=>array('class'=>false),
         	'itemsCssClass'=>'table table-bordered table-striped',
         	'template'=>'{summary} {items} {pager}',
