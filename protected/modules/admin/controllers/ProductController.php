@@ -432,7 +432,7 @@ class ProductController extends Controller
 							else
 								$columns[$fieldId]['value'] = 'isset($data->'.$field->alias.') ? $data->'.$field->alias.' : null';
 						break;
-        				case TypeField::CATEGORIES:
+        				case TypeField::CATEGORY:
 							if ($field->is_multiple_select)
 								$columns[$fieldId]['value'] = '$data->getRecordItems("'.$field->alias.'Category")';
 							else
@@ -475,19 +475,7 @@ class ProductController extends Controller
 
         $import = new Import();
 		$import->scenario='step_1';
-        $import->fields = $product->fields;
-
-
-		if( !empty($import->fields) )
-            $this->fields[0] = (object)array(	'id'=>0,
-												'name'=>'id',
-												'alias'=>'id',
-												'field_type'=>TypeField::INTEGER,
-												'is_mandatory'=>false,
-												'is_editing_table_admin'=>false,
-												'is_column_table_admin'=>false,
-												'tab_id'=>false,
-											);
+        $import->setFields($product->fields);
 
         $form = $import->getStepOneCForm();
 
@@ -575,26 +563,124 @@ class ProductController extends Controller
                         	foreach ($import->importFields as &$value) {
                     			if( isset($value['to'],$value['param'],$value['from']) && is_numeric($value['to']) && is_numeric($value['from']) ){
                                     $fieldAlias = $import->fields[$value['from']]->alias;
-                             		switch ($value['param']){
+                                    $valueSearch = null;
+                     				switch( $import->fields[$value['to']]->field_type ){
+                						case TypeField::STRING:
+                						case TypeField::PRICE:
+                						case TypeField::TEXT:
+                						case TypeField::INTEGER:
+                						case TypeField::DOUBLE:
+                							$valueСell = $objWorksheet->getCellByColumnAndRow($value['to'], $row)->getValue();
+                						break;
+                						case TypeField::BOOLEAN:
+                							$columns[$fieldId]['value'] = 'BooleanField::getValues($data->'.$field->alias.')';
+                						break;
+                						case TypeField::LISTS:
+                							if ($field->is_multiple_select)
+                								$columns[$fieldId]['value'] = '$data->getRecordItems("'.$field->alias.'")';
+                							else
+                								$columns[$fieldId]['value'] = 'isset($data->'.$field->alias.') ? $data->'.$field->alias.' : null';
+                						break;
+                        				case TypeField::CATEGORY:
+                							if ($field->is_multiple_select)
+                								$columns[$fieldId]['value'] = '$data->getRecordItems("'.$field->alias.'Category")';
+                							else
+                								$columns[$fieldId]['value'] = 'isset($data->'.$field->alias.'Category) ? $data->'.$field->alias.'Category->name : null';
+                						break;                         
+                    					case TypeField::MANUFACTURER:
+                							if ($field->is_multiple_select)
+                								$columns[$fieldId]['value'] = '$data->getRecordItems("'.$field->alias.'Manufacturer")';
+                							else {
+                								$valueСell = trim($objWorksheet->getCellByColumnAndRow($value['to'], $row)->getValue());
+                                                echo $valueСell;
+                                                if ( $valueСell ){
+                                                    $valueСell = explode(",",$valueСell);
+                                                    
+                                                    $criteria = new CDbCriteria();
+                                                    $criteria->addInCondition("name", $valueСell);
+                                                    $manufacturers = Manufacturer::model()->findAll($criteria);
+                                                    if ( !empty($manufacturers) && sizeof($manufacturers) > 1 ){
+                                                        $valueСell = array();
+                                                        foreach ($manufacturers as &$manufacturer) {
+                                                            $valueСell[] = $manufacturer->id;                                                        
+                                                        }
+                                                    } elseif( !empty($manufacturers) && sizeof($manufacturers) == 1 ) {
+                                                        $valueСell = $manufacturers[0]->id;
+                                                    }
+                                                    unset($criteria);
+                                                }
+                							}
+                						break;
+                
+                					}
+                                    
+                                    switch ($value['param']){
                         				case 0: // =
-                                            $condition[] = $fieldAlias." = :".$fieldAlias;
-                                            $params[":".$fieldAlias] = $objWorksheet->getCellByColumnAndRow($value['to'], $row)->getValue();
+                                            $params[$value['from']] = $valueСell;
                                         break;
                                         case 1: // >
-                                            $attributes[$fieldAlias] = $objWorksheet->getCellByColumnAndRow($value['to'], $row)->getValue();
+                                            $attributes[$value['from']] = $valueСell;
                                         break;
                              		}
                     			}
                     		}
 
-                            if( !empty($condition) && !empty($params) ) {
-                                $condition = implode(" AND ",$condition);
+                            if( !empty($params) && !empty($attributes) ) {
+                                
+                                $criteria = new CDbCriteria();
+                                $criteria->with = $model->with;
+                                foreach ($params as $fieldId => $param) {
+                                    $field = $import->fields[$fieldId];
+                                    
+                            		switch( $field->field_type ){
+                            			case TypeField::STRING:
+                                        case TypeField::TEXT:
+                                            $criteria->compare($field->alias, $param, true );
+                        				break;
+                        				case TypeField::LISTS:
+                                            if ( !empty($this->{$field->alias} ) )
+                            					if ($field->is_multiple_select){
+                                                    $criteria->addCondition(" (SELECT COUNT(*) FROM `record_list` WHERE `record_id` = t.id AND `product_id` = :product_id AND `list_item_id` = :list_item_id ) > 0 ");
+                                                    $criteria->params[":product_id"] = $product->id;
+                                                    $criteria->params[':list_item_id'] = $param ;
+                        						} else
+                        							$criteria->compare($field->alias, $param );
+                        				break;
+                    
+                        				default :
+                        					$criteria->compare($field->alias, $param );
+                        			}                                       
+                                }
+                                
+                                $record = $model->find($criteria);
+                                
+                                if($record){
+                                    foreach ($attributes as $fieldId => $val) {
+                                        $field = $import->fields[$fieldId];
+                                        $record->{$field->alias} = $val;                                    	                                   
+                                    }
+                                    $record->save();
+                                }
+                                
+                                unset($record);
+                            } elseif ( !empty($attributes) ) {
+                                echo "<pre>";
+                                var_dump($attributes);
+                                die();
+                                $record = clone $model;
+                                foreach ($attributes as $fieldId => $val) {
+                                    $field = $import->fields[$fieldId];
+                                    $record->{$field->alias} = $val;                                                                           
+                                }
+                                $record->save();
+                                $record = null;
+                                unset($record);
                             } else {
                                 $condition = null;
                                 $params = array();
+                                $attributes = array();
                             }
-
-						    $model->updateAll($attributes,$condition,$params);
+                            
 						}
 
                         $this->redirect($this->createUrl('/admin/product/view',array('id'=>$product->id)));
