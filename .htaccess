@@ -10,14 +10,9 @@ AddCharset utf-8 *
 
 <IfModule mod_rewrite.c>
 	RewriteEngine On
-	RewriteBase /yiishop/
+	RewriteBase /
 	RewriteRule ^index\.php$ - [L]
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteCond %{REQUEST_FILENAME} !-d
 	RewriteRule . index.php [L]
 </IfModule>
-
-#кэширование css, javascript файлов на неделю
-<FilesMatch ".(js|css|jpg)$">
-	Header set Cache-Control "max-age=604800"
-</FilesMatch>

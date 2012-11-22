@@ -3,8 +3,8 @@
 // theme
 define('YII_THEME','m-shina59');
 // connectionString
-define('CONNECTION_STRING','mysql:host=mysql0.db.koding.com;dbname=enchikiben_fbfde');
+define('CONNECTION_STRING','mysql:host=localhost;dbname=enchikiben_fbfde');
 // username
-define('DB_USERNAME','enchikiben_fbfde');
+define('DB_USERNAME','root');
 // password
-define('DB_PASSWORD','754089db');
+define('DB_PASSWORD','');

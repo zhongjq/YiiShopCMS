@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 3.5.4
+-- version 3.5.2.2
 -- http://www.phpmyadmin.net
 --
--- Хост: localhost
--- Время создания: Ноя 18 2012 г., 11:02
--- Версия сервера: 5.5.28-0ubuntu0.12.04.2
--- Версия PHP: 5.3.10-1ubuntu3.4
+-- Хост: mysql0.db.koding.com
+-- Время создания: Ноя 21 2012 г., 10:21
+-- Версия сервера: 5.1.61-log
+-- Версия PHP: 5.3.3
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -32,6 +32,47 @@ CREATE TABLE IF NOT EXISTS `boolean_field` (
   PRIMARY KEY (`field_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Числовое поле';
 
+--
+-- Дамп данных таблицы `boolean_field`
+--
+
+INSERT INTO `boolean_field` (`field_id`, `default`) VALUES
+(9, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `bus`
+--
+
+CREATE TABLE IF NOT EXISTS `bus` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `alias` varchar(255) DEFAULT NULL,
+  `title` text,
+  `keywords` text,
+  `description` text,
+  `manufacturer` int(11) DEFAULT NULL,
+  `model` varchar(255) DEFAULT NULL,
+  `season` int(11) DEFAULT NULL,
+  `typeAuto` int(11) DEFAULT NULL,
+  `profileWidth` int(11) DEFAULT NULL,
+  `profileHeight` int(11) DEFAULT NULL,
+  `construction` int(11) DEFAULT NULL,
+  `methodSealing` int(11) DEFAULT NULL,
+  `spikes` tinyint(1) DEFAULT NULL,
+  `price` decimal(9,2) DEFAULT NULL,
+  `quantity` int(11) DEFAULT NULL,
+  `importID` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+
+--
+-- Дамп данных таблицы `bus`
+--
+
+INSERT INTO `bus` (`id`, `alias`, `title`, `keywords`, `description`, `manufacturer`, `model`, `season`, `typeAuto`, `profileWidth`, `profileHeight`, `construction`, `methodSealing`, `spikes`, `price`, `quantity`, `importID`) VALUES
+(1, '', '', '', '', 6, 'Ice Cruiser 7000', 1, 4, 14, 39, 81, 82, 1, '1000.00', 2, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -47,6 +88,8 @@ CREATE TABLE IF NOT EXISTS `category` (
   `status` int(1) unsigned NOT NULL DEFAULT '1',
   `alias` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
+  `title` text,
+  `keywords` text,
   `description` text,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Категории' AUTO_INCREMENT=1 ;
@@ -82,27 +125,6 @@ CREATE TABLE IF NOT EXISTS `datetime_field` (
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `disk`
---
-
-CREATE TABLE IF NOT EXISTS `disk` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `alias` varchar(255) DEFAULT NULL,
-  `title` text,
-  `keywords` text,
-  `description` text,
-  `name` varchar(255) DEFAULT NULL,
-  `price` decimal(9,2) DEFAULT NULL,
-  `spikes` tinyint(1) DEFAULT NULL,
-  `boom` float DEFAULT NULL,
-  `count` int(11) DEFAULT NULL,
-  `diameter` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
--- --------------------------------------------------------
-
---
 -- Структура таблицы `double_field`
 --
 
@@ -125,6 +147,25 @@ CREATE TABLE IF NOT EXISTS `field_tab` (
   PRIMARY KEY (`field_id`),
   KEY `tab_id` (`tab_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `field_tab`
+--
+
+INSERT INTO `field_tab` (`field_id`, `tab_id`, `position`) VALUES
+(1, NULL, 0),
+(2, NULL, 1),
+(3, NULL, 8),
+(4, NULL, 7),
+(5, NULL, 6),
+(6, NULL, 5),
+(7, NULL, 4),
+(8, NULL, 3),
+(9, NULL, 10),
+(10, 1, NULL),
+(11, NULL, 2),
+(12, 2, NULL),
+(13, 2, NULL);
 
 -- --------------------------------------------------------
 
@@ -156,6 +197,13 @@ CREATE TABLE IF NOT EXISTS `file_field` (
   PRIMARY KEY (`field_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Поле типа файл';
 
+--
+-- Дамп данных таблицы `file_field`
+--
+
+INSERT INTO `file_field` (`field_id`, `file_type`) VALUES
+(10, 0);
+
 -- --------------------------------------------------------
 
 --
@@ -169,6 +217,13 @@ CREATE TABLE IF NOT EXISTS `integer_field` (
   PRIMARY KEY (`field_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Числовое поле';
 
+--
+-- Дамп данных таблицы `integer_field`
+--
+
+INSERT INTO `integer_field` (`field_id`, `min_value`, `max_value`) VALUES
+(12, 0, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -179,7 +234,22 @@ CREATE TABLE IF NOT EXISTS `list` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Списки' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Списки' AUTO_INCREMENT=10 ;
+
+--
+-- Дамп данных таблицы `list`
+--
+
+INSERT INTO `list` (`id`, `name`) VALUES
+(1, 'Сезонность'),
+(2, 'Тип автомобиля'),
+(3, 'Ширина профиля'),
+(4, 'Высота профиля'),
+(5, 'Диаметр'),
+(6, 'Индекс скорости'),
+(7, 'Индекс нагрузки'),
+(8, 'Способ герметизации'),
+(9, 'Конструкция');
 
 -- --------------------------------------------------------
 
@@ -193,7 +263,19 @@ CREATE TABLE IF NOT EXISTS `list_field` (
   `is_multiple_select` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT 'Множественный выбор списка',
   PRIMARY KEY (`field_id`),
   KEY `fk_list_field_list1_idx` (`list_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=9 ;
+
+--
+-- Дамп данных таблицы `list_field`
+--
+
+INSERT INTO `list_field` (`field_id`, `list_id`, `is_multiple_select`) VALUES
+(3, 1, 0),
+(4, 2, 0),
+(5, 3, 0),
+(6, 4, 0),
+(7, 9, 0),
+(8, 8, 0);
 
 -- --------------------------------------------------------
 
@@ -209,7 +291,96 @@ CREATE TABLE IF NOT EXISTS `list_item` (
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_list_item_list1_idx` (`list_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Списки' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Списки' AUTO_INCREMENT=84 ;
+
+--
+-- Дамп данных таблицы `list_item`
+--
+
+INSERT INTO `list_item` (`id`, `list_id`, `status`, `priority`, `name`) VALUES
+(1, 1, 1, 0, 'зимние'),
+(2, 1, 1, 0, 'летние'),
+(3, 1, 1, 0, 'всесезонные'),
+(4, 2, 1, 0, 'легковой'),
+(5, 2, 1, 0, 'грузовой'),
+(6, 3, 1, 0, '125'),
+(7, 3, 1, 0, '135'),
+(8, 3, 1, 0, '145'),
+(9, 3, 1, 0, '155'),
+(10, 3, 1, 0, '165'),
+(11, 3, 1, 0, '175'),
+(12, 3, 1, 0, '185'),
+(13, 3, 1, 0, '195'),
+(14, 3, 1, 0, '205'),
+(15, 3, 1, 0, '215'),
+(16, 3, 1, 0, '225'),
+(17, 3, 1, 0, '235'),
+(18, 3, 1, 0, '245'),
+(19, 3, 1, 0, '255'),
+(20, 3, 1, 0, '265'),
+(21, 3, 1, 0, '275'),
+(22, 3, 1, 0, '285'),
+(23, 3, 1, 0, '295'),
+(24, 3, 1, 0, '305'),
+(25, 3, 1, 0, '315'),
+(26, 3, 1, 0, '325'),
+(27, 3, 1, 0, '335'),
+(28, 3, 1, 0, '345'),
+(29, 3, 1, 0, '355'),
+(30, 3, 1, 0, '365'),
+(31, 3, 1, 0, '375'),
+(32, 3, 1, 0, '395'),
+(33, 4, 1, 0, '25'),
+(34, 4, 1, 0, '30'),
+(35, 4, 1, 0, '35'),
+(36, 4, 1, 0, '40'),
+(37, 4, 1, 0, '45'),
+(38, 4, 1, 0, '50'),
+(39, 4, 1, 0, '55'),
+(40, 4, 1, 0, '60'),
+(41, 4, 1, 0, '65'),
+(42, 4, 1, 0, '70'),
+(43, 4, 1, 0, '75'),
+(44, 4, 1, 0, '80'),
+(45, 4, 1, 0, '85'),
+(46, 4, 1, 0, '90'),
+(47, 4, 1, 0, '95'),
+(48, 4, 1, 0, '105'),
+(49, 5, 1, 0, '12'),
+(50, 5, 1, 0, '13'),
+(51, 5, 1, 0, '14'),
+(52, 5, 1, 0, '15'),
+(53, 5, 1, 0, '16'),
+(54, 5, 1, 0, '16.5'),
+(55, 5, 1, 0, '17'),
+(56, 5, 1, 0, '18'),
+(57, 5, 1, 0, '19'),
+(58, 5, 1, 0, '20'),
+(59, 5, 1, 0, '21'),
+(60, 5, 1, 0, '22'),
+(61, 5, 1, 0, '23'),
+(62, 5, 1, 0, '24'),
+(63, 5, 1, 0, '26'),
+(64, 5, 1, 0, '28'),
+(65, 6, 1, 0, 'H (до 210 км/ч)'),
+(66, 6, 1, 0, 'J (до 100 км/ч)'),
+(67, 6, 1, 0, 'K (до 110 км/ч)'),
+(68, 6, 1, 0, 'L (до 120 км/ч)'),
+(69, 6, 1, 0, 'M (до 130 км/ч)'),
+(70, 6, 1, 0, 'N (до 140 км/ч)'),
+(71, 6, 1, 0, 'P (до 150 км/ч)'),
+(72, 6, 1, 0, 'Q (до 160 км/ч)'),
+(73, 6, 1, 0, 'R (до 170 км/ч)'),
+(74, 6, 1, 0, 'S (до 180 км/ч)'),
+(75, 6, 1, 0, 'T (до 190 км/ч)'),
+(76, 6, 1, 0, 'V (до 240 км/ч)'),
+(77, 6, 1, 0, 'W (до 270 км/ч)'),
+(78, 6, 1, 0, 'Y (до 300 км/ч)'),
+(79, 6, 1, 0, 'Z/ZR (свыше 240 км/ч)'),
+(80, 9, 1, 0, 'диагональные'),
+(81, 9, 1, 0, 'радиальные'),
+(82, 8, 1, 0, 'бескамерные'),
+(83, 8, 1, 0, 'камерные');
 
 -- --------------------------------------------------------
 
@@ -226,11 +397,25 @@ CREATE TABLE IF NOT EXISTS `manufacturer` (
   `status` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `alias` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
+  `title` text,
   `description` text,
   `keywords` text,
-  `logo` varchar(255) DEFAULT NULL,
+  `logo` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Производители' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Производители' AUTO_INCREMENT=8 ;
+
+--
+-- Дамп данных таблицы `manufacturer`
+--
+
+INSERT INTO `manufacturer` (`id`, `root`, `lft`, `rgt`, `level`, `status`, `alias`, `name`, `title`, `description`, `keywords`, `logo`) VALUES
+(1, 1, 1, 14, 1, 1, 'bus', 'Шины', '', '', '', ''),
+(2, 1, 2, 3, 2, 1, 'amtel', 'Amtel', '', '', '', 'amtel.png'),
+(3, 1, 4, 5, 2, 1, 'barum', 'Barum', '', '', '', 'barum.gif'),
+(4, 1, 6, 7, 2, 1, 'bfgoodrich', 'BFGoodrich', '', '', '', 'bfgoodrich.png'),
+(5, 1, 8, 9, 2, 1, 'brasa', 'Brasa', '', '', '', 'brasa.png'),
+(6, 1, 10, 11, 2, 1, 'bridgestone', 'Bridgestone', 'Bridgestone', '', '', 'bridgestone.gif'),
+(7, 1, 12, 13, 2, 1, 'nokian', 'Nokian', 'nokian', 'nokian', 'nokian', '');
 
 -- --------------------------------------------------------
 
@@ -246,6 +431,13 @@ CREATE TABLE IF NOT EXISTS `manufacturer_field` (
   KEY `manufacturer_id` (`manufacturer_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Дамп данных таблицы `manufacturer_field`
+--
+
+INSERT INTO `manufacturer_field` (`field_id`, `manufacturer_id`, `is_multiple_select`) VALUES
+(1, 1, 0);
+
 -- --------------------------------------------------------
 
 --
@@ -257,6 +449,13 @@ CREATE TABLE IF NOT EXISTS `price_field` (
   `max_value` int(11) unsigned DEFAULT NULL COMMENT 'Максимальное значение',
   PRIMARY KEY (`field_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Ценовые поля';
+
+--
+-- Дамп данных таблицы `price_field`
+--
+
+INSERT INTO `price_field` (`field_id`, `max_value`) VALUES
+(11, 0);
 
 -- --------------------------------------------------------
 
@@ -273,7 +472,14 @@ CREATE TABLE IF NOT EXISTS `product` (
   `keywords` text NOT NULL,
   `description` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Таблица продуктов магазина' AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='Таблица продуктов магазина' AUTO_INCREMENT=2 ;
+
+--
+-- Дамп данных таблицы `product`
+--
+
+INSERT INTO `product` (`id`, `status`, `name`, `alias`, `title`, `keywords`, `description`) VALUES
+(1, 1, 'Шины', 'bus', 'Шины', 'Шины', 'Шины');
 
 -- --------------------------------------------------------
 
@@ -299,7 +505,26 @@ CREATE TABLE IF NOT EXISTS `product_field` (
   KEY `fk_product_field_product1_idx` (`product_id`),
   KEY `is_column_table_admin` (`is_column_table_admin`),
   KEY `is_editing_table_admin` (`is_editing_table_admin`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
+
+--
+-- Дамп данных таблицы `product_field`
+--
+
+INSERT INTO `product_field` (`id`, `position`, `product_id`, `field_type`, `name`, `alias`, `is_mandatory`, `is_filter`, `is_column_table`, `unit_name`, `hint`, `is_editing_table_admin`, `is_column_table_admin`) VALUES
+(1, 0, 1, 7, 'Производитель', 'manufacturer', 1, 1, 1, '', '', 0, 1),
+(2, 1, 1, 2, 'Наименование модели', 'model', 1, 1, 1, '', '', 0, 1),
+(3, 5, 1, 5, 'Сезонность', 'season', 0, 1, 1, '', '', 0, 0),
+(4, 6, 1, 5, 'Тип автомобиля', 'typeAuto', 0, 1, 1, '', '', 0, 0),
+(5, 7, 1, 5, 'Ширина профиля', 'profileWidth', 0, 0, 1, 'мм', '', 0, 0),
+(6, 8, 1, 5, 'Высота профиля', 'profileHeight', 0, 1, 1, '', '', 0, 0),
+(7, 9, 1, 5, 'Конструкция', 'construction', 0, 1, 1, '', '', 0, 0),
+(8, 10, 1, 5, 'Способ герметизации', 'methodSealing', 0, 1, 1, '', '', 0, 0),
+(9, 11, 1, 10, 'Шипы', 'spikes', 0, 1, 1, '', '', 0, 0),
+(10, 12, 1, 8, 'Изображения', 'image', 0, 0, 1, '', '', 0, 0),
+(11, 2, 1, 3, 'Цена', 'price', 1, 1, 1, 'руб.', '', 1, 1),
+(12, 3, 1, 1, 'Количество', 'quantity', 0, 0, 1, 'ед.', '', 1, 1),
+(13, 4, 1, 2, 'Номер импорта', 'importID', 0, 0, 1, '', '', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -371,6 +596,14 @@ CREATE TABLE IF NOT EXISTS `string_field` (
   PRIMARY KEY (`field_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Строковые поля';
 
+--
+-- Дамп данных таблицы `string_field`
+--
+
+INSERT INTO `string_field` (`field_id`, `min_length`, `max_length`) VALUES
+(2, 0, 255),
+(13, 0, 255);
+
 -- --------------------------------------------------------
 
 --
@@ -385,7 +618,15 @@ CREATE TABLE IF NOT EXISTS `tab` (
   PRIMARY KEY (`id`,`product_id`),
   KEY `fk_tab_product_field1_idx` (`product_id`),
   KEY `fk_tab_field_tab1_idx` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+
+--
+-- Дамп данных таблицы `tab`
+--
+
+INSERT INTO `tab` (`id`, `product_id`, `position`, `name`) VALUES
+(1, 1, NULL, 'Изображения'),
+(2, 1, NULL, 'Склад');
 
 -- --------------------------------------------------------
 
@@ -400,27 +641,6 @@ CREATE TABLE IF NOT EXISTS `text_field` (
   `rows` int(11) unsigned NOT NULL DEFAULT '5' COMMENT 'Строк',
   PRIMARY KEY (`field_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Текстовые поля';
-
--- --------------------------------------------------------
-
---
--- Структура таблицы `tires`
---
-
-CREATE TABLE IF NOT EXISTS `tires` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `alias` varchar(255) DEFAULT NULL,
-  `title` text,
-  `keywords` text,
-  `description` text,
-  `name` varchar(255) DEFAULT NULL,
-  `price` decimal(9,2) DEFAULT NULL,
-  `count` int(11) DEFAULT NULL,
-  `logTest` tinyint(1) DEFAULT NULL,
-  `manufacturer` int(11) unsigned DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `manufacturer` (`manufacturer`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -578,12 +798,6 @@ ALTER TABLE `tab`
 --
 ALTER TABLE `text_field`
   ADD CONSTRAINT `fk_text_field_product_field1` FOREIGN KEY (`field_id`) REFERENCES `product_field` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Ограничения внешнего ключа таблицы `tires`
---
-ALTER TABLE `tires`
-  ADD CONSTRAINT `tires_ibfk_1` FOREIGN KEY (`manufacturer`) REFERENCES `manufacturer` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
