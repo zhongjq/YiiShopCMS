@@ -98,7 +98,7 @@ return array(
         	'urlFormat' => 'path',
 			'showScriptName' => false,
             // тут правим если запускаем из подпапки
-			'baseUrl' => 'http://'.$_SERVER['SERVER_NAME']."/",
+			//'baseUrl' => 'http://'.$_SERVER['SERVER_NAME']."/",
          	'rules' => require 'rules.php',
 
 			'urlSuffix' => '.html',
