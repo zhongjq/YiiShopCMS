@@ -6,3 +6,4 @@ sxd
 yii/
 /assets/
 /data/
+/protected/runtime/
