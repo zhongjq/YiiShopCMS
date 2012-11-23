@@ -555,7 +555,7 @@ class ProductController extends Controller
 
                         $model = $product->getRecordObject();
                         // проходим по строкам
-						for ($row = 2; $row <= $highestRow; ++$row) {
+						for ($row = 1; $row <= $highestRow; ++$row) {
                             $attributes = array();
                             $condition = array();
                             $params = array();
@@ -563,8 +563,9 @@ class ProductController extends Controller
                         	foreach ($import->importFields as &$value) {
                     			if( isset($value['to'],$value['param'],$value['from']) && is_numeric($value['to']) && is_numeric($value['from']) ){
                                     $fieldAlias = $import->fields[$value['from']]->alias;
-                                    $valueSearch = null;
-                     				switch( $import->fields[$value['to']]->field_type ){
+                                    $valueСell = trim($objWorksheet->getCellByColumnAndRow($value['to'], $row)->getValue());
+                                    
+                     				switch( $import->fields[$value['from']]->field_type ){
                 						case TypeField::STRING:
                 						case TypeField::PRICE:
                 						case TypeField::TEXT:
@@ -587,29 +588,25 @@ class ProductController extends Controller
                 							else
                 								$columns[$fieldId]['value'] = 'isset($data->'.$field->alias.'Category) ? $data->'.$field->alias.'Category->name : null';
                 						break;                         
-                    					case TypeField::MANUFACTURER:
-                							if ($field->is_multiple_select)
-                								$columns[$fieldId]['value'] = '$data->getRecordItems("'.$field->alias.'Manufacturer")';
-                							else {
-                								$valueСell = trim($objWorksheet->getCellByColumnAndRow($value['to'], $row)->getValue());
-                                                echo $valueСell;
-                                                if ( $valueСell ){
-                                                    $valueСell = explode(",",$valueСell);
+                    					case TypeField::MANUFACTURER:              								
+                                               
+                                            if ( $valueСell != "" ){
+                                                $valueСell = explode(",",$valueСell);
                                                     
-                                                    $criteria = new CDbCriteria();
-                                                    $criteria->addInCondition("name", $valueСell);
-                                                    $manufacturers = Manufacturer::model()->findAll($criteria);
-                                                    if ( !empty($manufacturers) && sizeof($manufacturers) > 1 ){
-                                                        $valueСell = array();
-                                                        foreach ($manufacturers as &$manufacturer) {
-                                                            $valueСell[] = $manufacturer->id;                                                        
-                                                        }
-                                                    } elseif( !empty($manufacturers) && sizeof($manufacturers) == 1 ) {
-                                                        $valueСell = $manufacturers[0]->id;
+                                                $criteria = new CDbCriteria();
+                                                $criteria->addInCondition("name", $valueСell);
+                                                $manufacturers = Manufacturer::model()->findAll($criteria);
+                                                if ( !empty($manufacturers) && sizeof($manufacturers) > 1 ){
+                                                    $valueСell = array();
+                                                    foreach ($manufacturers as &$manufacturer) {
+                                                        $valueСell[] = $manufacturer->id;                                                        
                                                     }
-                                                    unset($criteria);
+                                                } elseif( !empty($manufacturers) && sizeof($manufacturers) == 1 ) {
+                                                    $valueСell = (int)$manufacturers[0]->id;
                                                 }
-                							}
+                                                unset($criteria);
+                                            }                                                
+                							
                 						break;
                 
                 					}
@@ -664,15 +661,18 @@ class ProductController extends Controller
                                 
                                 unset($record);
                             } elseif ( !empty($attributes) ) {
-                                echo "<pre>";
-                                var_dump($attributes);
-                                die();
                                 $record = clone $model;
                                 foreach ($attributes as $fieldId => $val) {
                                     $field = $import->fields[$fieldId];
                                     $record->{$field->alias} = $val;                                                                           
                                 }
-                                $record->save();
+                                
+                                if( !$record->save() ){
+                                    echo "<pre>";
+                                    print_r($record->getErrors());
+                                    die;
+                                }    
+                                    
                                 $record = null;
                                 unset($record);
                             } else {
