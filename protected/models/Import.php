@@ -5,7 +5,11 @@ class Import extends CModel {
 	public $file = null;
 	public $step = 1;
 	public $importType = null;
-    public static $importTypes = array(0=>'xls',1=>'csv');
+	
+	const XLS = 0;	
+	const CSV = 1;
+
+	public static $importTypes = array(self::XLS =>'xls', self::CSV => 'csv');
 
 
     public $fields = null;

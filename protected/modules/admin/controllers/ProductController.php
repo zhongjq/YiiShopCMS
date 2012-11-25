@@ -486,8 +486,12 @@ class ProductController extends Controller
 				case 1:
 					$import->file = CUploadedFile::getInstance($import,'file');
 					if( $import->validate() ){
-						$file = Yii::getPathOfAlias('webroot').DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR.$product->id.".".$import->file->getExtensionName();
-
+						$dir = Yii::getPathOfAlias('webroot.data');
+						$file = $dir.DIRECTORY_SEPARATOR.$product->id.".".$import->file->getExtensionName();
+						
+						if (!is_dir($dir))
+							@mkdir ($dir,0777,true);
+						
 						if ($import->file->saveAs($file)){
     		    			$import->file = $file;
 						}
@@ -500,31 +504,17 @@ class ProductController extends Controller
 						$objReader = new PHPExcel_Reader_Excel5;
 
 						spl_autoload_register(array('YiiBase','autoload'));
-
-						$objReader = PHPExcel_IOFactory::createReaderForFile($file);
-						$objReader->setReadDataOnly(false);
-						$objPHPExcel = $objReader->load($file);
-
-						$objWorksheet = $objPHPExcel->getActiveSheet();
-						$import->countImportFields = PHPExcel_Cell::columnIndexFromString($objWorksheet->getHighestDataColumn());
-
-
-						/*
-						//$objPHPExcel = $objReader->load($file);
-						$objWorksheet = $objPHPExcel->getActiveSheet();
-						$highestRow = $objWorksheet->getHighestRow(); // e.g. 10
-						$highestColumn = $objWorksheet->getHighestDataColumn(); // e.g 'F'
-						$highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn); // e.g. 5
-						echo '<table>' . "\n";
-						for ($row = 2; $row <= $highestRow; ++$row) {
-						  echo '<tr>' . "\n";
-						  for ($col = 0; $col <= $highestColumnIndex; ++$col) {
-							echo '<td>' . $objWorksheet->getCellByColumnAndRow($col, $row)->getValue() . '</td>' . "\n";
-						  }
-						  echo '</tr>' . "\n";
+						
+						if ( $import->importType == Import::CSV )					
+							$objReader = PHPExcel_IOFactory::createReader(Import::$importTypes[$import->importType]);
+						else {
+							$objReader = PHPExcel_IOFactory::createReaderForFile($file);
+							$objReader->setReadDataOnly(false);
 						}
-						echo '</table>' . "\n";
-						*/
+						$objPHPExcel = $objReader->load($file);	
+						$objWorksheet = $objPHPExcel->getActiveSheet();
+						
+						$import->countImportFields = PHPExcel_Cell::columnIndexFromString($objWorksheet->getHighestDataColumn());
 
 						$form = $import->getStepTwoCForm();
 					}

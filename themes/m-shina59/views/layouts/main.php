@@ -22,7 +22,22 @@
 	<body>
         <div class="container">
 			<header>
-				<h1>Персональный сайт Кристины Ветровой</h1>
+				<img class="logo" src="http://placehold.it/350x150"/>
+				<div class="navbar">
+					<div class="navbar-inner">
+					<?php
+						$this->widget('zii.widgets.CMenu',array(
+							'items'=> array(
+								 array('label'=>'Главная', 'url'=>array('site/index')),
+								 array('label'=>'Доставка', 'url'=>array('site/delivery')),
+								 array('label'=>'Контакты', 'url'=>array('site/сontacts')),
+							),
+							'encodeLabel'=> false,
+							'htmlOptions'=> array('class'=>'nav')
+						));
+					?>
+					</div>
+				</div>
 			</header>
 			<?php
 

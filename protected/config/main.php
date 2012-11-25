@@ -39,7 +39,7 @@ return array(
             'newDirMode'    =>  0777,
         )
     ),
-	'preload'=>array('log'),
+	//'preload'=>array('log'),
 	// Компоненты
 	'components'=>array(
 

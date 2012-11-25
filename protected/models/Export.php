@@ -5,14 +5,15 @@ class Export extends CModel {
     public $exportType = null;
     public static $exportTypes = array(0=>'xls',1=>'csv');
 
-
-    public $fields = null;
+	public $header = 1;
+	public $fields = null;
     public $exportFields = null;
 
     public function rules()
     {
         return array(
-            array('exportType,exportFields', 'required'),
+            array('exportType, exportFields', 'required'),
+			array('header', 'numerical', 'integerOnly'=>true),
             array('exportFields', 'ArrayValidator', 'validator'=>'numerical', 'params'=>array('integerOnly'=>true) ),
         );
     }
@@ -21,12 +22,14 @@ class Export extends CModel {
         return array(
             'exportType',
             'exportFields',
+			'header'
         );
     }
     public function attributeLabels(){
         return array(
             'exportType' => Yii::t('record','Export type'),
             'exportFields' => Yii::t('record','Export fields'),
+            'header' => Yii::t('record','Export header'),
         );
     }
 
@@ -58,9 +61,12 @@ class Export extends CModel {
                     'multiple' => true,
 				    'empty'=> '',
 			    ),
+				'header'=>array(
+					'type'=>'checkbox',
+					'layout'=>'{input}{label}{error}{hint}',
+				),				
             ),
 			'buttons' => array(
-				'<br/>',
 				'submit'=>array(
 					'type' => 'submit',
 					'label' => Yii::t("product","Export"),
