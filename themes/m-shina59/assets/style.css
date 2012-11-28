@@ -34,3 +34,40 @@
 header {
 	padding: 10px 0;
 }
+
+header .logo {
+    width: 350px;
+    height: 150px;   
+}
+
+#cart {
+    float:right;
+    width: 250px;
+    height: 50px;
+    border: 1px solid #DDDDDD;
+}
+
+#cart i.icon-shopping-cart {
+    background-color: #DDDDDD;
+}
+
+.records .items {
+    margin:0;   
+}
+
+.records li {
+    display: inline-block;
+    width: 220px;
+    margin:10px;
+    padding:10px;
+    border: 1px solid #DDDDDD;
+}
+
+.records li img {
+    display: block;
+    margin: 10px auto;
+}
+
+
+
+

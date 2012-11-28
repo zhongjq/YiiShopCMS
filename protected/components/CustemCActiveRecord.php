@@ -53,7 +53,7 @@ class CustemCActiveRecord extends CActiveRecord {
             			case TypeField::LISTS :
     					case TypeField::CATEGORY :
         				case TypeField::FILE :
-                            $this->with[] = $field->alias;
+                            $this->with[] = $field->alias."File";
                         break;
                         case TypeField::MANUFACTURER :
                             $this->with[] = $field->alias."Manufacturer";
@@ -104,7 +104,8 @@ class CustemCActiveRecord extends CActiveRecord {
     						} else
     							$criteria->compare($field->alias, $this->{$field->alias} );
     				break;
-
+                    case TypeField::FILE:
+                    break;
     				default :
     					$criteria->compare($field->alias, $this->{$field->alias} );
     			}
@@ -831,9 +832,14 @@ class CustemCActiveRecord extends CActiveRecord {
 
 	}
 
-    protected function getRecordFolder()
+    public function getRecordFolder()
     {
         return Yii::getPathOfAlias('files').DIRECTORY_SEPARATOR.$this->id.DIRECTORY_SEPARATOR;
+    }
+
+    public function getRecordFolderURL()
+    {
+        return Yii::getPathOfAlias('url').DIRECTORY_SEPARATOR.$this->id.DIRECTORY_SEPARATOR;
     }
 
     protected function addRule($field)
@@ -997,7 +1003,8 @@ class CustemCActiveRecord extends CActiveRecord {
                     break;
 
     				case TypeField::FILE :
-                        $this->metaData->addRelation($field->alias,array(CActiveRecord::HAS_MANY, 'File', 'record_id',
+                        $name = $field->alias."File";
+                        $this->metaData->addRelation($name,array(CActiveRecord::HAS_MANY, 'File', 'record_id',
 															'on'=> '`'.$name.'`.`product_id` = :product_id',
 															'params' => array(":product_id" => $this->getProductID() ),
 															'together' => true

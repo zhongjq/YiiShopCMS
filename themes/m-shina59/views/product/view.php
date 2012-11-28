@@ -18,8 +18,8 @@ $this->widget('zii.widgets.CDetailView', array(
 
 ?>
 
-<?php if ( $record->image ) : ?>
-    <?php foreach($record->image as $image): ?>
+<?php if ( $record->imageFile ) : ?>
+    <?php foreach($record->imageFile as $image): ?>
         <img src="<?=$image->getURL()?>">
     <?php endforeach  ?>
 <?php endif  ?>
