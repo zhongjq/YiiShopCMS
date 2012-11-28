@@ -1,8 +1,11 @@
 <?php
 
 return array(
-		        '/<action:(index|test)>'=>'site/<action>',                
-                
+		        '/<action:(index)>'=>'site/<action>',
+
+				// корзина
+				'/cart'=>'cart/index',
+
 		         //// ПОЛЬЗОВАТЕЛЬ
 				// просмотр пользователя
 		        '/profile/' => 'user/profile',
@@ -14,9 +17,9 @@ return array(
 				"<action:(login|logout|registration|signup)>" => 'site/<action>',
 				// подтверждение регистрации
 				'/confirmation/<code>' => 'site/confirmation',
-                
+
                 '/manufacturers' => 'manufacturer/index',
-                
+
 
                 /* АДМИНИСТРАТИРОВАНИЕ */
                 "/admin/<action:(login|logout)>" => "admin/default/<action>",
@@ -44,7 +47,7 @@ return array(
                 '/admin/constructor/<id:\d+>/form/<action:(savePositionTabs|savePositionField|savePositionFields)>' => 'admin/constructor/<action>',
 		        '/admin/constructor/<productId:\d+>/form/tab<action:(edit|delete)>/<tabId:\d+>' => 'admin/constructor/<action>tab',
 		        '/admin/constructor/<productId:\d+>/field/<action:(edit|delete)>/<fieldId:\d+>' => 'admin/constructor/<action>field',
-                
+
 
                 // записи
                 '/admin/product/<id:\d+>' => 'admin/product/view',
@@ -58,8 +61,8 @@ return array(
                 '/admin/list/<id:\d+>/items' => 'admin/lists/items',
                 '/admin/list/<id:\d+>/items/add' => 'admin/lists/additems',
                 '/admin/list/<listId:\d+>/item/<action:(edit|delete)>/<itemId:\d+>' => 'admin/lists/<action>item',
-                
-                
+
+
 		         // своё правило для URL вида '/Производитель/Модель'
 		         array('class' => 'application.components.UrlRule','connectionID' => 'db'),
 

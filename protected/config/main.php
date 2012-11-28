@@ -6,7 +6,7 @@ return array(
 	'sourceLanguage'    =>  'en',
 	'language'          =>  'ru',
     'theme' => YII_THEME,
-    
+
 	'params'=>array(
 		'keywords' => array(),
 		'description' => '',
@@ -34,7 +34,7 @@ return array(
         'gii'=>array(
             'class'         =>  'system.gii.GiiModule',
             'password'      =>  '1',
-            'ipFilters'     =>  array("192.168.56.1","127.0.0.1",),
+            'ipFilters'     =>  array("127.0.0.1"),
             'newFileMode'   =>  0666,
             'newDirMode'    =>  0777,
         )
