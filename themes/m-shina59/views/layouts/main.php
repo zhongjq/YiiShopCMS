@@ -22,7 +22,12 @@
 	<body>
         <div class="container">
 			<header>
-				<img class="logo" src="http://placehold.it/350x150"/>
+				<img class="logo" src="http://dummyimage.com/350x150/c0c0c0"/>
+                <div id="cart">
+                    <i class="icon-shopping-cart"></i>
+                    <span class='quantity'></span>/<span class="price"></span>
+                </div>
+                <br/>
 				<div class="navbar">
 					<div class="navbar-inner">
 					<?php

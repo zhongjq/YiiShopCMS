@@ -2,7 +2,9 @@
 
 class CartController extends Controller
 {
-
+	/**
+	 * @return array action filters
+	 */
 	public function filters()
 	{
 		return array(
@@ -36,4 +38,8 @@ class CartController extends Controller
 		);
 	}
 
+	public function actionIndex()
+	{
+        
+	}
 }

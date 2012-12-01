@@ -10,6 +10,7 @@ $this->breadcrumbs = array(
 
 if( !empty($products) ){
     foreach($products as $product){
+        /*
         $this->widget('zii.widgets.grid.CGridView', array(
             'dataProvider'=>$product->search(),
 			//'filter'=>$product,
@@ -29,6 +30,29 @@ if( !empty($products) ){
         		'htmlOptions'	=> array("class"=>false),
         	),
         ));
+        */
+        
+            $this->widget('zii.widgets.CListView', array(
+                'ajaxUpdate'=>false,
+                'itemsTagName'=>'ul',
+                'enablePagination' => true,
+                'dataProvider'=>$product->search(),
+                'itemView'=>'_record',
+                'htmlOptions'=>array('class'=>'records'),
+                'template'=>'{summary} {items} {pager}',
+                'pagerCssClass'=>'pagination',
+                'pager'=>array(
+                	'class' => 'myLinkPager',
+                	'cssFile' => false,
+                	'header' => '',
+                	'firstPageLabel'=> '&laquo;',
+                	'prevPageLabel'	=> '&larr;',
+                	'nextPageLabel'	=> '&rarr;',
+                	'lastPageLabel' => '&raquo;',
+                	'htmlOptions'	=> array("class"=>false),
+                )           
+            )); 
+        
     }
 }
 
