@@ -133,6 +133,11 @@ class CustemCActiveRecord extends CActiveRecord {
         return CHtml::link($text,$url);
     }
 
+    public function getAddCartURL()
+	{
+        return Yii::app()->createUrl('cart/add',array('product'=>$this->productName,'id'=>$this->id));
+    }
+
     public function getAddToCartLink($text)
 	{
 
@@ -426,7 +431,7 @@ class CustemCActiveRecord extends CActiveRecord {
 				    'items' => CHtml::listData($this->getCategoryFilter($field->category_id) , 'id', 'name'),
 				    'empty'=> '',
 					'htmlOptions' => $field->is_multiple_select ? array("multiple"=>true,"class"=>"chzn-select","data-placeholder"=>" ") : null,
-			    );                
+			    );
 			break;
             case TypeField::MANUFACTURER:
                 $filter = array(
@@ -660,11 +665,11 @@ class CustemCActiveRecord extends CActiveRecord {
                 $arTabs[] = array("id"=>$tab->id,"position"=>$tab->position,"name"=>$tab->name,"content"=>array(),'productId'=> $isEdit ? $this->getProductID() : null );
             }
         }
-       
+
         if ( $this->product ){
-            
+
             $this->product->setFields('position_tab');
-            
+
             foreach( $this->product->fields as $field ){
 
                 $id = $this->searchForId( $field->tab_id > 0 ? $field->tab_id : 0 , $arTabs);

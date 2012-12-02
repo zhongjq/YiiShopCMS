@@ -5,6 +5,8 @@ return array(
 
 				// корзина
 				'/cart'=>'cart/index',
+				'/cart/<product>/<id>'=>'cart/add',
+
 
 		         //// ПОЛЬЗОВАТЕЛЬ
 				// просмотр пользователя

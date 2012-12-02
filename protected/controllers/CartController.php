@@ -5,7 +5,7 @@ class CartController extends Controller
 	/**
 	 * @return array action filters
 	 */
-	public function filters()
+	public function filters1()
 	{
 		return array(
 			'accessControl', // perform access control for CRUD operations
@@ -17,7 +17,7 @@ class CartController extends Controller
 	 * This method is used by the 'accessControl' filter.
 	 * @return array access control rules
 	 */
-	public function accessRules()
+	public function accessRules1()
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
@@ -40,6 +40,10 @@ class CartController extends Controller
 
 	public function actionIndex()
 	{
-        
+
+	}
+
+	public function actionAdd($product,$id){
+		$this->redirect(Yii::app()->request->urlReferrer);
 	}
 }
