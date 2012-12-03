@@ -25,7 +25,7 @@
 				<img class="logo" src="http://dummyimage.com/350x150/c0c0c0"/>
                 <div id="cart">
                     <i class="icon-shopping-cart"></i>
-                    <span class='quantity'></span>/<span class="price"></span>
+                    <span class='quantity'><?php echo Cart::model()->quantity() ?></span>/<span class="price"><?php echo Cart::model()->price() ?></span>
                 </div>
                 <br/>
 				<div class="navbar">

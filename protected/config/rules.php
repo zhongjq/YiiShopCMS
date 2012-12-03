@@ -3,6 +3,9 @@
 return array(
 		        '/<action:(index|test)>'=>'site/<action>',                
                 
+                '/cart/<product>/<id>/add'=>'cart/add',
+                
+                
 		         //// ПОЛЬЗОВАТЕЛЬ
 				// просмотр пользователя
 		        '/profile/' => 'user/profile',

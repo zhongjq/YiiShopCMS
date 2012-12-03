@@ -14,5 +14,10 @@
         echo CHtml::openTag('div',array('class'=>'price'));
             echo CHtml::encode($data->price);
         echo CHtml::closeTag('div');
+        
+        echo CHtml::openTag('div',array());
+            echo CHtml::link('Добавить в корзину', $data->addCartURL(), array('class'=>'btn') );
+        echo CHtml::closeTag('div');        
+        
     echo CHtml::closeTag('li');
 ?>
