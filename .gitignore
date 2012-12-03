@@ -7,3 +7,4 @@ yii/
 /assets/
 /data/
 /protected/runtime/
+config.php
