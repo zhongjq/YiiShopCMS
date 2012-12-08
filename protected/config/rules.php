@@ -1,13 +1,11 @@
 <?php
 
 return array(
-		        '/<action:(index)>'=>'site/<action>',
-
-				// корзина
-				'/cart'=>'cart/index',
-				'/cart/<product>/<id>'=>'cart/add',
-
-
+		        '/<action:(index|test)>'=>'site/<action>',                
+                
+                '/cart/<product>/<id>/add'=>'cart/add',
+                
+                
 		         //// ПОЛЬЗОВАТЕЛЬ
 				// просмотр пользователя
 		        '/profile/' => 'user/profile',

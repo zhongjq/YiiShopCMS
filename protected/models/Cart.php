@@ -2,23 +2,29 @@
 
 class Cart extends CModel {
 
-	public static $instance = null;
+    static private $instance = NULL;
 
-	public static function model(){
-		if (self::$instance == null){
-			self::$instance = new self();
-		}
-		return self::$instance;
-	}
+    public static function model(){
+        if (self::$instance == NULL){
+            self::$instance = new self();
+        }
+        return self::$instance;        
+    }
 
-	public function attributeNames() {
-		return array();
-	}
+    public function attributeNames(){
+        return array();
+    }
+    
+    public function attributeLabels(){
+        return array();
+    }
+    
+    public function quantity(){
+        return 1;
+    }
 
-	public function quantity(){
-		return 1;
-	}
+    public function price(){
+        return 1;
+    }
 
 }
-
-?>

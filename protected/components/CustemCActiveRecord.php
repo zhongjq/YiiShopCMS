@@ -133,21 +133,9 @@ class CustemCActiveRecord extends CActiveRecord {
         return CHtml::link($text,$url);
     }
 
-    public function getAddCartURL()
+    public function addCartURL()
 	{
         return Yii::app()->createUrl('cart/add',array('product'=>$this->productName,'id'=>$this->id));
-    }
-
-    public function getAddToCartLink($text)
-	{
-
-        if ( $this->alias ){
-            $url = Yii::app()->createUrl('product/addtocart',array('product'=>$this->productName,'alias'=>$this->alias));
-        } else {
-            $url = Yii::app()->createUrl('product/addtocart',array('product'=>$this->productName,'id'=>$this->id));
-        }
-
-        return CHtml::link($text,$url);
     }
 
 	public function getTableFields()
