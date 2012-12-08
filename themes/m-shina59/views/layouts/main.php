@@ -26,6 +26,7 @@
                 <div id="cart">
                     <i class="icon-shopping-cart"></i>
                     <span class='quantity'><?php echo Cart::model()->quantity() ?></span>/<span class="price"><?php echo Cart::model()->price() ?></span>
+					<?php echo CHtml::link('корзина',array('cart/index')) ?>
                 </div>
                 <br/>
 				<div class="navbar">
